@@ -1,4 +1,4 @@
-module golang.org/x/arch
+module github.com/srinivas-pokala/arch
 
 go 1.18
 
