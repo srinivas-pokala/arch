@@ -16,7 +16,7 @@ import (
 // being disassembled. It returns the name and base address of the symbol
 // containing the target, if any; otherwise it returns "", 0.
 func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) string {
-	if symname == nil {
+/*	if symname == nil {
 		symname = func(uint64) (string, uint64) { return "", 0 }
 	}
 	if inst.Op == 0 && inst.Enc == 0 {
@@ -166,7 +166,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		return op + " " + strings.Join(args, ",")
 	case BCA, BCL, BCLA, BCLRL, BCTAR, BCTARL:
 		return op + " " + strings.Join(args, ",")
-	}
+	}*/
+	return ""
 }
 
 // plan9Arg formats arg (which is the argIndex's arg in inst) according to Plan 9 rules.
