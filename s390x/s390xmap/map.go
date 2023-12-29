@@ -290,7 +290,6 @@ func add(p *Prog, text, mnemonics, encoding string) {
 		field := Field{Name: opr}
 		typ := asm.TypeUnknown
 		flag := uint16(0)
-		var shift uint8 //STM R1, R2
 		switch opr {
 		case "R1", "R2", "R3":
 			substr := []string{"FPS", "HFP", "BFP", "DFP"}
@@ -404,7 +403,6 @@ func add(p *Prog, text, mnemonics, encoding string) {
 		}
 
 		field.Type = typ
-		field.Shift = shift
 		field.flags = flag
 		var f1 asm.BitField
 		i := args.Find(opr)
@@ -449,9 +447,6 @@ func argFieldName(f Field) string {
 	ns := []string{"ap", f.Type.String()}
 	b := f.BitField
 	ns = append(ns, fmt.Sprintf("%d_%d", b.Offs, b.Offs+b.Bits-1))
-	if f.Shift > 0 {
-		ns = append(ns, fmt.Sprintf("shift%d", f.Shift))
-	}
 	return strings.Join(ns, "_")
 }
 
@@ -501,7 +496,7 @@ func printDecoder(p *Prog) {
 				continue
 			}
 			m[name] = true
-			fmt.Fprintf(&buf, "\t%s = &argField{Type: %#v, Shift: %d, flags: %#x, BitField: BitField{", name, f.Type, f.Shift, f.flags)
+			fmt.Fprintf(&buf, "\t%s = &argField{Type: %#v, flags: %#x, BitField: BitField{", name, f.Type, f.flags)
 			b := f.BitField
 			fmt.Fprintf(&buf, "{%d, %d }", b.Offs, b.Bits)
 			fmt.Fprintf(&buf, "}}\n")

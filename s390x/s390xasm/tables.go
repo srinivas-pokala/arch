@@ -562,6 +562,7 @@ const (
 	LDER
 	LLGF
 	LLGFR
+	LLGFSG
 	LLGFAT
 	LLZRGF
 	LLC
@@ -1807,6 +1808,7 @@ var opstr = [...]string{
 	LDER:    "LDER",
 	LLGF:    "LLGF",
 	LLGFR:   "LLGFR",
+	LLGFSG:  "LLGFSG",
 	LLGFAT:  "LLGFAT",
 	LLZRGF:  "LLZRGF",
 	LLC:     "LLC",
@@ -2494,49 +2496,49 @@ var opstr = [...]string{
 }
 
 var (
-	ap_Reg_8_11          = &argField{Type: TypeReg, Shift: 0, flags: 0x1, BitField: BitField{{8, 4}}}
-	ap_Disp_20_31        = &argField{Type: TypeDisp, Shift: 0, flags: 0x10, BitField: BitField{{20, 12}}}
-	ap_IndexReg_12_15    = &argField{Type: TypeIndexReg, Shift: 0, flags: 0x41, BitField: BitField{{12, 4}}}
-	ap_BaseReg_16_19     = &argField{Type: TypeBaseReg, Shift: 0, flags: 0x21, BitField: BitField{{16, 4}}}
-	ap_Reg_12_15         = &argField{Type: TypeReg, Shift: 0, flags: 0x1, BitField: BitField{{12, 4}}}
-	ap_Reg_24_27         = &argField{Type: TypeReg, Shift: 0, flags: 0x1, BitField: BitField{{24, 4}}}
-	ap_Reg_28_31         = &argField{Type: TypeReg, Shift: 0, flags: 0x1, BitField: BitField{{28, 4}}}
-	ap_Reg_16_19         = &argField{Type: TypeReg, Shift: 0, flags: 0x1, BitField: BitField{{16, 4}}}
-	ap_Disp_20_39        = &argField{Type: TypeDisp, Shift: 0, flags: 0x10, BitField: BitField{{20, 20}}}
-	ap_FPReg_24_27       = &argField{Type: TypeFPReg, Shift: 0, flags: 0x2, BitField: BitField{{24, 4}}}
-	ap_FPReg_28_31       = &argField{Type: TypeFPReg, Shift: 0, flags: 0x2, BitField: BitField{{28, 4}}}
-	ap_FPReg_16_19       = &argField{Type: TypeFPReg, Shift: 0, flags: 0x2, BitField: BitField{{16, 4}}}
-	ap_FPReg_8_11        = &argField{Type: TypeFPReg, Shift: 0, flags: 0x2, BitField: BitField{{8, 4}}}
-	ap_ImmUnsigned_32_35 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x800, BitField: BitField{{32, 4}}}
-	ap_Len_8_11          = &argField{Type: TypeLen, Shift: 0, flags: 0x10, BitField: BitField{{8, 4}}}
-	ap_Disp_36_47        = &argField{Type: TypeDisp, Shift: 0, flags: 0x10, BitField: BitField{{36, 12}}}
-	ap_Len_12_15         = &argField{Type: TypeLen, Shift: 0, flags: 0x10, BitField: BitField{{12, 4}}}
-	ap_BaseReg_32_35     = &argField{Type: TypeBaseReg, Shift: 0, flags: 0x21, BitField: BitField{{32, 4}}}
-	ap_ImmUnsigned_16_31 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x0, BitField: BitField{{16, 16}}}
-	ap_ImmUnsigned_16_47 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x0, BitField: BitField{{16, 32}}}
-	ap_ImmUnsigned_8_15  = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x0, BitField: BitField{{8, 8}}}
-	ap_FPReg_12_15       = &argField{Type: TypeFPReg, Shift: 0, flags: 0x2, BitField: BitField{{12, 4}}}
-	ap_Len_8_15          = &argField{Type: TypeLen, Shift: 0, flags: 0x10, BitField: BitField{{8, 8}}}
-	ap_ImmUnsigned_8_11  = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x800, BitField: BitField{{8, 4}}}
-	ap_ImmUnsigned_32_47 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x80, BitField: BitField{{32, 16}}}
-	ap_ImmUnsigned_12_23 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x80, BitField: BitField{{12, 12}}}
-	ap_ImmUnsigned_24_47 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x80, BitField: BitField{{24, 24}}}
-	ap_ImmUnsigned_16_19 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x800, BitField: BitField{{16, 4}}}
-	ap_ImmUnsigned_32_39 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x0, BitField: BitField{{32, 8}}}
-	ap_ImmUnsigned_12_15 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x800, BitField: BitField{{12, 4}}}
-	ap_FPReg_32_35       = &argField{Type: TypeFPReg, Shift: 0, flags: 0x2, BitField: BitField{{32, 4}}}
-	ap_ImmUnsigned_36_39 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x800, BitField: BitField{{36, 4}}}
-	ap_ImmUnsigned_20_23 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x800, BitField: BitField{{20, 4}}}
-	ap_VecReg_8_11       = &argField{Type: TypeVecReg, Shift: 0, flags: 0x8, BitField: BitField{{8, 4}}}
-	ap_VecReg_12_15      = &argField{Type: TypeVecReg, Shift: 0, flags: 0x8, BitField: BitField{{12, 4}}}
-	ap_VecReg_16_19      = &argField{Type: TypeVecReg, Shift: 0, flags: 0x8, BitField: BitField{{16, 4}}}
-	ap_ImmUnsigned_24_27 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x800, BitField: BitField{{24, 4}}}
-	ap_ImmUnsigned_28_31 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x0, BitField: BitField{{28, 4}}}
-	ap_ImmUnsigned_16_23 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x0, BitField: BitField{{16, 8}}}
-	ap_ImmUnsigned_24_31 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x0, BitField: BitField{{24, 8}}}
-	ap_ImmUnsigned_28_35 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x0, BitField: BitField{{28, 8}}}
-	ap_VecReg_32_35      = &argField{Type: TypeVecReg, Shift: 0, flags: 0x8, BitField: BitField{{32, 4}}}
-	ap_ImmUnsigned_16_27 = &argField{Type: TypeImmUnsigned, Shift: 0, flags: 0x0, BitField: BitField{{16, 12}}}
+	ap_Reg_8_11          = &argField{Type: TypeReg, flags: 0x1, BitField: BitField{{8, 4}}}
+	ap_Disp_20_31        = &argField{Type: TypeDisp, flags: 0x10, BitField: BitField{{20, 12}}}
+	ap_IndexReg_12_15    = &argField{Type: TypeIndexReg, flags: 0x41, BitField: BitField{{12, 4}}}
+	ap_BaseReg_16_19     = &argField{Type: TypeBaseReg, flags: 0x21, BitField: BitField{{16, 4}}}
+	ap_Reg_12_15         = &argField{Type: TypeReg, flags: 0x1, BitField: BitField{{12, 4}}}
+	ap_Reg_24_27         = &argField{Type: TypeReg, flags: 0x1, BitField: BitField{{24, 4}}}
+	ap_Reg_28_31         = &argField{Type: TypeReg, flags: 0x1, BitField: BitField{{28, 4}}}
+	ap_Reg_16_19         = &argField{Type: TypeReg, flags: 0x1, BitField: BitField{{16, 4}}}
+	ap_Disp_20_39        = &argField{Type: TypeDisp, flags: 0x10, BitField: BitField{{20, 20}}}
+	ap_FPReg_24_27       = &argField{Type: TypeFPReg, flags: 0x2, BitField: BitField{{24, 4}}}
+	ap_FPReg_28_31       = &argField{Type: TypeFPReg, flags: 0x2, BitField: BitField{{28, 4}}}
+	ap_FPReg_16_19       = &argField{Type: TypeFPReg, flags: 0x2, BitField: BitField{{16, 4}}}
+	ap_FPReg_8_11        = &argField{Type: TypeFPReg, flags: 0x2, BitField: BitField{{8, 4}}}
+	ap_ImmUnsigned_32_35 = &argField{Type: TypeImmUnsigned, flags: 0x800, BitField: BitField{{32, 4}}}
+	ap_Len_8_11          = &argField{Type: TypeLen, flags: 0x10, BitField: BitField{{8, 4}}}
+	ap_Disp_36_47        = &argField{Type: TypeDisp, flags: 0x10, BitField: BitField{{36, 12}}}
+	ap_Len_12_15         = &argField{Type: TypeLen, flags: 0x10, BitField: BitField{{12, 4}}}
+	ap_BaseReg_32_35     = &argField{Type: TypeBaseReg, flags: 0x21, BitField: BitField{{32, 4}}}
+	ap_ImmUnsigned_16_31 = &argField{Type: TypeImmUnsigned, flags: 0x0, BitField: BitField{{16, 16}}}
+	ap_ImmUnsigned_16_47 = &argField{Type: TypeImmUnsigned, flags: 0x0, BitField: BitField{{16, 32}}}
+	ap_ImmUnsigned_8_15  = &argField{Type: TypeImmUnsigned, flags: 0x0, BitField: BitField{{8, 8}}}
+	ap_FPReg_12_15       = &argField{Type: TypeFPReg, flags: 0x2, BitField: BitField{{12, 4}}}
+	ap_Len_8_15          = &argField{Type: TypeLen, flags: 0x10, BitField: BitField{{8, 8}}}
+	ap_ImmUnsigned_8_11  = &argField{Type: TypeImmUnsigned, flags: 0x800, BitField: BitField{{8, 4}}}
+	ap_ImmUnsigned_32_47 = &argField{Type: TypeImmUnsigned, flags: 0x80, BitField: BitField{{32, 16}}}
+	ap_ImmUnsigned_12_23 = &argField{Type: TypeImmUnsigned, flags: 0x80, BitField: BitField{{12, 12}}}
+	ap_ImmUnsigned_24_47 = &argField{Type: TypeImmUnsigned, flags: 0x80, BitField: BitField{{24, 24}}}
+	ap_ImmUnsigned_16_19 = &argField{Type: TypeImmUnsigned, flags: 0x800, BitField: BitField{{16, 4}}}
+	ap_ImmUnsigned_32_39 = &argField{Type: TypeImmUnsigned, flags: 0x0, BitField: BitField{{32, 8}}}
+	ap_ImmUnsigned_12_15 = &argField{Type: TypeImmUnsigned, flags: 0x800, BitField: BitField{{12, 4}}}
+	ap_FPReg_32_35       = &argField{Type: TypeFPReg, flags: 0x2, BitField: BitField{{32, 4}}}
+	ap_ImmUnsigned_36_39 = &argField{Type: TypeImmUnsigned, flags: 0x800, BitField: BitField{{36, 4}}}
+	ap_ImmUnsigned_20_23 = &argField{Type: TypeImmUnsigned, flags: 0x800, BitField: BitField{{20, 4}}}
+	ap_VecReg_8_11       = &argField{Type: TypeVecReg, flags: 0x8, BitField: BitField{{8, 4}}}
+	ap_VecReg_12_15      = &argField{Type: TypeVecReg, flags: 0x8, BitField: BitField{{12, 4}}}
+	ap_VecReg_16_19      = &argField{Type: TypeVecReg, flags: 0x8, BitField: BitField{{16, 4}}}
+	ap_ImmUnsigned_24_27 = &argField{Type: TypeImmUnsigned, flags: 0x800, BitField: BitField{{24, 4}}}
+	ap_ImmUnsigned_28_31 = &argField{Type: TypeImmUnsigned, flags: 0x0, BitField: BitField{{28, 4}}}
+	ap_ImmUnsigned_16_23 = &argField{Type: TypeImmUnsigned, flags: 0x0, BitField: BitField{{16, 8}}}
+	ap_ImmUnsigned_24_31 = &argField{Type: TypeImmUnsigned, flags: 0x0, BitField: BitField{{24, 8}}}
+	ap_ImmUnsigned_28_35 = &argField{Type: TypeImmUnsigned, flags: 0x0, BitField: BitField{{28, 8}}}
+	ap_VecReg_32_35      = &argField{Type: TypeVecReg, flags: 0x8, BitField: BitField{{32, 4}}}
+	ap_ImmUnsigned_16_27 = &argField{Type: TypeImmUnsigned, flags: 0x0, BitField: BitField{{16, 12}}}
 )
 
 var instFormats = [...]instFormat{
@@ -3656,6 +3658,8 @@ var instFormats = [...]instFormat{
 		[6]*argField{ap_Reg_8_11, ap_Disp_20_39, ap_IndexReg_12_15, ap_BaseReg_16_19}},
 	{LLGFR, 0xffff000000000000, 0xb916000000000000, // LOAD LOGICAL (64←32) (LLGFR R1,R2)
 		[6]*argField{ap_Reg_24_27, ap_Reg_28_31}},
+	{LLGFSG, 0xff00000000ff0000, 0xe300000000480000, // LOAD LOGICAL AND SHIFT GUARDED (64←32) (LLGFSG R1,D2(X2,B2))
+		[6]*argField{ap_Reg_8_11, ap_Disp_20_39, ap_IndexReg_12_15, ap_BaseReg_16_19}},
 	{LLGFAT, 0xff00000000ff0000, 0xe3000000009d0000, // LOAD LOGICAL AND TRAP (64→32) (LLGFAT R1,D2(X2,B2))
 		[6]*argField{ap_Reg_8_11, ap_Disp_20_39, ap_IndexReg_12_15, ap_BaseReg_16_19}},
 	{LLZRGF, 0xff00000000ff0000, 0xe3000000003a0000, // LOAD LOGICAL AND ZERO RIGHTMOST BYTE(64→32) (LLZRGF R1,D2(X2,B2))
