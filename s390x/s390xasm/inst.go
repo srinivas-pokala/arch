@@ -7,6 +7,7 @@ package s390xasm
 import (
 	"bytes"
 	"fmt"
+	"strings"
 )
 
 type Inst struct {
@@ -18,7 +19,8 @@ type Inst struct {
 
 func (i Inst) String() string {
 	var buf bytes.Buffer
-	buf.WriteString(i.Op.String())
+	//buf.WriteString(i.Op.String())
+	buf.WriteString(fmt.Sprintf("%-8s",strings.ToLower(i.Op.String())))
 	for j, arg := range i.Args {
 		if arg == nil {
 			break
@@ -32,6 +34,12 @@ func (i Inst) String() string {
 				buf.WriteString(", ")
 			}
 		}
+		switch arg.(type) {
+			case Index,Base,Reg:
+				buf.WriteString("%")
+			default:
+		}
+		//buf.WriteString(arg.String())
 		buf.WriteString(arg.String())
 	}
 	return buf.String()
@@ -62,8 +70,7 @@ type Args [6]Arg
 type Base uint8
 
 const (
-	_ Base = iota
-	B0
+	B0 Base = iota
 	B1
 	B2
 	B3
@@ -95,8 +102,7 @@ func (r Base) String() string {
 type Index uint8
 
 const (
-	_ Base = iota
-	X0
+	X0 Index = iota
 	X1
 	X2
 	X3
@@ -118,17 +124,17 @@ func (Index) IsArg() {}
 func (r Index) String() string {
 	switch {
 	case X0 <= r && r <= X15:
-		return fmt.Sprintf("r%d, ", int(r-X0))
+		return fmt.Sprintf("r%d,", int(r-X0))
 	default:
 		return fmt.Sprintf("Base(%d)", int(r))
 	}
 }
 
-type Disp uint32
+type Disp uint64
 
 func (Disp) IsArg() {}
 func (r Disp) String() string {
-	return fmt.Sprintf("r%d(", int32(r))
+	return fmt.Sprintf("%d(", int32(r | 0xfff<<20))
 }
 
 // A Reg is a single register. The zero value means R0, not the absence of a register.
@@ -136,8 +142,7 @@ func (r Disp) String() string {
 type Reg uint16
 
 const (
-	_ Reg = iota
-	R0
+	R0 Reg = iota
 	R1
 	R2
 	R3
@@ -169,7 +174,7 @@ const (
 	F13
 	F14
 	F15
-	V0 // VSX extension, F0 is V0[0:63].
+	V0
 	V1
 	V2
 	V3
@@ -201,7 +206,7 @@ const (
 	V29
 	V30
 	V31
-	A0 // Acces Registers
+	A0
 	A1
 	A2
 	A3
@@ -217,7 +222,7 @@ const (
 	A13
 	A14
 	A15
-	C0 //Control Registers
+	C0
 	C1
 	C2
 	C3
@@ -238,9 +243,9 @@ const (
 func (Reg) IsArg() {}
 func (r Reg) String() string {
 	switch {
-	case R0 <= r && r <= R31:
+	case R0 <= r && r <= R15:
 		return fmt.Sprintf("r%d", int(r-R0))
-	case F0 <= r && r <= F31:
+	case F0 <= r && r <= F15:
 		return fmt.Sprintf("f%d", int(r-F0))
 	case V0 <= r && r <= V31:
 		return fmt.Sprintf("v%d", int(r-V0))
@@ -254,13 +259,34 @@ func (r Reg) String() string {
 }
 
 // Imm represents an immediate number.
-type Imm int64
+type Imm uint64
 
 func (Imm) IsArg() {}
 func (i Imm) String() string {
-	return fmt.Sprintf("%d", int32(i))
+	return fmt.Sprintf("%x", uint64(i))
 }
 
+type Sign8 int8
+
+func (Sign8) IsArg() {}
+func (i Sign8) String() string {
+	//x := int16(ff<<8) | int16(i)
+	return fmt.Sprintf("%d", i)
+}
+
+type Sign16 int16
+
+func (Sign16) IsArg() {}
+func (i Sign16) String() string {
+	return fmt.Sprintf("%d", i)
+}
+
+type Sign32 int32
+
+func (Sign32) IsArg() {}
+func (i Sign32) String() string {
+	return fmt.Sprintf("%d", i)
+}
 // Offset represents a memory offset immediate.
 type Offset int64
 

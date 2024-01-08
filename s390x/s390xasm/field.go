@@ -31,17 +31,22 @@ func (b BitField) String() string {
 
 // Parse extracts the bitfield b from i, and return it as an unsigned integer.
 // Parse will panic if b is invalid.
-func (b BitField) Parse(i uint64) uint32 {
+func (b BitField) Parse(i uint64) uint64 {
 	if b.Bits > 64 || b.Bits == 0 || b.Offs > 63  || b.Offs+b.Bits > 64 {
 		panic(fmt.Sprintf("invalid bitfiled %v", b))
 	}
-	return (i >> (64 - b.Offs - b.Bits)) & ((1 << b.Bits) - 1)
+	if b.Bits == 20 {
+		return ((((i >> (64 - b.Offs - b.Bits)) & ((1 << 8)-1)) << 12) | ((i >> (64 - b.Offs - b.Bits+8)) & 0xFFF))
+
+	} else {
+		return (i >> (64 - b.Offs - b.Bits)) & ((1 << b.Bits) - 1)
+	}
 }
 
 // ParseSigned extracts the bitfield b from i, and return it as a signed integer.
 // ParseSigned will panic if b is invalid.
-func (b BitField) ParseSigned(i [2]uint32) int32 {
-	u := int32(b.Parse(i))
+func (b BitField) ParseSigned(i uint64) int64 {
+	u := int64(b.Parse(i))
 	return u << (64 - b.Bits) >> (64 - b.Bits)
 }
 
@@ -64,7 +69,7 @@ func (bs *BitFields) Append(b BitField) {
 // as an unsigned integer and the total length of all the bitfields.
 // parse will panic if any bitfield in b is invalid, but it doesn't check if
 // the sequence of bitfields is reasonable.
-func (bs BitFields) parse(i [2]uint32) (u uint64, Bits uint8) {
+func (bs BitFields) parse(i uint64) (u uint64, Bits uint8) {
 	for _, b := range bs {
 		u = (u << b.Bits) | uint64(b.Parse(i))
 		Bits += b.Bits
@@ -74,14 +79,14 @@ func (bs BitFields) parse(i [2]uint32) (u uint64, Bits uint8) {
 
 // Parse extracts the bitfields from i, concatenate them and return the result
 // as an unsigned integer. Parse will panic if any bitfield in b is invalid.
-func (bs BitFields) Parse(i [2]uint32) uint64 {
+func (bs BitFields) Parse(i uint64) uint64 {
 	u, _ := bs.parse(i)
 	return u
 }
 
 // ParseSigned extracts the bitfields from i, concatenate them and return the result
 // as a signed integer. Parse will panic if any bitfield in b is invalid.
-func (bs BitFields) ParseSigned(i [2]uint32) int64 {
+func (bs BitFields) ParseSigned(i uint64) int64 {
 	u, l := bs.parse(i)
 	return int64(u) << (64 - l) >> (64 - l)
 }

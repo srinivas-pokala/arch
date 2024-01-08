@@ -33,7 +33,7 @@ type instFormat struct {
 	Mask     uint64
 	Value    uint64
 //	DontCare uint64
-	Args     [6]*argField
+	Args     [7]*argField
 }
 
 // argField indicate how to decode an argument to an instruction.
@@ -41,6 +41,7 @@ type instFormat struct {
 // bits to get the actual numerical value.
 type argField struct {
 	Type  ArgType
+	flags uint16
 	BitField
 }
 
@@ -51,7 +52,7 @@ func (a argField) Parse(i uint64) Arg {
 		return nil
 	case TypeUnknown:
 		return nil
-	case TypeReg, TypeBaseReg, TypeIndexReg:
+	case TypeReg:
 		return R0 + Reg(a.BitField.Parse(i))
 	case TypeFPReg:
 		return F0 + Reg(a.BitField.Parse(i))
@@ -67,10 +68,14 @@ func (a argField) Parse(i uint64) Arg {
 		return Disp(a.BitField.Parse(i))
 	case TypeVecReg:
 		return V0 + Reg(a.BitField.Parse(i))
-	case TypeVecpReg:
-		return V0 + Reg(a.BitField.Parse(i))
 	case TypeImmSigned:
 		return Imm(a.BitField.ParseSigned(i))
+	case TypeImmSigned8:
+		return Sign8(a.BitField.ParseSigned(i))
+	case TypeImmSigned16:
+		return Sign16(a.BitField.ParseSigned(i))
+	case TypeImmSigned32:
+		return Sign32(a.BitField.ParseSigned(i))
 	case TypeImmUnsigned, TypeLen:
 		return Imm(a.BitField.Parse(i))
 	case TypeOffset:
@@ -87,15 +92,18 @@ const (
 	TypeACReg                // access register
         TypeCReg                 // control register
         TypeVecReg               // vector register
-        TypeVecpReg              // vector register
-        TypeImmSigned            // signed immediate
         TypeImmUnsigned          // unsigned immediate/flag/mask, this is the catch-all type
+        TypeImmSigned            // signed immediate
+	TypeImmSigned8
+	TypeImmSigned16
+	TypeImmSigned32
 	TypeBaseReg		// Base Register for accessing memory
 	TypeIndexReg		// Index Register
 	TypeDisp		// Displacement for memory address
 	TypeLen			// Length
         TypeOffset               // signed offset in load/store
         TypeNegOffset            // A negative 16 bit value 0b1111111xxxxx000 encoded as 0bxxxxx (e.g in the hashchk instruction)
+	TypeLast
 
 )
 
@@ -123,10 +131,14 @@ func (t ArgType) String() string {
 		return "Len"
 	case TypeVecReg:
 		return "VecReg"
-	case TypeVecSpReg:
-		return "VecSpReg"
 	case TypeImmSigned:
 		return "ImmSigned"
+	case TypeImmSigned8:
+                return "ImmSigned8"
+        case TypeImmSigned16:
+                return "ImmSigned16"
+        case TypeImmSigned32:
+                return "ImmSigned32"
 	case TypeImmUnsigned:
 		return "ImmUnsigned"
 	case TypeOffset:
@@ -161,26 +173,40 @@ func Decode(src []byte ) (inst Inst, err error) {
 	if decoderCover == nil {
 		decoderCover = make([]bool, len(instFormats))
 	}
-	bit_check :=  binary.BigEndian.Uint8(src[0:1]) >> 6
-	l := uint8(0)
-	if bit_check & uint8(0x03) == 0 {
+	bit_check := binary.BigEndian.Uint16(src[:2])
+	bit_check =  bit_check >> 14
+//	fmt.Printf("bit_check:0x%x\n", bit_check)
+	l := int(0)
+	if (bit_check & 0x03) == 0 {
 		l = 2
-	} else if (bit_check & uint8(0x01) || bit_check & uint8(0x02) ) {
-		l = 4
-	} else if bit_check & uint8(0x03) {
+	} else if (bit_check & 0x03 == 3) {
 		l = 6
+	} else if (bit_check & 0x01 == 1) || (bit_check & 0x02 == 2) {
+		l = 4
 	}
 	inst.Len = l
+	ui_extn := uint64(0)
 	switch l {
 	case 2:
-		ui_extn := uint64(binary.BigEndian.Uint16(src[:inst.Len]))
+		ui_extn = uint64(binary.BigEndian.Uint16(src[:inst.Len]))
+		inst.Enc = ui_extn
+		ui_extn =  ui_extn << 48
 	case 4:
-		ui_extn := uint64(binary.BigEndian.Uint32(src[:inst.Len]))
+		ui_extn = uint64(binary.BigEndian.Uint32(src[:inst.Len]))
+		inst.Enc = ui_extn
+		ui_extn =  ui_extn << 32
 	case 6:
-		ui_extn := uint64(binary.BigEndian.Uint48(src[:inst.Len]))
+		u1 := binary.BigEndian.Uint32(src[:(inst.Len-2)])
+		u2 := binary.BigEndian.Uint16(src[(inst.Len-2):inst.Len])
+		//fmt.Printf("case 6:u1: 0x%x u2: 0x%x\n", u1, u2)
+		ui_extn = uint64(u1)<<16 |uint64(u2)
+		//fmt.Printf("case 6: ui_extn: 0x:%x\n", ui_extn)
+		ui_extn =  ui_extn << 16
+		inst.Enc = ui_extn
+	default:
+		return inst, errShort
 	}
-	inst.Enc = ui_extn
-	ui_extn =  ui_extn << (8-l)*8
+	//fmt.Printf("ui_extn: 0x%x\n", ui_extn)
 	for i, iform := range instFormats {
 		if ui_extn&iform.Mask != iform.Value {
 			continue
@@ -199,13 +225,16 @@ func Decode(src []byte ) (inst Inst, err error) {
 		}
 		inst.Op = iform.Op
 		if debugDecode {
-			log.Printf("%#x: search entry %d", ui, i)
+			log.Printf("%#x: search entry %d", ui_extn, i)
 			continue
 		}
 		break
 	}
 	if inst.Op == 0 && inst.Enc != 0 {
 		return inst, errUnknown
+	}
+	if inst.Op.String() == "STG" {
+		fmt.Printf("Srinivas: STG: %#v\n", inst)
 	}
 	return inst, nil
 }
