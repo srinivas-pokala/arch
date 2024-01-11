@@ -17,9 +17,8 @@ type Inst struct {
 	Args Args   // Instruction arguments, in Power ISA manual order.
 }
 
-func (i Inst) String() string {
+func (i Inst) String(pc uint64) string {
 	var buf bytes.Buffer
-	//buf.WriteString(i.Op.String())
 	buf.WriteString(fmt.Sprintf("%-8s",strings.ToLower(i.Op.String())))
 	for j, arg := range i.Args {
 		if arg == nil {
@@ -29,7 +28,7 @@ func (i Inst) String() string {
 			buf.WriteString(" ")
 		} else {
 			switch arg.(type) {
-			case Index, Base:
+			case Index, Base, Len:
 			default:
 				buf.WriteString(", ")
 			}
@@ -39,8 +38,7 @@ func (i Inst) String() string {
 				buf.WriteString("%")
 			default:
 		}
-		//buf.WriteString(arg.String())
-		buf.WriteString(arg.String())
+		buf.WriteString(arg.String(pc))
 	}
 	return buf.String()
 }
@@ -55,10 +53,11 @@ func (o Op) String() string {
 	return opstr[o]
 }
 
-// An Arg is a single instruction argument, one of these types: Reg, CondReg, SpReg, Imm, PCRel, Label, or Offset.
+// An Arg is a single instruction argument. 
+// One of these types: Reg, Base, Index, Disp20, Disp12, Len, Mask, Sign8, Sign16, Sign32, RegIm12, RegIm16, RegIm24, RegIm32.
 type Arg interface {
 	IsArg()
-	String() string
+	String(pc uint64) string
 }
 
 // An Args holds the instruction arguments.
@@ -66,7 +65,7 @@ type Arg interface {
 // the final elements in the array are nil.
 type Args [6]Arg
 
-// Base Register(B)
+// Base represents an 4-bit Base Register field
 type Base uint8
 
 const (
@@ -89,7 +88,7 @@ const (
 )
 
 func (Base) IsArg() {}
-func (r Base) String() string {
+func (r Base) String(pc uint64) string {
 	switch {
 	case B0 <= r && r <= B15:
 		return fmt.Sprintf("r%d)", int(r-B0))
@@ -98,7 +97,7 @@ func (r Base) String() string {
 	}
 }
 
-// Index register(X)
+// Index represents an 4-bit Index Register field
 type Index uint8
 
 const (
@@ -121,7 +120,7 @@ const (
 )
 
 func (Index) IsArg() {}
-func (r Index) String() string {
+func (r Index) String(pc uint64) string {
 	switch {
 	case X0 <= r && r <= X15:
 		return fmt.Sprintf("r%d,", int(r-X0))
@@ -130,11 +129,64 @@ func (r Index) String() string {
 	}
 }
 
-type Disp uint64
+// Disp20 represents an 20-bit Unsigned Displacement
+type Disp20 uint32
 
-func (Disp) IsArg() {}
-func (r Disp) String() string {
-	return fmt.Sprintf("%d(", int32(r | 0xfff<<20))
+func (Disp20) IsArg() {}
+func (r Disp20) String(pc uint64) string {
+	if (r >> 19) & 0x01 == 1 {
+		return fmt.Sprintf("%d(", int32(r | 0xfff<<20))
+	} else {
+		return fmt.Sprintf("%d(", int32(r))
+	}
+}
+
+// Disp12 represents an 12-bit Unsigned Displacement
+type Disp12 uint16
+
+func (Disp12) IsArg() {}
+func (r Disp12) String(pc uint64) string {
+	return fmt.Sprintf("%d(", r)
+}
+
+// RegIm12 represents an 12-bit Register immediate number.
+type RegIm12 uint16
+
+func (RegIm12) IsArg() {}
+func (r RegIm12) String(pc uint64) string {
+	if (r >> 11) & 0x01 == 1 {
+		return fmt.Sprintf("%x", pc + (2*uint64(int16(r | 0xf<<12))))
+	} else {
+		return fmt.Sprintf("%x", pc + (2*uint64(int16(r))))
+	}
+}
+
+// RegIm16 represents an 16-bit Register immediate number.
+type RegIm16 uint16
+
+func (RegIm16) IsArg() {}
+func (r RegIm16) String(pc uint64) string {
+	return fmt.Sprintf("%x", pc+ (2*uint64(int16(r))))
+}
+
+// RegIm24 represents an 24-bit Register immediate number.
+type RegIm24 uint32
+
+func (RegIm24) IsArg() {}
+func (r RegIm24) String(pc uint64) string {
+	if (r >> 23) & 0x01 == 1 {
+		return fmt.Sprintf("%#x", pc + (2*uint64(int32(r | 0xff<<24))))
+	} else {
+		return fmt.Sprintf("%#x", pc + (2*uint64(int32(r))))
+	}
+}
+
+// RegIm32 represents an 32-bit Register immediate number.
+type RegIm32 uint32
+
+func (RegIm32) IsArg() {}
+func (r RegIm32) String(pc uint64) string {
+	return fmt.Sprintf("%#x", pc+ (2*uint64(int32(r))))
 }
 
 // A Reg is a single register. The zero value means R0, not the absence of a register.
@@ -241,7 +293,7 @@ const (
 )
 
 func (Reg) IsArg() {}
-func (r Reg) String() string {
+func (r Reg) String(pc uint64) string {
 	switch {
 	case R0 <= r && r <= R15:
 		return fmt.Sprintf("r%d", int(r-R0))
@@ -259,38 +311,49 @@ func (r Reg) String() string {
 }
 
 // Imm represents an immediate number.
-type Imm uint64
+type Imm uint32
 
 func (Imm) IsArg() {}
-func (i Imm) String() string {
-	return fmt.Sprintf("%x", uint64(i))
+func (i Imm) String(pc uint64) string {
+	return fmt.Sprintf("%x", uint32(i))
 }
 
+// Sign8 represents an 8-bit signed immediate number.
 type Sign8 int8
 
 func (Sign8) IsArg() {}
-func (i Sign8) String() string {
-	//x := int16(ff<<8) | int16(i)
+func (i Sign8) String(pc uint64) string {
 	return fmt.Sprintf("%d", i)
 }
 
+// Sign16 represents an 16-bit signed immediate number.
 type Sign16 int16
 
 func (Sign16) IsArg() {}
-func (i Sign16) String() string {
+func (i Sign16) String(pc uint64) string {
 	return fmt.Sprintf("%d", i)
 }
 
+// Sign32 represents an 32-bit signed immediate number.
 type Sign32 int32
 
 func (Sign32) IsArg() {}
-func (i Sign32) String() string {
+func (i Sign32) String(pc uint64) string {
 	return fmt.Sprintf("%d", i)
 }
-// Offset represents a memory offset immediate.
-type Offset int64
 
-func (Offset) IsArg() {}
-func (o Offset) String() string {
-	return fmt.Sprintf("%+d", int32(o))
+// Mask represents an 4-bit mask value
+type Mask uint8
+
+func (Mask) IsArg() {}
+func (i Mask) String(pc uint64) string {
+	return fmt.Sprintf("%d", i)
+}
+
+// Len represents an 8-bit type holds 4/8-bit Len argument
+type Len uint8
+
+func (Len) IsArg() {}
+func (i Len) String(pc uint64) string {
+	return fmt.Sprintf("%d,",uint16(i)+1)
 }

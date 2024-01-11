@@ -100,7 +100,7 @@ func readCSV(file string) (*Prog, error) {
 
 	p := &Prog{}
 	for _, row := range table {
-		add(p, row[0], row[1], row[2])
+		add(p, row[0], row[1], row[2], row[3])
 	}
 	return p, nil
 }
@@ -262,12 +262,24 @@ func computeMaskValueReserved(args Args, text string) (mask, value uint64) {
 
 type ArgType int8
 
+
+func check_flags(flags string) bool {
+	if strings.Contains(flags, "Da") {
+		return true
+	} else if strings.Contains(flags, "Db") {
+		return true
+	} else if strings.Contains(flags, "Dt") {
+		return true
+	} else {
+		return false
+	}
+}
+
 // Parse a row from the CSV describing the instructions, and place the
 // detected instructions into p. One entry may generate multiple intruction
 // entries as each extended mnemonic listed in text is treated like a unique
 // instruction.
-// func add(p *Prog, text, mnemonics, encoding, format string) {
-func add(p *Prog, text, mnemonics, encoding string) {
+func add(p *Prog, text, mnemonics, encoding, flags string) {
 	// Parse encoding, building size and offset of each field.
 	// The first field in the encoding is the smallest offset.
 	// And note the MSB is bit 0, not bit 31.
@@ -292,13 +304,9 @@ func add(p *Prog, text, mnemonics, encoding string) {
 		flag := uint16(0)
 		switch opr {
 		case "R1", "R2", "R3":
-			substr := []string{"FPS", "HFP", "BFP", "DFP"}
-			var f bool = false
 			switch opr {
-			case "R1":
-				for _, s := range substr {
-					if strings.Contains(text, s) { //Check float format's FPS HFP BFP DFP
-						f = true
+				case "R1":
+					if check_flags(flags) {
 						if strings.Contains(text, "CONVERT TO FIXED") {
 							typ = asm.TypeReg
 							flag = 0x1
@@ -306,18 +314,12 @@ func add(p *Prog, text, mnemonics, encoding string) {
 							typ = asm.TypeFPReg
 							flag = 0x2
 						}
-						break
+					} else {
+						typ = asm.TypeReg
+						flag = 0x1
 					}
-				}
-				if f == false {
-					typ = asm.TypeReg
-					flag = 0x1
-				}
-
-			case "R2":
-				for _, s := range substr {
-					if strings.Contains(text, s) { //Check float format's FPS HFP BFP DFP
-						f = true
+				case "R2":
+					if check_flags(flags) {
 						if strings.Contains(text, "CONVERT FROM FIXED") {
 							typ = asm.TypeReg
 							flag = 0x1
@@ -325,78 +327,93 @@ func add(p *Prog, text, mnemonics, encoding string) {
 							typ = asm.TypeFPReg
 							flag = 0x2
 						}
-						break
+					} else {
+						typ = asm.TypeReg
+						flag = 0x1
 					}
-				}
-				if f == false {
-					typ = asm.TypeReg
-					flag = 0x1
-				}
-
-			case "R3":
-				for _, s := range substr {
-					if strings.Contains(text, s) { //Check float format's FPS HFP BFP DFP
-						f = true
+				case "R3":
+					if check_flags(flags) {
 						typ = asm.TypeFPReg
 						flag = 0x2
-						break
+					} else {
+						typ = asm.TypeReg
+						flag = 0x1
 					}
-				}
-				if f == false {
-					typ = asm.TypeReg
-					flag = 0x1
-				}
 			}
+		case "I", "I1", "I2","I3", "I4", "I5":
+                        flag = 0x0
+                        switch opr {
+                        case "I":
+                                typ = asm.TypeImmUnsigned
 
-		case "I", "I1", "I2", "I3", "I4", "I5":
-			flag = 0x0
-			switch opr {
-			case "I":
-				typ = asm.TypeImmUnsigned
+                        case "I1":
+                                typ = asm.TypeImmUnsigned
 
-			case "I1":
-				typ = asm.TypeImmUnsigned
+                        case "I2":
+                                if Imm_signed_8bit_check(inst.Op) {
+                                        typ = asm.TypeImmSigned8
+                                        break
+                                } else if Imm_signed_16bit_check(inst.Op) {     // "ASI", "AGSI", "ALSI", "ALGSI"
+                                        typ = asm.TypeImmSigned16
+                                        break
+                                } else if Imm_signed_32bit_check(inst.Op) {     // "AHI", "AGHI", "AHIK", "AGHIK", "LHI", "LGHI"
+                                        typ = asm.TypeImmSigned32
+                                        break
+                                } else {
+                                        typ = asm.TypeImmUnsigned
+                                        break
+                                }
+                        case "I3", "I4", "I5":
+                                typ = asm.TypeImmUnsigned
+                        }
+		 case "RI2", "RI3", "RI4":
+                        flag = 0x80
+                        i := args.Find(opr)
+                        count := uint8(args[i].Bits)
+                        if count == 12 {
+                                typ = asm.TypeRegImSigned12
+                                break
+                        } else if count == 16 {
+                                typ = asm.TypeRegImSigned16
+                                break
+                        } else if count == 24 {
+                                typ = asm.TypeRegImSigned24
+                                break
+                        } else if count == 32 {
+                                typ = asm.TypeRegImSigned32
+                                break
+                        }
 
-			case "I2":
-				typ = asm.TypeImmUnsigned
+                case "M1", "M3", "M4", "M5", "M6":
+                        flag = 0x800
+                        typ = asm.TypeMask
 
-			case "I3":
-				typ = asm.TypeImmUnsigned
+                case "B1", "B2", "B3", "B4":
+                        typ = asm.TypeBaseReg
+                        flag = 0x20 | 0x01
 
-			case "I4":
-				typ = asm.TypeImmUnsigned
+                case "X2":
+                        typ = asm.TypeIndexReg
+                        flag = 0x40 | 0x01
 
-			case "I5":
-				typ = asm.TypeImmUnsigned
-			}
-
-		case "RI1", "RI2", "RI3", "RI4":
-			flag = 0x80
-			typ = asm.TypeImmUnsigned
-
-		case "M1", "M2", "M3", "M4", "M5", "M6":
-			flag = 0x800
-			typ = asm.TypeImmUnsigned
-
-		case "B1", "B2", "B3", "B4":
-			typ = asm.TypeBaseReg
-			flag = 0x20 | 0x01
-
-		case "X2":
-			typ = asm.TypeIndexReg
-			flag = 0x40 | 0x01
-
-		case "D1", "D2", "D3", "D4":
-			typ = asm.TypeDisp
-			flag = 0x10
-		case "L", "L1", "L2":
-			typ = asm.TypeLen
-			flag = 0x10
+                case "D1", "D2", "D3", "D4":
+                        flag = 0x10
+                        i := args.Find(opr)
+                        if uint8(args[i].Bits) == 20 {
+                                typ = asm.TypeDispSigned20
+                                break
+                        } else {
+                                typ = asm.TypeDispUnsigned
+                                break
+                        }
+                case "L", "L1", "L2":
+                        typ = asm.TypeLen
+                        flag = 0x10
 		case "V1", "V2", "V3", "V4", "V5", "V6":
-			typ = asm.TypeVecReg
-			flag = 0x08
+                        typ = asm.TypeVecReg
+                        flag = 0x08
 
-		}
+                }
 
 		if typ == asm.TypeUnknown {
 			log.Fatalf("%s %s unknown type for opr %s", text, inst, opr)

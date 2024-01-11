@@ -64,8 +64,10 @@ func (a argField) Parse(i uint64) Arg {
 		return B0 + Base(a.BitField.Parse(i))
 	case TypeIndexReg:
 		return X0 + Index(a.BitField.Parse(i))
-	case TypeDisp:
-		return Disp(a.BitField.Parse(i))
+	case TypeDispUnsigned:
+		return Disp12(a.BitField.Parse(i))
+	case TypeDispSigned20:
+		return Disp20(a.BitField.ParseSigned(i))
 	case TypeVecReg:
 		return V0 + Reg(a.BitField.Parse(i))
 	case TypeImmSigned:
@@ -76,8 +78,20 @@ func (a argField) Parse(i uint64) Arg {
 		return Sign16(a.BitField.ParseSigned(i))
 	case TypeImmSigned32:
 		return Sign32(a.BitField.ParseSigned(i))
-	case TypeImmUnsigned, TypeLen:
+	case TypeImmUnsigned:
 		return Imm(a.BitField.Parse(i))
+	case TypeRegImSigned12:
+		return RegIm12(a.BitField.ParseSigned(i))
+	case TypeRegImSigned16:
+		return RegIm16(a.BitField.ParseSigned(i))
+	case TypeRegImSigned24:
+		return RegIm24(a.BitField.ParseSigned(i))
+	case TypeRegImSigned32:
+		return RegIm32(a.BitField.ParseSigned(i))
+	case TypeMask:
+		return Mask(a.BitField.Parse(i))
+	case TypeLen:
+		return Len(a.BitField.Parse(i))
 	case TypeOffset:
 		return Offset(a.BitField.ParseSigned(i))
 	}
@@ -99,10 +113,14 @@ const (
 	TypeImmSigned32
 	TypeBaseReg		// Base Register for accessing memory
 	TypeIndexReg		// Index Register
-	TypeDisp		// Displacement for memory address
+	TypeDispUnsigned		// Displacement for memory address
+	TypeDispSigned20
+	TypeRegImSigned12
+	TypeRegImSigned16
+	TypeRegImSigned24
+	TypeRegImSigned32
+	TypeMask
 	TypeLen			// Length
-        TypeOffset               // signed offset in load/store
-        TypeNegOffset            // A negative 16 bit value 0b1111111xxxxx000 encoded as 0bxxxxx (e.g in the hashchk instruction)
 	TypeLast
 
 )
@@ -121,14 +139,14 @@ func (t ArgType) String() string {
 		return "ACReg"
 	case TypeCReg:
 		return "CReg"
-	case TypeDisp:
-		return "Disp"
+	case TypeDispUnsigned:
+		return "DispUnsigned"
+	case TypeDispSigned20:
+		return "DispSigned20"
 	case TypeBaseReg:
 		return "BaseReg"
 	case TypeIndexReg:
 		return "IndexReg"
-	case TypeLen:
-		return "Len"
 	case TypeVecReg:
 		return "VecReg"
 	case TypeImmSigned:
@@ -141,10 +159,18 @@ func (t ArgType) String() string {
                 return "ImmSigned32"
 	case TypeImmUnsigned:
 		return "ImmUnsigned"
-	case TypeOffset:
-		return "Offset"
-	case TypeNegOffset:
-		return "NegOffset"
+	case TypeRegImSigned12:
+		return "RegImSigned12"
+	case TypeRegImSigned16:
+		return "RegImSigned16"
+	case TypeRegImSigned24:
+		return "RegImSigned24"
+	case TypeRegImSigned32:
+		return "RegImSigned32"
+	case TypeMask:
+		return "Mask"
+	case TypeLen:
+		return "Len"
 	}
 }
 
@@ -232,9 +258,6 @@ func Decode(src []byte ) (inst Inst, err error) {
 	}
 	if inst.Op == 0 && inst.Enc != 0 {
 		return inst, errUnknown
-	}
-	if inst.Op.String() == "STG" {
-		fmt.Printf("Srinivas: STG: %#v\n", inst)
 	}
 	return inst, nil
 }

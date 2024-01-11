@@ -41,6 +41,7 @@ type Inst struct {
 	Name string
 	Text string
 	Enc  string
+	Flags string
 }
 
 const debugPage = 0
@@ -81,9 +82,6 @@ func main() {
 			break
 		}
 	}
-	/*			page := f.Page(1939)
-				table := parsePage(1939, page)
-				all = append(all, table...)*/
 	stdout = bufio.NewWriter(os.Stdout)
 	for _, inst := range all {
 		if strings.Contains(inst.Name, "\x00I") {
@@ -93,7 +91,7 @@ func main() {
 			r := rune(0x2192)
 			inst.Name = strings.Replace(inst.Name, "I\x00", string(r), -1)
 		}
-		fmt.Fprintf(stdout, "%q,%q,%q\n", inst.Name, inst.Text, inst.Enc)
+		fmt.Fprintf(stdout, "%q,%q,%q,%q\n", inst.Name, inst.Text, inst.Enc, inst.Flags)
 	}
 	stdout.Flush()
 
@@ -162,6 +160,13 @@ func parsePage(num int, p pdf.Page) []Inst {
 		}
 		before, _, _ := strings.Cut(format, " ")
 		format = before
+		for len(text) > 0 && !(match(text[0], "Helvetica-Narrow", 8, "") && (matchXCord(text[0], 350.82) || matchXCord(text[0], 363.84) || matchXCord(text[0], 332.82) || matchXCord(text[0],345.84)))	{
+			if text[0].X > 405.48  {
+				break
+			}
+			text = text[1:]
+		}
+		flags := text[0].S
 		for len(text) > 0 && !(match(text[0], "Helvetica-Narrow", 8, "") && ((matchXCord(text[0], 481.7) && (!matchXCord(text[1], 496.1))) || (matchXCord(text[0], 514) || matchXCord(text[0], 496.1)))) {
 			text = text[1:]
 		}
@@ -186,7 +191,7 @@ func parsePage(num int, p pdf.Page) []Inst {
 		}
 		if match(text[0], "Helvetica-Oblique", 9, "") {
 			text = text[2:]
-			insts = append(insts, Inst{heading, mnemonic1, encoding})
+			insts = append(insts, Inst{heading, mnemonic1, encoding, flags})
 			continue
 		}
 		if strings.HasPrefix(text[0].S, "(") {
@@ -199,7 +204,7 @@ func parsePage(num int, p pdf.Page) []Inst {
 			heading += " " + text[0].S
 			text = text[1:]
 		}
-		insts = append(insts, Inst{heading, mnemonic1, encoding})
+		insts = append(insts, Inst{heading, mnemonic1, encoding, flags})
 		if match(text[0], "Helvetica-Oblique", 9, "") {
 			break
 		}
@@ -228,109 +233,74 @@ func frameMnemonic(mnemonic, format, opcode string) (string, string) {
 	switch format {
 	case "E":
 		mn, enc = mnemonic_E(mnemonic, opcode)
-
 	case "I":
 		mn, enc = mnemonic_I(mnemonic, opcode)
-
 	case "IE":
 		mn, enc = mnemonic_IE(mnemonic, opcode)
-
 	case "MII":
 		mn, enc = mnemonic_MII(mnemonic, opcode)
-
 	case "RI-a", "RI-b", "RI-c":
 		mn, enc = mnemonic_RI(mnemonic, format, opcode)
-
 	case "RIE-a", "RIE-b", "RIE-c", "RIE-d", "RIE-e", "RIE-f", "RIE-g":
 		mn, enc = mnemonic_RIE(mnemonic, format, opcode)
-
 	case "RIL-a", "RIL-b", "RIL-c":
 		mn, enc = mnemonic_RIL(mnemonic, format, opcode)
-
 	case "RIS":
 		mn, enc = mnemonic_RIS(mnemonic, opcode)
-
 	case "RR":
 		mn, enc = mnemonic_RR(mnemonic, opcode)
-
 	case "RRD":
 		mn, enc = mnemonic_RRD(mnemonic, opcode)
-
 	case "RRE":
 		mn, enc = mnemonic_RRE(mnemonic, opcode)
-
 	case "RRF-a", "RRF-b", "RRF-c", "RRF-d", "RRF-e":
 		mn, enc = mnemonic_RRF(mnemonic, format, opcode)
-
 	case "RRS":
 		mn, enc = mnemonic_RRS(mnemonic, opcode)
-
 	case "RS-a", "RS-b":
 		mn, enc = mnemonic_RS(mnemonic, format, opcode)
-
 	case "RSI":
 		mn, enc = mnemonic_RSI(mnemonic, opcode)
-
 	case "RSL-a", "RSL-b":
 		mn, enc = mnemonic_RSL(mnemonic, format, opcode)
-
 	case "RSY-a", "RSY-b":
 		mn, enc = mnemonic_RSY(mnemonic, format, opcode)
-
 	case "RX-a", "RX-b":
 		mn, enc = mnemonic_RX(mnemonic, format, opcode)
-
 	case "RXE":
 		mn, enc = mnemonic_RXE(mnemonic, opcode)
-
 	case "RXF":
 		mn, enc = mnemonic_RXF(mnemonic, opcode)
-
 	case "RXY-a", "RXY-b":
 		mn, enc = mnemonic_RXY(mnemonic, format, opcode)
-
 	case "S":
 		mn, enc = mnemonic_S(mnemonic, opcode)
-
 	case "SI":
 		mn, enc = mnemonic_SI(mnemonic, opcode)
-
 	case "SIL":
 		mn, enc = mnemonic_SIL(mnemonic, opcode)
-
 	case "SIY":
 		mn, enc = mnemonic_SIY(mnemonic, opcode)
-
 	case "SMI":
 		mn, enc = mnemonic_SMI(mnemonic, opcode)
-
 	case "SS-a", "SS-b", "SS-c", "SS-d", "SS-e", "SS-f":
 		mn, enc = mnemonic_SS(mnemonic, format, opcode)
-
 	case "SSE":
 		mn, enc = mnemonic_SSE(mnemonic, opcode)
-
 	case "SSF":
 		mn, enc = mnemonic_SSF(mnemonic, opcode)
-
 	case "VRI-a", "VRI-b", "VRI-c", "VRI-d", "VRI-e", "VRI-f", "VRI-g", "VRI-h", "VRI-i":
 		mn, enc = mnemonic_VRI(mnemonic, format, opcode)
-
 	case "VRR-a", "VRR-b", "VRR-c", "VRR-d", "VRR-e", "VRR-f", "VRR-g", "VRR-h", "VRR-i", "VRR-j", "VRR-k":
 		mn, enc = mnemonic_VRR(mnemonic, format, opcode)
-
 	case "VRS-a", "VRS-b", "VRS-c", "VRS-d":
 		mn, enc = mnemonic_VRS(mnemonic, format, opcode)
-
 	case "VRV":
 		mn, enc = mnemonic_VRV(mnemonic, opcode)
-
 	case "VRX":
 		mn, enc = mnemonic_VRX(mnemonic, opcode)
-
 	case "VSI":
 		mn, enc = mnemonic_VSI(mnemonic, opcode)
-
 	default:
 		mn = mnemonic
 	}
