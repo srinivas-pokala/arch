@@ -383,19 +383,15 @@ func add(p *Prog, text, mnemonics, encoding, flags string) {
                                 typ = asm.TypeRegImSigned32
                                 break
                         }
-
                 case "M1", "M3", "M4", "M5", "M6":
                         flag = 0x800
                         typ = asm.TypeMask
-
                 case "B1", "B2", "B3", "B4":
                         typ = asm.TypeBaseReg
                         flag = 0x20 | 0x01
-
                 case "X2":
                         typ = asm.TypeIndexReg
                         flag = 0x40 | 0x01
-
                 case "D1", "D2", "D3", "D4":
                         flag = 0x10
                         i := args.Find(opr)
@@ -412,13 +408,10 @@ func add(p *Prog, text, mnemonics, encoding, flags string) {
 		case "V1", "V2", "V3", "V4", "V5", "V6":
                         typ = asm.TypeVecReg
                         flag = 0x08
-
                 }
-
 		if typ == asm.TypeUnknown {
 			log.Fatalf("%s %s unknown type for opr %s", text, inst, opr)
 		}
-
 		field.Type = typ
 		field.flags = flag
 		var f1 asm.BitField
