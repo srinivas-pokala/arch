@@ -12,8 +12,6 @@ import (
 
 const debugDecode = false
 
-const prefixOpcode = 1
-
 // instFormat is a decoding rule for one specific instruction form.
 // an instruction ins matches the rule if ins&Mask == Value
 // DontCare bits should be zero, but the machine might not reject
@@ -21,13 +19,6 @@ const prefixOpcode = 1
 // of the instruction set.
 // The Args are stored in the same order as the instruction manual.
 //
-// Prefixed instructions are stored as:
-//
-//	prefix << 32 | suffix,
-//
-// Regular instructions are:
-//
-//	inst << 32
 type instFormat struct {
 	Op       Op
 	Mask     uint64
@@ -100,28 +91,28 @@ func (a argField) Parse(i uint64) Arg {
 type ArgType int8
 
 const (
-	TypeUnknown      ArgType = iota
-	TypeReg                  // integer register
-	TypeFPReg                // floating point register
-	TypeACReg                // access register
-        TypeCReg                 // control register
-        TypeVecReg               // vector register
-        TypeImmUnsigned          // unsigned immediate/flag/mask, this is the catch-all type
-        TypeImmSigned            // signed immediate
-	TypeImmSigned8
-	TypeImmSigned16
-	TypeImmSigned32
-	TypeBaseReg		// Base Register for accessing memory
-	TypeIndexReg		// Index Register
-	TypeDispUnsigned		// Displacement for memory address
-	TypeDispSigned20
-	TypeRegImSigned12
-	TypeRegImSigned16
-	TypeRegImSigned24
-	TypeRegImSigned32
-	TypeMask
-	TypeLen			// Length
-	TypeLast
+        TypeUnknown      ArgType = iota
+        TypeReg                 // integer register
+        TypeFPReg               // floating point register
+        TypeACReg               // access register
+        TypeCReg                // control register
+        TypeVecReg              // vector register
+        TypeImmUnsigned         // unsigned immediate/flag/mask, this is the catch-all type
+        TypeImmSigned           // signed immediate
+        TypeImmSigned8          // Signed 8-bit Immdediate
+        TypeImmSigned16         // Signed 16-bit Immdediate
+        TypeImmSigned32         // Signed 32-bit Immdediate
+        TypeBaseReg             // Base Register for accessing memory
+        TypeIndexReg            // Index Register
+        TypeDispUnsigned        // Displacement 12-bit unsigned for memory address
+        TypeDispSigned20        // Displacement 20-bit signed for memory address
+        TypeRegImSigned12       // RegisterImmediate 12-bit signed data
+        TypeRegImSigned16       // RegisterImmediate 16-bit signed data
+        TypeRegImSigned24       // RegisterImmediate 24-bit signed data
+        TypeRegImSigned32       // RegisterImmediate 32-bit signed data
+        TypeMask                // 4-bit Mask
+        TypeLen                 // Length of Memory Operand
+        TypeLast
 
 )
 
@@ -201,7 +192,6 @@ func Decode(src []byte ) (inst Inst, err error) {
 	}
 	bit_check := binary.BigEndian.Uint16(src[:2])
 	bit_check =  bit_check >> 14
-//	fmt.Printf("bit_check:0x%x\n", bit_check)
 	l := int(0)
 	if (bit_check & 0x03) == 0 {
 		l = 2
@@ -224,15 +214,12 @@ func Decode(src []byte ) (inst Inst, err error) {
 	case 6:
 		u1 := binary.BigEndian.Uint32(src[:(inst.Len-2)])
 		u2 := binary.BigEndian.Uint16(src[(inst.Len-2):inst.Len])
-		//fmt.Printf("case 6:u1: 0x%x u2: 0x%x\n", u1, u2)
 		ui_extn = uint64(u1)<<16 |uint64(u2)
-		//fmt.Printf("case 6: ui_extn: 0x:%x\n", ui_extn)
 		ui_extn =  ui_extn << 16
 		inst.Enc = ui_extn
 	default:
 		return inst, errShort
 	}
-	//fmt.Printf("ui_extn: 0x%x\n", ui_extn)
 	for i, iform := range instFormats {
 		if ui_extn&iform.Mask != iform.Value {
 			continue
