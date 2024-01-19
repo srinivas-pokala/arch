@@ -427,10 +427,15 @@ func mnemonic_RIS(mnemonic, opcode string) (string, string) {
 
 func mnemonic_RR(mnemonic, opcode string) (string, string) {
 	var enc string
-	mnemonic += " R1,R2"
 	val, _ := strconv.ParseUint(opcode, 16, 16)
 	str := strconv.Itoa(int(val))
-	enc = str + "@0|R1@8|R2@12|??@16"
+	if strings.Compare(mnemonic, "BCR") == 0 {
+		mnemonic += " M1,R2"
+		enc = str + "@0|M1@8|R2@12|??@16"
+	} else {
+		mnemonic += " R1,R2"
+		enc = str + "@0|R1@8|R2@12|??@16"
+	}
 	return mnemonic, enc
 }
 func mnemonic_RRD(mnemonic, opcode string) (string, string) {
@@ -444,10 +449,22 @@ func mnemonic_RRD(mnemonic, opcode string) (string, string) {
 
 func mnemonic_RRE(mnemonic, opcode string) (string, string) {
 	var enc string
-	mnemonic += " R1,R2"
+	var check_operand bool
+	load_str := []string{"LZER", "LZDR", "LZXR"}
 	val, _ := strconv.ParseUint(opcode, 16, 16)
 	str := strconv.Itoa(int(val))
-	enc = str + "@0|0@16|R1@24|R2@28|??@32"
+	for _, s := range load_str {
+		if strings.Compare(mnemonic, s) == 0 {
+			mnemonic += " R1"
+			enc = str + "@0|0@16|R1@24|0@28|??@32"
+			check_operand = true
+			break
+		}
+	}
+	if !check_operand {
+		mnemonic += " R1,R2"
+		enc = str + "@0|0@16|R1@24|R2@28|??@32"
+	}
 	return mnemonic, enc
 }
 
