@@ -242,7 +242,7 @@ func computeMaskValueReserved(args Args, text string) (mask, value uint64) {
 		arg := args[i]
 		v, err := strconv.Atoi(arg.Name)
 		switch {
-		case err == nil && v != 0: // is a numbered field
+		case err == nil && v >= 0: // is a numbered field
 			if v < 0 || v > arg.Maximum() {
 				fmt.Fprintf(os.Stderr, "%s: field %s value (%d) is out of range (%d-bit)\n", text, arg, v, arg.Bits)
 			}
@@ -250,7 +250,7 @@ func computeMaskValueReserved(args Args, text string) (mask, value uint64) {
 			value |= uint64(v) << arg.Shift()
 			args.Delete(i)
 			i--
-		case arg.Name[0] == '0': // is don't care
+		case arg.Name[0] == '/': // don't care
 			args.Delete(i)
 			i--
 		default:
@@ -506,10 +506,10 @@ func printDecoder(p *Prog) {
 				continue
 			}
 			m[name] = true
-			fmt.Fprintf(&buf, "\t%s = &argField{Type: %#v, flags: %#x, BitField: BitField{", name, f.Type, f.flags)
+			fmt.Fprintf(&buf, "\t%s = &argField{Type: %#v, flags: %#x, BitField: BitField", name, f.Type, f.flags)
 			b := f.BitField
 			fmt.Fprintf(&buf, "{%d, %d }", b.Offs, b.Bits)
-			fmt.Fprintf(&buf, "}}\n")
+			fmt.Fprintf(&buf, "}\n")
 		}
 	}
 	fmt.Fprint(&buf, ")\n\n\n")
@@ -519,7 +519,7 @@ func printDecoder(p *Prog) {
 	for _, inst := range p.Insts {
 		m, v := inst.Mask, inst.Value
 		fmt.Fprintf(&buf, "\t{ %s, %#x, %#x,", inst.Op, m, v)
-		fmt.Fprintf(&buf, " // %s (%s)\n\t\t[6]*argField{", inst.Text, inst.Encoding)
+		fmt.Fprintf(&buf, " // %s (%s)\n\t\t[8]*argField{", inst.Text, inst.Encoding)
 		for _, f := range inst.Fields {
 			fmt.Fprintf(&buf, "%s, ", argFieldName(f))
 		}
