@@ -9,8 +9,8 @@ import (
 	"strings"
 )
 
-// A BitField is a bit-field in a 32-bit word.
-// Bits are counted from 0 from the MSB to 31 as the LSB.
+// A BitField is a bit-field in a 64-bit double word.
+// Bits are counted from 0 from the MSB to 63 as the LSB.
 type BitField struct {
 	Offs uint8 // the offset of the left-most bit.
 	Bits uint8 // length in bits.
