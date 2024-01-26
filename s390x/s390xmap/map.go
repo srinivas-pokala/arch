@@ -423,7 +423,7 @@ func add(p *Prog, text, mnemonics, encoding, flags string) {
 		field.BitField = f1
 		inst.Fields = append(inst.Fields, field)
 	}
-	if strings.HasPrefix(inst.Op, "V") { //Check Vector Instructions
+	if strings.HasPrefix(inst.Op, "V") || strings.Contains(inst.Op, "WFC") || strings.Contains(inst.Op, "WFK") { //Check Vector Instructions
 		Bits := asm.BitField{Offs: 36, Bits: 4}
 		field := Field{Name: "RXB", BitField: Bits, Type: asm.TypeImmUnsigned, flags: 0xC00}
 		inst.Fields = append(inst.Fields, field)
