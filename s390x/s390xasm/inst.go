@@ -19,7 +19,15 @@ type Inst struct {
 
 func (i Inst) String(pc uint64) string {
 	var buf bytes.Buffer
-	buf.WriteString(fmt.Sprintf("%-8s",strings.ToLower(i.Op.String())))
+	var rxb_check bool
+	//buf.WriteString(fmt.Sprintf("%-8s",strings.ToLower(i.Op.String())))
+	mnemonic := HandleExtndMnemonic(&i)
+	if strings.HasPrefix(mnemonic,"V") || strings.Contains(mnemonic,"WFC") || strings.Contains(mnemonic, "WFK") {
+		//i.Args[len(i.Args)-1] = nil
+		rxb_check = true
+		//fmt.Printf("Srinivas:RXb len:%d\n", len(i.Args))
+	}
+	buf.WriteString(fmt.Sprintf("%-8s",strings.ToLower(mnemonic)))
 	for j, arg := range i.Args {
 		if arg == nil {
 			break
@@ -34,14 +42,19 @@ func (i Inst) String(pc uint64) string {
 			}
 		}
 		switch arg.(type) {
-			case Index,Base,Reg:
+			case Reg,VReg:
 				buf.WriteString("%")
 			default:
 		}
 		buf.WriteString(arg.String(pc))
+		if rxb_check && i.Args[j+2] == nil {
+			break
+		}
 	}
 	return buf.String()
 }
+
+
 
 // An Op is an instruction operation.
 type Op uint16
@@ -63,7 +76,7 @@ type Arg interface {
 // An Args holds the instruction arguments.
 // If an instruction has fewer than 6 arguments,
 // the final elements in the array are nil.
-type Args [6]Arg
+type Args [8]Arg
 
 // Base represents an 4-bit Base Register field
 type Base uint8
@@ -90,8 +103,11 @@ const (
 func (Base) IsArg() {}
 func (r Base) String(pc uint64) string {
 	switch {
-	case B0 <= r && r <= B15:
-		return fmt.Sprintf("r%d)", int(r-B0))
+	case B1 <= r && r <= B15:
+		s := "%"
+		return fmt.Sprintf("%sr%d)", s, int(r-B0))
+	case B0 == r:
+		return fmt.Sprintf("")
 	default:
 		return fmt.Sprintf("Base(%d)", int(r))
 	}
@@ -122,8 +138,11 @@ const (
 func (Index) IsArg() {}
 func (r Index) String(pc uint64) string {
 	switch {
-	case X0 <= r && r <= X15:
-		return fmt.Sprintf("r%d,", int(r-X0))
+	case X1 <= r && r <= X15:
+		s := "%"
+		return fmt.Sprintf("%sr%d,", s, int(r-X0))
+	case X0 == r:
+		return fmt.Sprintf("")
 	default:
 		return fmt.Sprintf("Base(%d)", int(r))
 	}
@@ -226,38 +245,6 @@ const (
 	F13
 	F14
 	F15
-	V0
-	V1
-	V2
-	V3
-	V4
-	V5
-	V6
-	V7
-	V8
-	V9
-	V10
-	V11
-	V12
-	V13
-	V14
-	V15
-	V16
-	V17
-	V18
-	V19
-	V20
-	V21
-	V22
-	V23
-	V24
-	V25
-	V26
-	V27
-	V28
-	V29
-	V30
-	V31
 	A0
 	A1
 	A2
@@ -299,8 +286,6 @@ func (r Reg) String(pc uint64) string {
 		return fmt.Sprintf("r%d", int(r-R0))
 	case F0 <= r && r <= F15:
 		return fmt.Sprintf("f%d", int(r-F0))
-	case V0 <= r && r <= V31:
-		return fmt.Sprintf("v%d", int(r-V0))
 	case A0 <= r && r <= A15:
 		return fmt.Sprintf("a%d", int(r-A0))
 	case C0 <= r && r <= C15:
@@ -310,12 +295,60 @@ func (r Reg) String(pc uint64) string {
 	}
 }
 
+// VReg is a vector register. The zero value means V0, not the absence of a register.
+
+type VReg uint8
+
+const (
+	V0 VReg = iota
+	V1
+	V2
+	V3
+	V4
+	V5
+	V6
+	V7
+	V8
+	V9
+	V10
+	V11
+	V12
+	V13
+	V14
+	V15
+	V16
+	V17
+	V18
+	V19
+	V20
+	V21
+	V22
+	V23
+	V24
+	V25
+	V26
+	V27
+	V28
+	V29
+	V30
+	V31
+)
+
+func (VReg) IsArg() {}
+func (r VReg) String(pc uint64) string {
+	if V0 <= r && r <= V31 {
+		return fmt.Sprintf("v%d", int(r-V0))
+	} else {
+		return fmt.Sprintf("VReg(%d)", int(r))
+	}
+}
+
 // Imm represents an immediate number.
 type Imm uint32
 
 func (Imm) IsArg() {}
 func (i Imm) String(pc uint64) string {
-	return fmt.Sprintf("%x", uint32(i))
+	return fmt.Sprintf("%d", uint32(i))
 }
 
 // Sign8 represents an 8-bit signed immediate number.

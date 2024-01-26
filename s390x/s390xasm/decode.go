@@ -12,6 +12,8 @@ import (
 
 const debugDecode = false
 
+const prefixOpcode = 1
+
 // instFormat is a decoding rule for one specific instruction form.
 // an instruction ins matches the rule if ins&Mask == Value
 // DontCare bits should be zero, but the machine might not reject
@@ -19,12 +21,19 @@ const debugDecode = false
 // of the instruction set.
 // The Args are stored in the same order as the instruction manual.
 //
+// Prefixed instructions are stored as:
+//
+//	prefix << 32 | suffix,
+//
+// Regular instructions are:
+//
+//	inst << 32
 type instFormat struct {
 	Op       Op
 	Mask     uint64
 	Value    uint64
 //	DontCare uint64
-	Args     [7]*argField
+	Args     [8]*argField
 }
 
 // argField indicate how to decode an argument to an instruction.
@@ -60,9 +69,18 @@ func (a argField) Parse(i uint64) Arg {
 	case TypeDispSigned20:
 		return Disp20(a.BitField.ParseSigned(i))
 	case TypeVecReg:
-		return V0 + Reg(a.BitField.Parse(i))
-	case TypeImmSigned:
-		return Imm(a.BitField.ParseSigned(i))
+		m := i >> 24		// Handling RXB field(bits 36 to 39)
+		if ((m>>3)&0x1 == 1) && (a.BitField.Offs == 8) {
+			return V0 + VReg(a.BitField.Parse(i)) + VReg(16)
+		} else if ((m >> 2)&0x1 == 1) && (a.BitField.Offs == 12) {
+			return V0 + VReg(a.BitField.Parse(i)) + VReg(16)
+		} else if ((m >> 1)&0x1 == 1) && (a.BitField.Offs == 16) {
+			return V0 + VReg(a.BitField.Parse(i)) + VReg(16)
+		} else if ((m)&0x1 == 1) && (a.BitField.Offs == 32) {
+			return V0 + VReg(a.BitField.Parse(i)) + VReg(16)
+		} else {
+			return V0 + VReg(a.BitField.Parse(i))
+		}
 	case TypeImmSigned8:
 		return Sign8(a.BitField.ParseSigned(i))
 	case TypeImmSigned16:
@@ -83,36 +101,33 @@ func (a argField) Parse(i uint64) Arg {
 		return Mask(a.BitField.Parse(i))
 	case TypeLen:
 		return Len(a.BitField.Parse(i))
-	case TypeOffset:
-		return Offset(a.BitField.ParseSigned(i))
 	}
 }
 
 type ArgType int8
 
 const (
-        TypeUnknown      ArgType = iota
-        TypeReg                 // integer register
-        TypeFPReg               // floating point register
-        TypeACReg               // access register
-        TypeCReg                // control register
-        TypeVecReg              // vector register
-        TypeImmUnsigned         // unsigned immediate/flag/mask, this is the catch-all type
-        TypeImmSigned           // signed immediate
-        TypeImmSigned8          // Signed 8-bit Immdediate
-        TypeImmSigned16         // Signed 16-bit Immdediate
-        TypeImmSigned32         // Signed 32-bit Immdediate
-        TypeBaseReg             // Base Register for accessing memory
-        TypeIndexReg            // Index Register
-        TypeDispUnsigned        // Displacement 12-bit unsigned for memory address
-        TypeDispSigned20        // Displacement 20-bit signed for memory address
-        TypeRegImSigned12       // RegisterImmediate 12-bit signed data
-        TypeRegImSigned16       // RegisterImmediate 16-bit signed data
-        TypeRegImSigned24       // RegisterImmediate 24-bit signed data
-        TypeRegImSigned32       // RegisterImmediate 32-bit signed data
-        TypeMask                // 4-bit Mask
-        TypeLen                 // Length of Memory Operand
-        TypeLast
+	TypeUnknown      ArgType = iota
+	TypeReg			// integer register
+	TypeFPReg		// floating point register
+	TypeACReg		// access register
+        TypeCReg		// control register
+        TypeVecReg		// vector register
+        TypeImmUnsigned		// unsigned immediate/flag/mask, this is the catch-all type
+	TypeImmSigned8		// Signed 8-bit Immdediate
+	TypeImmSigned16		// Signed 16-bit Immdediate
+	TypeImmSigned32		// Signed 32-bit Immdediate
+	TypeBaseReg		// Base Register for accessing memory
+	TypeIndexReg		// Index Register
+	TypeDispUnsigned	// Displacement 12-bit unsigned for memory address
+	TypeDispSigned20	// Displacement 20-bit signed for memory address
+	TypeRegImSigned12	// RegisterImmediate 12-bit signed data
+	TypeRegImSigned16	// RegisterImmediate 16-bit signed data
+	TypeRegImSigned24	// RegisterImmediate 24-bit signed data
+	TypeRegImSigned32	// RegisterImmediate 32-bit signed data
+	TypeMask		// 4-bit Mask
+	TypeLen			// Length of Memory Operand
+	TypeLast
 
 )
 
@@ -140,8 +155,6 @@ func (t ArgType) String() string {
 		return "IndexReg"
 	case TypeVecReg:
 		return "VecReg"
-	case TypeImmSigned:
-		return "ImmSigned"
 	case TypeImmSigned8:
                 return "ImmSigned8"
         case TypeImmSigned16:
@@ -181,6 +194,7 @@ var (
 
 var decoderCover []bool
 
+
 // Decode decodes the leading bytes in src as a single instruction using
 // byte order ord.
 func Decode(src []byte ) (inst Inst, err error) {
@@ -192,6 +206,7 @@ func Decode(src []byte ) (inst Inst, err error) {
 	}
 	bit_check := binary.BigEndian.Uint16(src[:2])
 	bit_check =  bit_check >> 14
+//	fmt.Printf("bit_check:0x%x\n", bit_check)
 	l := int(0)
 	if (bit_check & 0x03) == 0 {
 		l = 2
@@ -214,12 +229,15 @@ func Decode(src []byte ) (inst Inst, err error) {
 	case 6:
 		u1 := binary.BigEndian.Uint32(src[:(inst.Len-2)])
 		u2 := binary.BigEndian.Uint16(src[(inst.Len-2):inst.Len])
+		//fmt.Printf("case 6:u1: 0x%x u2: 0x%x\n", u1, u2)
 		ui_extn = uint64(u1)<<16 |uint64(u2)
+		//fmt.Printf("case 6: ui_extn: 0x:%x\n", ui_extn)
 		ui_extn =  ui_extn << 16
 		inst.Enc = ui_extn
 	default:
 		return inst, errShort
 	}
+	//fmt.Printf("ui_extn: 0x%x\n", ui_extn)
 	for i, iform := range instFormats {
 		if ui_extn&iform.Mask != iform.Value {
 			continue
@@ -230,11 +248,11 @@ func Decode(src []byte ) (inst Inst, err error) {
 			}
 			// to match GNU objdump (libopcodes), we ignore don't care bits
 		}*/
-		for i, argfield := range iform.Args {
+		for j, argfield := range iform.Args {
 			if argfield == nil {
 				break
 			}
-			inst.Args[i] = argfield.Parse(ui_extn)
+			inst.Args[j] = argfield.Parse(ui_extn)
 		}
 		inst.Op = iform.Op
 		if debugDecode {
