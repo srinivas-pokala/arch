@@ -24,7 +24,7 @@ import (
 	"flag"
 	"fmt"
 	gofmt "go/format"
-	asm "golang.org/x/arch/s390x/s390xasm"
+	asm "github.com/srinivas-pokala/arch/s390x/s390xasm"
 	"log"
 	"os"
 	"regexp"
