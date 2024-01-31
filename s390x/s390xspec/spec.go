@@ -500,8 +500,15 @@ func mnemonic_RRF(mnemonic, format, opcode string) (string, string) {
 		mnemonic += " R1,R2,M4"
 		enc = str + "@0|//@16|M4@20|R1@24|R2@28|??@32"
 	case "RRF-e":
-		mnemonic += " R1,M3,R2"
-		enc = str + "@0|M3@16|//@20|R1@24|R2@28|??@32"
+		switch mnemonic {
+			case "CXFBRA", "CXFTR", "CDFBRA", "CDFTR", "CEFBRA", "CXGBRA", "CXGTRA", "CDGBRA", "CDGTRA", "CEGBRA", "CXLFBR",  "CXLFTR", "CDLFBR", "CDLFTR", "CELFBR",
+				"CXLGBR", "CXLGTR", "CDLGBR", "CDLGTR", "CELGBR", "CFXBRA", "CGXBRA", "CFXTR", "CGXTRA", "CFDBRA", "CGDBRA", "CFDTR", "CGDTRA":
+				mnemonic += " R1,M3,R2,M4"
+				enc = str + "@0|M3@16|M4@20|R1@24|R2@28|??@32"
+			default:
+				mnemonic += " R1,M3,R2"
+				enc = str + "@0|M3@16|//@20|R1@24|R2@28|??@32"
+		}
 	}
 	return mnemonic, enc
 }
@@ -592,12 +599,18 @@ func mnemonic_RX(mnemonic, format, opcode string) (string, string) {
 
 func mnemonic_RXE(mnemonic, opcode string) (string, string) {
 	var enc string
-	mnemonic += " R1,D2(X2,B2),M3"
 	val1, _ := strconv.ParseUint(opcode[:2], 16, 16)
 	str1 := strconv.Itoa(int(val1))
 	val2, _ := strconv.ParseUint(opcode[2:], 16, 16)
 	str2 := strconv.Itoa(int(val2))
-	enc = str1 + "@0|R1@8|X2@12|B2@16|D2@20|M3@32|//@36|" + str2 + "@40|??@48"
+	switch mnemonic {
+		case "LCBB":
+			mnemonic += " R1,D2(X2,B2),M3"
+			enc = str1 + "@0|R1@8|X2@12|B2@16|D2@20|M3@32|//@36|" + str2 + "@40|??@48"
+		default:
+			mnemonic += " R1,D2(X2,B2)"
+			enc = str1 + "@0|R1@8|X2@12|B2@16|D2@20|//@32|" + str2 + "@40|??@48"
+	}
 	return mnemonic, enc
 }
 
