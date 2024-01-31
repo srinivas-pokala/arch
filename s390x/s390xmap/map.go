@@ -301,33 +301,6 @@ func Imm_signed_32bit_check(op string) bool {
 return ret
 }
 
-//Displacement 12-bit Type(Sign/Unsign) Check
-/*func Disp_signed_12bit_check(op string) bool {
-	disp_12 := []string{""}
-	var ret bool
-	ret = false
-	for _, str := range disp_12 {
-		if strings.Compare(op, str) == 0 {
-			ret = true
-			break
-		}
-	}
-return ret
-}*/
-
-//Displacement 20-bit Type(Sign/Unsign) Check
-/*func Disp_signed_20bit_check(op string) bool {
-	disp_20 := []string{"LAA", "LAAG","LAAAL", "LAALG","LAMY","LAN", "LANG","LAX", "LAXG","LAO", "LAOG","LAY","LAEY","LB","LBH", "LFH","LGB","LGG","LHH","LHY","LGH","LLCH","LLZRGF","LLZRGF","LLGC","LLGFSG","LMG", "LMY","LOC","LOCFH", "LOCG","LY","LG","LGF", "LZRF", "LZRG","MVIY","SG","SGH","SGF","SHY","SLY","SLG", "SLGF","STAMY","STCH","STCMY", "STCMH","STCY","STFH","STG","STMY","STMG","STOCFH","STY", "SY"}
-	var ret bool
-	ret = false
-	for _, str := range disp_20 {
-		if strings.Compare(op, str) == 0 {
-			ret = true
-			break
-		}
-	}
-return ret
-} */
 func check_flags(flags string) bool {
         if strings.Contains(flags, "Da") {
                 return true
