@@ -488,7 +488,7 @@ func add(p *Prog, text, mnemonics, encoding, flags string) {
 		}
 		field.Type = typ
 		field.flags = flag
-		var f1 BitField
+		var f1 asm.BitField
 		i := args.Find(opr)
 		if i < 0 {
 			log.Fatalf("%s: couldn't find %s in %s", text, opr, args)
@@ -498,7 +498,7 @@ func add(p *Prog, text, mnemonics, encoding, flags string) {
 		inst.Fields = append(inst.Fields, field)
 	}
 	if strings.HasPrefix(inst.Op, "V") || strings.Contains(inst.Op, "WFC") || strings.Contains(inst.Op, "WFK") { //Check Vector Instructions
-		Bits := BitField{Offs: 36, Bits: 4}
+		Bits := asm.BitField{Offs: 36, Bits: 4}
 		field := Field{Name: "RXB", BitField: Bits, Type: asm.TypeImmUnsigned, flags: 0xC00}
 		inst.Fields = append(inst.Fields, field)
 	}
