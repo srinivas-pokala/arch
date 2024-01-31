@@ -385,7 +385,7 @@ func mnemonic_RIE(mnemonic, format, opcode string) (string, string) {
 		mnemonic += " R1,R3,RI2"
 		enc = str1 + "@0|R1@8|R3@12|RI2@16|//@32|" + str2 + "@40|??@48"
 	case "RIE-f":
-		mnemonic += " R1,R2,I3,I4[,I5]"
+		mnemonic += " R1,R2,I3,I4,I5"
 		enc = str1 + "@0|R1@8|R2@12|I3@16|I4@24|I5@32|" + str2 + "@40|??@48"
 	case "RIE-g":
 		mnemonic += " R1,I2,M3"
@@ -474,11 +474,25 @@ func mnemonic_RRF(mnemonic, format, opcode string) (string, string) {
 	str := strconv.Itoa(int(val))
 	switch format {
 	case "RRF-a":
-		mnemonic += " R1,R2,R3"
-		enc = str + "@0|R3@16|//@20|R1@24|R2@28|??@32"
+		switch mnemonic {
+			case "SELR", "SELGR", "SELFHR", "IPTE", "AXTRA", "ADTRA",
+				"DDTRA", "DXTRA", "MDTRA", "MXTRA", "SDTRA", "SXTRA":
+				mnemonic += " R1,R2,R3,M4"
+				enc = str + "@0|R3@16|M4@20|R1@24|R2@28|??@32"
+			default:
+				mnemonic += " R1,R2,R3"
+				enc = str + "@0|R3@16|//@20|R1@24|R2@28|??@32"
+		}
 	case "RRF-b":
-		mnemonic += " R1,R3,R2"
-		enc = str + "@0|R3@16|M4@20|R1@24|R2@28|??@32"
+		switch mnemonic {
+			case "CRDTE", "IDTE", "LPTEA", "RDP", "DIEBR", "DIDBR",
+				"QADTR", "QAXTR", "RRDTR", "RRXTR":
+				mnemonic += " R1,R3,R2,M4"
+				enc = str + "@0|R3@16|M4@20|R1@24|R2@28|??@32"
+			default:
+				mnemonic += " R1,R3,R2"
+				enc = str + "@0|R3@16|//@20|R1@24|R2@28|??@32"
+		}
 	case "RRF-c":
 		mnemonic += " R1,R2,M3"
 		enc = str + "@0|M3@16|//@20|R1@24|R2@28|??@32"
@@ -817,7 +831,7 @@ func mnemonic_VRR(mnemonic, format, opcode string) (string, string) {
 		mnemonic += " V1,V2,M3"
 		enc = str1 + "@0|//@8|V1@12|V2@16|//@20|M3@24|//@28|RXB@36|" + str2 + "@40|??@48"
 	case "VRR-i":
-		mnemonic += " R1,V2,M3[,M4]"
+		mnemonic += " R1,V2,M3,M4"
 		enc = str1 + "@0|R1@8|V2@12|//@16|M3@24|M4@28|//@32|RXB@36|" + str2 + "@40|??@48"
 	case "VRR-j":
 		mnemonic += " V1,V2,V3,M4"
@@ -837,7 +851,7 @@ func mnemonic_VRS(mnemonic, format, opcode string) (string, string) {
 	str2 := strconv.Itoa(int(val2))
 	switch format {
 	case "VRS-a":
-		mnemonic += " V1,V3,D2(B2)[,M4]"
+		mnemonic += " V1,V3,D2(B2),M4"
 		enc = str1 + "@0|V1@8|V3@12|B2@16|D2@20|M4@32|RXB@36|" + str2 + "@40|??@48"
 	case "VRS-b":
 		if strings.Contains(mnemonic, "VLVG") {
@@ -874,7 +888,7 @@ func mnemonic_VRX(mnemonic, opcode string) (string, string) {
 	str1 := strconv.Itoa(int(val1))
 	val2, _ := strconv.ParseUint(opcode[2:], 16, 16)
 	str2 := strconv.Itoa(int(val2))
-	mnemonic += " V1,D2(X2,B2)[,M3]"
+	mnemonic += " V1,D2(X2,B2),M3"
 	enc = str1 + "@0|V1@8|X2@12|B2@16|D2@20|M3@32|RXB@36|" + str2 + "@40|??@48"
 	return mnemonic, enc
 }
