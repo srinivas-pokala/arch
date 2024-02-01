@@ -710,7 +710,12 @@ func mnemonic_SS(mnemonic, format, opcode string) (string, string) {
 		mnemonic += " D1(R1,B1),D2(B2),R3"
 		enc = str + "@0|R1@8|R3@12|B1@16|D1@20|B2@32|D2@36|??@48"
 	case "SS-e":
-		mnemonic += " R1,D2(B2),R3,D4(B4)"
+		switch mnemonic {
+			case "LMD":
+				mnemonic += " R1,R3,D2(B2),D4(B4)"
+			case "PLO":
+				mnemonic += " R1,D2(B2),R3,D4(B4)"
+		}
 		enc = str + "@0|R1@8|R3@12|B2@16|D2@20|B4@32|D4@36|??@48"
 	case "SS-f":
 		mnemonic += " D1(B1),D2(L2,B2)"
@@ -731,11 +736,16 @@ func mnemonic_SSE(mnemonic, opcode string) (string, string) {
 
 func mnemonic_SSF(mnemonic, opcode string) (string, string) {
 	var enc string
-	mnemonic += " D1(B1),D2(B2),R3"
 	val1, _ := strconv.ParseUint(opcode[:2], 16, 16)
 	str1 := strconv.Itoa(int(val1))
 	val2, _ := strconv.ParseUint(opcode[2:], 16, 16)
 	str2 := strconv.Itoa(int(val2))
+	switch mnemonic {
+		case "LPD", "LPDG":
+			mnemonic += " R3,D1(B1),D2(B2)"
+		default:
+			mnemonic += " D1(B1),D2(B2),R3"
+	}
 	enc = str1 + "@0|R3@8|" + str2 + "@12|B1@16|D1@20|B2@32|D2@36|??@48"
 	return mnemonic, enc
 }
