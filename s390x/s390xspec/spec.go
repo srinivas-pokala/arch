@@ -449,21 +449,15 @@ func mnemonic_RRD(mnemonic, opcode string) (string, string) {
 
 func mnemonic_RRE(mnemonic, opcode string) (string, string) {
 	var enc string
-	var check_operand bool
-	load_str := []string{"LZER", "LZDR", "LZXR"}
 	val, _ := strconv.ParseUint(opcode, 16, 16)
 	str := strconv.Itoa(int(val))
-	for _, s := range load_str {
-		if strings.Compare(mnemonic, s) == 0 {
+	switch mnemonic {
+		case "LZER", "LZDR", "LZXR","EPAR","EPAIR","ESEA","ESAIR","ESAR","ETND","IAC", "IPM":
 			mnemonic += " R1"
 			enc = str + "@0|//@16|R1@24|//@28|??@32"
-			check_operand = true
-			break
-		}
-	}
-	if !check_operand {
-		mnemonic += " R1,R2"
-		enc = str + "@0|//@16|R1@24|R2@28|??@32"
+		default:
+			mnemonic += " R1,R2"
+			enc = str + "@0|//@16|R1@24|R2@28|??@32"
 	}
 	return mnemonic, enc
 }
@@ -502,7 +496,8 @@ func mnemonic_RRF(mnemonic, format, opcode string) (string, string) {
 	case "RRF-e":
 		switch mnemonic {
 			case "CXFBRA", "CXFTR", "CDFBRA", "CDFTR", "CEFBRA", "CXGBRA", "CXGTRA", "CDGBRA", "CDGTRA", "CEGBRA", "CXLFBR",  "CXLFTR", "CDLFBR", "CDLFTR", "CELFBR",
-				"CXLGBR", "CXLGTR", "CDLGBR", "CDLGTR", "CELGBR", "CFXBRA", "CGXBRA", "CFXTR", "CGXTRA", "CFDBRA", "CGDBRA", "CFDTR", "CGDTRA":
+				"CXLGBR", "CXLGTR", "CDLGBR", "CDLGTR", "CELGBR", "CFXBRA", "CGXBRA", "CFXTR", "CGXTRA", "CFDBRA", "CGDBRA", "CFDTR", "CGDTRA","CFEBRA", "CGEBRA",
+				"CLFEBR", "CLFDBR", "CLFXBR", "CLGEBR", "CLGDBR", "CLGXBR":
 				mnemonic += " R1,M3,R2,M4"
 				enc = str + "@0|M3@16|M4@20|R1@24|R2@28|??@32"
 			default:
@@ -817,8 +812,14 @@ func mnemonic_VRR(mnemonic, format, opcode string) (string, string) {
 				enc = str1 + "@0|V1@8|V2@12|//@16|M5@24|M4@28|M3@32|RXB@36|" + str2 + "@40|??@48"
 		}
 	case "VRR-b":
-		mnemonic += " V1,V2,V3,M4,M5"
-		enc = str1 + "@0|V1@8|V2@12|V3@16|//@20|M5@24|//@28|M4@32|RXB@36|" + str2 + "@40|??@48"
+		switch mnemonic {
+			case "VSCSHP":
+				mnemonic += " V1,V2,V3"
+				enc = str1 + "@0|V1@8|V2@12|V3@16|//@20|RXB@36|" + str2 + "@40|??@48"
+			default:
+				mnemonic += " V1,V2,V3,M4,M5"
+				enc = str1 + "@0|V1@8|V2@12|V3@16|//@20|M5@24|//@28|M4@32|RXB@36|" + str2 + "@40|??@48"
+		}
 	case "VRR-c":
 		mnemonic += " V1,V2,V3,M4,M5,M6"
 		enc = str1 + "@0|V1@8|V2@12|V3@16|//@20|M6@24|M5@28|M4@32|RXB@36|" + str2 + "@40|??@48"
