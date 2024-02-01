@@ -497,7 +497,7 @@ func mnemonic_RRF(mnemonic, format, opcode string) (string, string) {
 		switch mnemonic {
 			case "CXFBRA", "CXFTR", "CDFBRA", "CDFTR", "CEFBRA", "CXGBRA", "CXGTRA", "CDGBRA", "CDGTRA", "CEGBRA", "CXLFBR",  "CXLFTR", "CDLFBR", "CDLFTR", "CELFBR",
 				"CXLGBR", "CXLGTR", "CDLGBR", "CDLGTR", "CELGBR", "CFXBRA", "CGXBRA", "CFXTR", "CGXTRA", "CFDBRA", "CGDBRA", "CFDTR", "CGDTRA","CFEBRA", "CGEBRA",
-				"CLFEBR", "CLFDBR", "CLFXBR", "CLGEBR", "CLGDBR", "CLGXBR":
+				"CLFEBR", "CLFDBR", "CLFXBR", "CLGEBR", "CLGDBR", "CLGXBR", "CLFXTR", "CLFDTR", "CLGXTR","CLGDTR","FIEBRA","FIDBRA", "FIXBRA","FIDTR", "FIXTR":
 				mnemonic += " R1,M3,R2,M4"
 				enc = str + "@0|M3@16|M4@20|R1@24|R2@28|??@32"
 			default:
@@ -571,7 +571,12 @@ func mnemonic_RSY(mnemonic, format, opcode string) (string, string) {
 		mnemonic += " R1,R3,D2(B2)"
 		enc = str1 + "@0|R1@8|R3@12|B2@16|D2@20|" + str2 + "@40|??@48"
 	case "RSY-b":
-		mnemonic += " R1,M3,D2(B2)"
+		switch mnemonic {
+			case "LOC", "LOCFH","LOCG","STOCFH","STOC", "STOCG":
+				mnemonic += " R1,D2(B2),M3"
+			default:
+				mnemonic += " R1,M3,D2(B2)"
+		}
 		enc = str1 + "@0|R1@8|M3@12|B2@16|D2@20|" + str2 + "@40|??@48"
 	}
 	return mnemonic, enc
