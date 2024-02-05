@@ -2,11 +2,11 @@
 // // Use of this source code is governed by a BSD-style
 // // license that can be found in the LICENSE file.
 // //
-// // This file requires gcc and binutils with -mcpu=power10 support.
+// // This file requires gcc and binutils with -march=z16 support.
 // // s390xutil runs a series of commands like:
-// //   go run map.go -fmt=asm ../pp64.csv > asm.S
-// //   powerpc64le-linux-gnu-gcc -c asm.S -mcpu=power10 -mbig
-// //   powerpc64le-linux-gnu-objdump -d asm.o
+// //   go run map.go -fmt=asm ../s390x.csv > asm.S
+// //   /usr/bin/gcc -c asm.S -march=z16
+// //   /usr/bin/objdump -d asm.o
 // // to create the file decode_generated.txt used to verify the disassembler.
 // //
 // // Note, the golang disassembler is not expected to support every extended

@@ -7,8 +7,7 @@
 // Generate interesting test cases from s390x objdump via
 // go run util.go
 //
-// This requires s390x-linux-gnu-objdump be in
-// the PATH this command is run.
+// This requires s390x-linux-gnu-objdump be in the PATH this command is run.
 //
 // These tools can be acquired from the IBM advance toolchain for amd64 hosts too.
 
