@@ -721,8 +721,8 @@ func mnemonic_SS(mnemonic, format, opcode string) (string, string) {
 	str := strconv.Itoa(int(val))
 	switch format {
 	case "SS-a":
-		mnemonic += " D1(L,B1),D2(B2)"
-		enc = str + "@0|L@8|B1@16|D1@20|B2@32|D2@36|??@48"
+		mnemonic += " D1(L1,B1),D2(B2)"
+		enc = str + "@0|L1@8|B1@16|D1@20|B2@32|D2@36|??@48"
 	case "SS-b":
 		mnemonic += " D1(L1,B1),D2(L2,B2)"
 		enc = str + "@0|L1@8|L2@12|B1@16|D1@20|B2@32|D2@36|??@48"
