@@ -448,7 +448,7 @@ func add(p *Prog, text, mnemonics, encoding, flags string) {
 				break
 			}
 
-		case "L", "L1", "L2":
+		case "L1", "L2":
 			typ = asm.TypeLen
 			flag = 0x10
 		case "V1", "V2", "V3", "V4", "V5", "V6":
