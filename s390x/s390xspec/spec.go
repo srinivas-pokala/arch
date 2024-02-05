@@ -429,12 +429,16 @@ func mnemonic_RR(mnemonic, opcode string) (string, string) {
 	var enc string
 	val, _ := strconv.ParseUint(opcode, 16, 16)
 	str := strconv.Itoa(int(val))
-	if strings.Compare(mnemonic, "BCR") == 0 {
-		mnemonic += " M1,R2"
-		enc = str + "@0|M1@8|R2@12|??@16"
-	} else {
-		mnemonic += " R1,R2"
-		enc = str + "@0|R1@8|R2@12|??@16"
+	switch mnemonic {
+		case "BCR":
+			mnemonic += " M1,R2"
+			enc = str + "@0|M1@8|R2@12|??@16"
+		case "SPM":
+			mnemonic += " R1"
+			enc = str + "@0|R1@8|//@12|??@16"
+		default:
+			mnemonic += " R1,R2"
+			enc = str + "@0|R1@8|R2@12|??@16"
 	}
 	return mnemonic, enc
 }
@@ -452,9 +456,11 @@ func mnemonic_RRE(mnemonic, opcode string) (string, string) {
 	val, _ := strconv.ParseUint(opcode, 16, 16)
 	str := strconv.Itoa(int(val))
 	switch mnemonic {
-		case "LZER", "LZDR", "LZXR","EPAR","EPAIR","ESEA","ESAIR","ESAR","ETND","IAC", "IPM":
+		case "LZER", "LZDR", "LZXR","EPAR","EPAIR","ESEA","ESAIR","ESAR","ETND","IAC", "IPM", "MSTA", "PTF", "SFASR", "SSAR", "SSAIR":
 			mnemonic += " R1"
 			enc = str + "@0|//@16|R1@24|//@28|??@32"
+		case "NNPA", "PALB","PCC", "PCKMO":
+			enc = str + "@0|//@16|??@32"
 		default:
 			mnemonic += " R1,R2"
 			enc = str + "@0|//@16|R1@24|R2@28|??@32"
@@ -497,7 +503,8 @@ func mnemonic_RRF(mnemonic, format, opcode string) (string, string) {
 		switch mnemonic {
 			case "CXFBRA", "CXFTR", "CDFBRA", "CDFTR", "CEFBRA", "CXGBRA", "CXGTRA", "CDGBRA", "CDGTRA", "CEGBRA", "CXLFBR",  "CXLFTR", "CDLFBR", "CDLFTR", "CELFBR",
 				"CXLGBR", "CXLGTR", "CDLGBR", "CDLGTR", "CELGBR", "CFXBRA", "CGXBRA", "CFXTR", "CGXTRA", "CFDBRA", "CGDBRA", "CFDTR", "CGDTRA","CFEBRA", "CGEBRA",
-				"CLFEBR", "CLFDBR", "CLFXBR", "CLGEBR", "CLGDBR", "CLGXBR", "CLFXTR", "CLFDTR", "CLGXTR","CLGDTR","FIEBRA","FIDBRA", "FIXBRA","FIDTR", "FIXTR":
+				"CLFEBR", "CLFDBR", "CLFXBR", "CLGEBR", "CLGDBR", "CLGXBR", "CLFXTR", "CLFDTR", "CLGXTR","CLGDTR","FIEBRA","FIDBRA", "FIXBRA","FIDTR", "FIXTR",
+				"LDXBRA","LEDBRA", "LEXBRA", "LEDTR", "LDXTR":
 				mnemonic += " R1,M3,R2,M4"
 				enc = str + "@0|M3@16|M4@20|R1@24|R2@28|??@32"
 			default:
@@ -525,8 +532,14 @@ func mnemonic_RS(mnemonic, format, opcode string) (string, string) {
 	str := strconv.Itoa(int(val))
 	switch format {
 	case "RS-a":
-		mnemonic += " R1,R3,D2(B2)"
-		enc = str + "@0|R1@8|R3@12|B2@16|D2@20|??@32"
+		switch mnemonic {
+			case "SLDA", "SLDL", "SLA", "SLL", "SRA","SRDA", "SRDL", "SRL":
+				mnemonic += " R1,D2(B2)"
+				enc = str + "@0|R1@8|//@12|B2@16|D2@20|??@32"
+			default:
+				mnemonic += " R1,R3,D2(B2)"
+				enc = str + "@0|R1@8|R3@12|B2@16|D2@20|??@32"
+		}
 	case "RS-b":
 		mnemonic += " R1,M3,D2(B2)"
 		enc = str + "@0|R1@8|M3@12|B2@16|D2@20|??@32"
@@ -644,24 +657,28 @@ func mnemonic_RXY(mnemonic, format, opcode string) (string, string) {
 
 func mnemonic_S(mnemonic, opcode string) (string, string) {
 	var enc string
-	str_s := map[string]bool{"SCHM": true, "SAL": true, "RSCH": true, "RCHP": true, "PLTB": true, "HSCH": true, "CSCH": true, "XSCH": true, "IPK": true}
-	enc = opcode
 	val, _ := strconv.ParseUint(opcode, 16, 16)
 	str := strconv.Itoa(int(val))
-	if !str_s[mnemonic] {
-		mnemonic += " D2(B2)"
-		enc = str + "@0|B2@16|D2@20|??@32"
-	} else {
-		enc = str + "@0|//@16|??@32"
-	}
+	switch mnemonic {
+		case "PTLB", "TEND":
+			enc = str + "@0|//@16|??@32"
+		default:
+			mnemonic += " D2(B2)"
+			enc = str + "@0|B2@16|D2@20|??@32"
+		}
 	return mnemonic, enc
 }
 
 func mnemonic_SI(mnemonic, opcode string) (string, string) {
 	var enc string
-	mnemonic += " D1(B1),I2"
 	val, _ := strconv.ParseUint(opcode, 16, 16)
 	str := strconv.Itoa(int(val))
+	switch mnemonic {
+		case "TS", "SSM", "LPSW":
+			mnemonic += " D1(B1)"
+		default:
+			mnemonic += " D1(B1),I2"
+	}
 	enc = str + "@0|I2@8|B1@16|D1@20|??@32"
 	return mnemonic, enc
 }
@@ -713,7 +730,7 @@ func mnemonic_SS(mnemonic, format, opcode string) (string, string) {
 		switch mnemonic {
 			case "LMD":
 				mnemonic += " R1,R3,D2(B2),D4(B4)"
-			case "PLO":
+			default:
 				mnemonic += " R1,D2(B2),R3,D4(B4)"
 		}
 		enc = str + "@0|R1@8|R3@12|B2@16|D2@20|B4@32|D4@36|??@48"
@@ -836,16 +853,31 @@ func mnemonic_VRR(mnemonic, format, opcode string) (string, string) {
 				enc = str1 + "@0|V1@8|V2@12|V3@16|//@20|M5@24|//@28|M4@32|RXB@36|" + str2 + "@40|??@48"
 		}
 	case "VRR-c":
-		mnemonic += " V1,V2,V3,M4,M5,M6"
-		enc = str1 + "@0|V1@8|V2@12|V3@16|//@20|M6@24|M5@28|M4@32|RXB@36|" + str2 + "@40|??@48"
+		switch mnemonic {
+			case "VFA", "VFD", "VFM", "VFS", "VCRNF":	//V1,V2,V3,M4,M5
+				mnemonic += " V1,V2,V3,M4,M5"
+				enc = str1 + "@0|V1@8|V2@12|V3@16|//@20|M5@28|M4@32|RXB@36|" + str2 + "@40|??@48"
+
+			case  "VFCE", "VFCH", "VFCHE", "VFMAX", "VFMIN":	//V1,V2,V3,M4,M5,M6
+				mnemonic += " V1,V2,V3,M4,M5,M6"
+				enc = str1 + "@0|V1@8|V2@12|V3@16|//@20|M6@24|M5@28|M4@32|RXB@36|" + str2 + "@40|??@48"
+
+			case "VBPERM", "VN", "VNC", "VCKSM", "VX", "VNN", "VNO", "VNX",
+				"VO", "VOC","VSL", "VSLB", "VSRA", "VSRAB", "VSRL", "VSRLB":	//V1,V2,V3
+				mnemonic += " V1,V2,V3"
+				enc = str1 + "@0|V1@8|V2@12|V3@16|//@20|RXB@36|" + str2 + "@40|??@48"
+			default:	//V1,V2,V3,M4
+				mnemonic += " V1,V2,V3,M4"
+				enc = str1 + "@0|V1@8|V2@12|V3@16|//@20|M4@32|RXB@36|" + str2 + "@40|??@48"
+		}
 	case "VRR-d":
-		str_s := map[string]bool{"VMSL": true, "VSTRC": true, "VSTRS": true}
-		if str_s[mnemonic] {
-			mnemonic += " V1,V2,V3,V4,M5,M6"
-			enc = str1 + "@0|V1@8|V2@12|V3@16|M5@20|M6@24|//@28|V4@32|RXB@36|" + str2 + "@40|??@48"
-		} else {
-			mnemonic += " V1,V2,V3,V4,M5"
-			enc = str1 + "@0|V1@8|V2@12|V3@16|M5@20|//@24|V4@32|RXB@36|" + str2 + "@40|??@48"
+		switch mnemonic {
+			case "VMSL", "VSTRC", "VSTRS":		//V1,V2,V3,V4,M5,M6
+				mnemonic += " V1,V2,V3,V4,M5,M6"
+				enc = str1 + "@0|V1@8|V2@12|V3@16|M5@20|M6@24|//@28|V4@32|RXB@36|" + str2 + "@40|??@48"
+			default:
+				mnemonic += " V1,V2,V3,V4,M5"	//V1,V2,V3,V4,M5
+				enc = str1 + "@0|V1@8|V2@12|V3@16|M5@20|//@24|V4@32|RXB@36|" + str2 + "@40|??@48"
 		}
 	case "VRR-e":
 		mnemonic += " V1,V2,V3,V4,M5,M6"
