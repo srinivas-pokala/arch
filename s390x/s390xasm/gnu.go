@@ -429,7 +429,7 @@ func HandleExtndMnemonic(inst *Inst) string {
 
 			//For LOCFH, LOC, LOCG, SELR, SELGR, SELFHR, STOCFH, STOC, STOCG instructions,
 			//M-value is the forth operand. Hence, set the offset to "3"
-			if opString == "LOCFH" || opString == "LOC" || opString == "LOCFH" || opString == "SELR" || opString == "SELGR" ||
+			if opString == "LOCFH" || opString == "LOC" || opString == "SELR" || opString == "SELGR" ||
 				opString == "SELFHR" || opString == "STOCFH" || opString == "STOC" || opString == "STOCG" {
 				ldSt_InstrExtndMnics[i].Offset = 3
 			}
