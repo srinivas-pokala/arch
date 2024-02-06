@@ -239,7 +239,8 @@ func Decode(src []byte ) (inst Inst, err error) {
 	}
 	//fmt.Printf("ui_extn: 0x%x\n", ui_extn)
 	for i, iform := range instFormats {
-		if ui_extn&iform.Mask != iform.Value {
+		//if ui_extn&iform.Mask != iform.Value {
+		if ui_extn&iform.Mask != iform.Value && ((iform.DontCare & (^ui_extn)) == 0)  {
 			continue
 		}
 		/*if ui&iform.DontCare != 0 {

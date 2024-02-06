@@ -129,6 +129,7 @@ type Inst struct {
 	Op       string
 	Mask     uint64
 	Value    uint64
+	DontCare uint64
 	Len      uint16
 	Fields   []Field
 }
@@ -237,7 +238,7 @@ func parseFields(encoding, text string) Args {
 // Compute the Mask (usually Opcode + secondary Opcode bitfields),
 // the Value (the expected value under the mask), and
 // reserved bits (i.e the // fields which should be set to 0)
-func computeMaskValueReserved(args Args, text string) (mask, value uint64) {
+func computeMaskValueReserved(args Args, text string) (mask, value, reserved uint64) {
 	for i := 0; i < len(args); i++ {
 		arg := args[i]
 		v, err := strconv.Atoi(arg.Name)
@@ -251,11 +252,22 @@ func computeMaskValueReserved(args Args, text string) (mask, value uint64) {
 			args.Delete(i)
 			i--
 		case arg.Name[0] == '/': // don't care
+			if arg.Name != strings.Repeat("/", len(arg.Name)) {
+				log.Fatalf("%s: arg %v named like a don't care bit, but it's not", text, arg)
+			}
+			reserved |= arg.BitMask()
 			args.Delete(i)
 			i--
 		default:
 			continue
 		}
+	}
+	// sanity checks
+	if mask&reserved != 0 {
+		log.Fatalf("%s: mask (%08x) and don't care (%08x) collide", text, mask, reserved)
+	}
+	if value&^mask != 0 {
+		log.Fatalf("%s: value (%08x) out of range of mask (%08x)", text, value, mask)
 	}
 	return
 }
@@ -326,11 +338,11 @@ func add(p *Prog, text, mnemonics, encoding, flags string) {
 	var args Args
 
 	args = parseFields(encoding, text)
-	mask, value := computeMaskValueReserved(args, text)
+	mask, value, dontCare := computeMaskValueReserved(args, text)
 
 	// split mnemonics into individual instructions
 	// example: "b target_addr (AA=0 LK=0)|ba target_addr (AA=1 LK=0)|bl target_addr (AA=0 LK=1)|bla target_addr (AA=1 LK=1)"
-	inst := Inst{Text: text, Encoding: mnemonics, Value: value, Mask: mask}
+	inst := Inst{Text: text, Encoding: mnemonics, Value: value, Mask: mask, DontCare: dontCare}
 
 	// order inst.Args according to mnemonics order
 	for i, opr := range operandRe.FindAllString(mnemonics, -1) {
@@ -572,8 +584,8 @@ func printDecoder(p *Prog) {
 	// Emit decoding table.
 	fmt.Fprintf(&buf, "var instFormats = [...]instFormat{\n")
 	for _, inst := range p.Insts {
-		m, v := inst.Mask, inst.Value
-		fmt.Fprintf(&buf, "\t{ %s, %#x, %#x,", inst.Op, m, v)
+		m, v, dc := inst.Mask, inst.Value, inst.DontCare
+		fmt.Fprintf(&buf, "\t{ %s, %#x, %#x, %#x,", inst.Op, m, v, dc)
 		fmt.Fprintf(&buf, " // %s (%s)\n\t\t[8]*argField{", inst.Text, inst.Encoding)
 		for _, f := range inst.Fields {
 			fmt.Fprintf(&buf, "%s, ", argFieldName(f))
