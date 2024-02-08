@@ -358,12 +358,12 @@ func add(p *Prog, text, mnemonics, encoding, flags string) {
 			switch opr {
                                 case "R1":
                                         if check_flags(flags) {
-                                                if strings.Contains(text, "CONVERT FROM") {
-                                                        typ = asm.TypeFPReg
-                                                        flag = 0x2
-                                                } else {
+                                                if strings.Contains(text, "CONVERT TO") {
                                                         typ = asm.TypeReg
                                                         flag = 0x1
+                                                } else {
+                                                        typ = asm.TypeFPReg
+                                                        flag = 0x2
                                                 }
                                         } else {
                                                 typ = asm.TypeReg
@@ -371,12 +371,12 @@ func add(p *Prog, text, mnemonics, encoding, flags string) {
                                         }
                                 case "R2":
                                         if check_flags(flags) {
-                                                if strings.Contains(text, "CONVERT TO") {
-                                                        typ = asm.TypeFPReg
-                                                        flag = 0x2
-                                                } else {
+                                                if strings.Contains(text, "CONVERT FROM") {
                                                         typ = asm.TypeReg
                                                         flag = 0x1
+                                                } else {
+                                                        typ = asm.TypeFPReg
+                                                        flag = 0x2
                                                 }
                                         } else {
                                                 typ = asm.TypeReg
