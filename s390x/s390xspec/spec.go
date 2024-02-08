@@ -167,7 +167,7 @@ func parsePage(num int, p pdf.Page) []Inst {
 			text = text[1:]
 		}
 		flags := text[0].S
-		for len(text) > 0 && !(match(text[0], "Helvetica-Narrow", 8, "") && ((matchXCord(text[0], 481.7) && (!matchXCord(text[1], 496.1))) || (matchXCord(text[0], 514) || matchXCord(text[0], 496.1)))) {
+		for len(text) > 0 && !(match(text[0], "Helvetica-Narrow", 8, "") && ((matchXCord(text[0], 481.7) && (!matchXCord(text[1], 496.1))) || matchXCord(text[0], 496.1) || (matchXCord(text[0],499.6) && (!matchXCord(text[1], 514))) ||(matchXCord(text[0], 514)))) {
 			text = text[1:]
 		}
 		if len(text) == 0 {
@@ -175,7 +175,7 @@ func parsePage(num int, p pdf.Page) []Inst {
 		}
 		opcode := text[0].S
 		b1, b2, _ := strings.Cut(opcode, " ")
-		if matchXCord(text[0], 481.7) {
+		if matchXCord(text[0], 481.7) || matchXCord(text[0], 499.6) {
 			opcode = b2
 		} else {
 			opcode = b1
