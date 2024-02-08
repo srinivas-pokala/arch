@@ -32,7 +32,7 @@ type instFormat struct {
 	Op       Op
 	Mask     uint64
 	Value    uint64
-//	DontCare uint64
+	DontCare uint64
 	Args     [8]*argField
 }
 
@@ -206,7 +206,6 @@ func Decode(src []byte ) (inst Inst, err error) {
 	}
 	bit_check := binary.BigEndian.Uint16(src[:2])
 	bit_check =  bit_check >> 14
-//	fmt.Printf("bit_check:0x%x\n", bit_check)
 	l := int(0)
 	if (bit_check & 0x03) == 0 {
 		l = 2
@@ -240,7 +239,7 @@ func Decode(src []byte ) (inst Inst, err error) {
 	//fmt.Printf("ui_extn: 0x%x\n", ui_extn)
 	for i, iform := range instFormats {
 		//if ui_extn&iform.Mask != iform.Value {
-		if ui_extn&iform.Mask != iform.Value && ((iform.DontCare & (^ui_extn)) == 0)  {
+		if ui_extn&iform.Mask != iform.Value	{
 			continue
 		}
 		/*if ui&iform.DontCare != 0 {
@@ -249,6 +248,9 @@ func Decode(src []byte ) (inst Inst, err error) {
 			}
 			// to match GNU objdump (libopcodes), we ignore don't care bits
 		}*/
+		if (iform.DontCare & ^(ui_extn)) != iform.DontCare  {
+			continue
+		}
 		for j, argfield := range iform.Args {
 			if argfield == nil {
 				break

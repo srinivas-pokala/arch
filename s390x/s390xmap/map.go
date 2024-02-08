@@ -540,14 +540,21 @@ func printDecoder(p *Prog) {
 	// Build list of opcodes, using the csv order (which corresponds to ISA docs order)
 	m := map[string]bool{}
 	fmt.Fprintf(&buf, "const (\n\t_ Op = iota\n")
-	for _, inst := range p.Insts {
-		name := inst.Op
-		if ok := m[name]; ok {
-			continue
-		}
-		m[name] = true
-		fmt.Fprintf(&buf, "\t%s\n", name)
-	}
+	for i:=0;i<len(p.Insts);i++ {
+                name := p.Insts[i].Op
+                switch name {
+                case "CUUTF", "CUTFU":
+                        m[name] = false
+                        p.Insts = append(p.Insts[:i], p.Insts[i+1:]...)
+                        i--
+                default:
+                        m[name] = true
+                }
+                if ok := m[name]; !ok {
+                        continue
+                }
+	fmt.Fprintf(&buf, "\t%s\n", name)
+        }
 	fmt.Fprint(&buf, ")\n\n\n")
 
 	// Emit slice mapping opcode number to name string.

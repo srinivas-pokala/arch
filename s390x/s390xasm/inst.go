@@ -20,14 +20,11 @@ type Inst struct {
 func (i Inst) String(pc uint64) string {
 	var buf bytes.Buffer
 	var rxb_check bool
-	//buf.WriteString(fmt.Sprintf("%-8s",strings.ToLower(i.Op.String())))
 	mnemonic := HandleExtndMnemonic(&i)
 	if strings.HasPrefix(mnemonic,"V") || strings.Contains(mnemonic,"WFC") || strings.Contains(mnemonic, "WFK") {
-		//i.Args[len(i.Args)-1] = nil
 		rxb_check = true
-		//fmt.Printf("Srinivas:RXb len:%d\n", len(i.Args))
 	}
-	buf.WriteString(fmt.Sprintf("%-8s",strings.ToLower(mnemonic)))
+	buf.WriteString(fmt.Sprintf("%s",strings.ToLower(mnemonic)))
 	for j, arg := range i.Args {
 		if arg == nil {
 			break
@@ -38,7 +35,7 @@ func (i Inst) String(pc uint64) string {
 			switch arg.(type) {
 			case Index, Base, Len:
 			default:
-				buf.WriteString(", ")
+				buf.WriteString(",")
 			}
 		}
 		switch arg.(type) {
@@ -174,9 +171,9 @@ type RegIm12 uint16
 func (RegIm12) IsArg() {}
 func (r RegIm12) String(pc uint64) string {
 	if (r >> 11) & 0x01 == 1 {
-		return fmt.Sprintf("%x", pc + (2*uint64(int16(r | 0xf<<12))))
+		return fmt.Sprintf("%#x", pc + (2*uint64(int16(r | 0xf<<12))))
 	} else {
-		return fmt.Sprintf("%x", pc + (2*uint64(int16(r))))
+		return fmt.Sprintf("%#x", pc + (2*uint64(int16(r))))
 	}
 }
 
@@ -185,7 +182,7 @@ type RegIm16 uint16
 
 func (RegIm16) IsArg() {}
 func (r RegIm16) String(pc uint64) string {
-	return fmt.Sprintf("%x", pc+ (2*uint64(int16(r))))
+	return fmt.Sprintf("%#x", pc+ (2*uint64(int16(r))))
 }
 
 // RegIm24 represents an 24-bit Register immediate number.

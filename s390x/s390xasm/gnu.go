@@ -100,16 +100,16 @@ func HandleExtndMnemonic(inst *Inst) string {
 		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 15, Offset: 0, ExtnOpStr: "J"},
 
 		//BRCL - BRANCH RELATIVE ON CONDITION LONG instruction
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 0, Offset: 0, ExtnOpStr: "JLNOP"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 1, Offset: 0, ExtnOpStr: "JLO"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 2, Offset: 0, ExtnOpStr: "JLH"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 4, Offset: 0, ExtnOpStr: "JLL"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 7, Offset: 0, ExtnOpStr: "JLNE"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 8, Offset: 0, ExtnOpStr: "JLE"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 11, Offset: 0, ExtnOpStr: "JLNL"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 13, Offset: 0, ExtnOpStr: "JLNH"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 14, Offset: 0, ExtnOpStr: "JLNO"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 15, Offset: 0, ExtnOpStr: "JLU"},
+		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 0, Offset: 0, ExtnOpStr: "JGNOP"},
+		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 1, Offset: 0, ExtnOpStr: "JGO"},
+		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 2, Offset: 0, ExtnOpStr: "JGH"},
+		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 4, Offset: 0, ExtnOpStr: "JGL"},
+		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 7, Offset: 0, ExtnOpStr: "JGNE"},
+		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 8, Offset: 0, ExtnOpStr: "JGE"},
+		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 11, Offset: 0, ExtnOpStr: "JGNL"},
+		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 13, Offset: 0, ExtnOpStr: "JGNH"},
+		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 14, Offset: 0, ExtnOpStr: "JGNO"},
+		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 15, Offset: 0, ExtnOpStr: "JG"},
 	}
 
 	//Compare instructions
@@ -125,13 +125,13 @@ func HandleExtndMnemonic(inst *Inst) string {
 	//Load and Store instructions
 	ldSt_InstrExtndMnics := []typ2_ExtndMnics{
 		typ2_ExtndMnics{Value: 1, Offset: 2, ExtnOpStr: "O"},
-		typ2_ExtndMnics{Value: 2, Offset: 2, ExtnOpStr: "P"},
-		typ2_ExtndMnics{Value: 4, Offset: 2, ExtnOpStr: "M"},
-		typ2_ExtndMnics{Value: 7, Offset: 2, ExtnOpStr: "NZ"},
-		typ2_ExtndMnics{Value: 8, Offset: 2, ExtnOpStr: "Z"},
+		typ2_ExtndMnics{Value: 2, Offset: 2, ExtnOpStr: "H"},
+		typ2_ExtndMnics{Value: 4, Offset: 2, ExtnOpStr: "L"},
+		typ2_ExtndMnics{Value: 7, Offset: 2, ExtnOpStr: "NE"},
+		typ2_ExtndMnics{Value: 8, Offset: 2, ExtnOpStr: "E"},
                 typ2_ExtndMnics{Value: 10, Offset: 2, ExtnOpStr: "HE"},
-		typ2_ExtndMnics{Value: 11, Offset: 2, ExtnOpStr: "NM"},
-		typ2_ExtndMnics{Value: 13, Offset: 2, ExtnOpStr: "NP"},
+		typ2_ExtndMnics{Value: 11, Offset: 2, ExtnOpStr: "NL"},
+		typ2_ExtndMnics{Value: 13, Offset: 2, ExtnOpStr: "NH"},
 		typ2_ExtndMnics{Value: 14, Offset: 2, ExtnOpStr: "NO"},
 	}
 
