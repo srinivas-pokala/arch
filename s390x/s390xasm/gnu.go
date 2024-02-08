@@ -126,11 +126,16 @@ func HandleExtndMnemonic(inst *Inst) string {
 	ldSt_InstrExtndMnics := []typ2_ExtndMnics{
 		typ2_ExtndMnics{Value: 1, Offset: 2, ExtnOpStr: "O"},
 		typ2_ExtndMnics{Value: 2, Offset: 2, ExtnOpStr: "H"},
+		typ2_ExtndMnics{Value: 3, Offset: 2, ExtnOpStr: "NLE"},
 		typ2_ExtndMnics{Value: 4, Offset: 2, ExtnOpStr: "L"},
+		typ2_ExtndMnics{Value: 5, Offset: 2, ExtnOpStr: "NHE"},
+		typ2_ExtndMnics{Value: 6, Offset: 2, ExtnOpStr: "LH"},
 		typ2_ExtndMnics{Value: 7, Offset: 2, ExtnOpStr: "NE"},
 		typ2_ExtndMnics{Value: 8, Offset: 2, ExtnOpStr: "E"},
+		typ2_ExtndMnics{Value: 9, Offset: 2, ExtnOpStr: "NLH"},
                 typ2_ExtndMnics{Value: 10, Offset: 2, ExtnOpStr: "HE"},
 		typ2_ExtndMnics{Value: 11, Offset: 2, ExtnOpStr: "NL"},
+		typ2_ExtndMnics{Value: 12, Offset: 2, ExtnOpStr: "LE"},
 		typ2_ExtndMnics{Value: 13, Offset: 2, ExtnOpStr: "NH"},
 		typ2_ExtndMnics{Value: 14, Offset: 2, ExtnOpStr: "NO"},
 	}
