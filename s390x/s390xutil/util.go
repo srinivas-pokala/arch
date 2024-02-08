@@ -70,7 +70,7 @@ func genOutput(name, tcPfx string, generator func(io.Writer)) {
 			}
 			opc := strings.Join(ln[2:cnt+2], "")
 			dec := strings.Join(ln[cnt+2:], " ")
-			fmt.Fprintf(outf, "%-12s|\tgnu\t%-18s\n", opc, dec)
+			fmt.Fprintf(outf, "%12s|\tgnu\t%-18s\n", opc, dec)
 		}
 	}
 	cmd.Wait()
