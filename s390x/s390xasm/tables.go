@@ -345,10 +345,8 @@ const (
 	CUDTR
 	CZXT
 	CZDT
-	CUUTF
 	CU24
 	CU21
-	CUTFU
 	CU12
 	CU14
 	CU42
@@ -459,6 +457,8 @@ const (
 	LER
 	LEY
 	LAM
+	LAMY
+	LA
 	LAY
 	LAE
 	LAEY
@@ -1591,10 +1591,8 @@ var opstr = [...]string{
 	CUDTR:   "CUDTR",
 	CZXT:    "CZXT",
 	CZDT:    "CZDT",
-	CUUTF:   "CUUTF",
 	CU24:    "CU24",
 	CU21:    "CU21",
-	CUTFU:   "CUTFU",
 	CU12:    "CU12",
 	CU14:    "CU14",
 	CU42:    "CU42",
@@ -1705,6 +1703,8 @@ var opstr = [...]string{
 	LER:     "LER",
 	LEY:     "LEY",
 	LAM:     "LAM",
+	LAMY:    "LAMY",
+	LA:      "LA",
 	LAY:     "LAY",
 	LAE:     "LAE",
 	LAEY:    "LAEY",
@@ -3238,13 +3238,9 @@ var instFormats = [...]instFormat{
 		[8]*argField{ap_Reg_32_35, ap_DispUnsigned_20_31, ap_Len_8_15, ap_BaseReg_16_19, ap_Mask_36_39}},
 	{CZDT, 0xff00000000ff0000, 0xed00000000a80000, 0x0, // CONVERT TO ZONED (from long DFP) (CZDT R1,D2(L2,B2),M3)
 		[8]*argField{ap_Reg_32_35, ap_DispUnsigned_20_31, ap_Len_8_15, ap_BaseReg_16_19, ap_Mask_36_39}},
-	{CUUTF, 0xffff000000000000, 0xb2a6000000000000, 0xf0000000000, // CONVERT UNICODE TO UTF-8 (CUUTF R1,R2,M3)
-		[8]*argField{ap_Reg_24_27, ap_Reg_28_31, ap_Mask_16_19}},
 	{CU24, 0xffff000000000000, 0xb9b1000000000000, 0xf0000000000, // CONVERT UTF-16 TO UTF-32 (CU24 R1,R2,M3)
 		[8]*argField{ap_Reg_24_27, ap_Reg_28_31, ap_Mask_16_19}},
 	{CU21, 0xffff000000000000, 0xb2a6000000000000, 0xf0000000000, // CONVERT UTF-16 TO UTF-8 (CU21 R1,R2,M3)
-		[8]*argField{ap_Reg_24_27, ap_Reg_28_31, ap_Mask_16_19}},
-	{CUTFU, 0xffff000000000000, 0xb2a7000000000000, 0xf0000000000, // CONVERT UTF-8 TO UNICODE (CUTFU R1,R2,M3)
 		[8]*argField{ap_Reg_24_27, ap_Reg_28_31, ap_Mask_16_19}},
 	{CU12, 0xffff000000000000, 0xb2a7000000000000, 0xf0000000000, // CONVERT UTF-8 TO UTF-16 (CU12 R1,R2,M3)
 		[8]*argField{ap_Reg_24_27, ap_Reg_28_31, ap_Mask_16_19}},
@@ -3362,8 +3358,8 @@ var instFormats = [...]instFormat{
 		[8]*argField{ap_Reg_8_11, ap_Reg_12_15, ap_DispSigned20_20_39, ap_BaseReg_16_19}},
 	{ECTG, 0xff0f000000000000, 0xc801000000000000, 0x0, // EXTRACT CPU TIME (ECTG D1(B1),D2(B2),R3)
 		[8]*argField{ap_DispUnsigned_20_31, ap_BaseReg_16_19, ap_DispUnsigned_36_47, ap_BaseReg_32_35, ap_Reg_8_11}},
-	{EFPC, 0xffff000000000000, 0xb38c000000000000, 0xff0000000000, // EXTRACT FPC (EFPC R1,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31}},
+	{EFPC, 0xffff000000000000, 0xb38c000000000000, 0xff0f00000000, // EXTRACT FPC (EFPC R1)
+		[8]*argField{ap_FPReg_24_27}},
 	{EPAR, 0xffff000000000000, 0xb226000000000000, 0xff0f00000000, // EXTRACT PRIMARY ASN (EPAR R1)
 		[8]*argField{ap_Reg_24_27}},
 	{EPAIR, 0xffff000000000000, 0xb99a000000000000, 0xff0f00000000, // EXTRACT PRIMARY ASN AND INSTANCE (EPAIR R1)
@@ -3464,8 +3460,12 @@ var instFormats = [...]instFormat{
 		[8]*argField{ap_FPReg_8_11, ap_FPReg_12_15}},
 	{LEY, 0xff00000000ff0000, 0xed00000000640000, 0x0, // LOAD (short) (LEY R1,D2(X2,B2))
 		[8]*argField{ap_FPReg_8_11, ap_DispSigned20_20_39, ap_IndexReg_12_15, ap_BaseReg_16_19}},
-	{LAM, 0xff00000000000000, 0x4100000000000000, 0x0, // LOAD ACCESS MULTIPLE (LAM R1,R3,D2(B2))
+	{LAM, 0xff00000000000000, 0x9a00000000000000, 0x0, // LOAD ACCESS MULTIPLE 7-268 (LAM R1,R3,D2(B2))
 		[8]*argField{ap_Reg_8_11, ap_Reg_12_15, ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
+	{LAMY, 0xff00000000ff0000, 0xeb000000009a0000, 0x0, // LOAD ACCESS MULTIPLE 7-268 (LAMY R1,R3,D2(B2))
+		[8]*argField{ap_Reg_8_11, ap_Reg_12_15, ap_DispSigned20_20_39, ap_BaseReg_16_19}},
+	{LA, 0xff00000000000000, 0x4100000000000000, 0x0, // LOAD ADDRESS (LA R1,D2(X2,B2))
+		[8]*argField{ap_Reg_8_11, ap_DispUnsigned_20_31, ap_IndexReg_12_15, ap_BaseReg_16_19}},
 	{LAY, 0xff00000000ff0000, 0xe300000000710000, 0x0, // LOAD ADDRESS (LAY R1,D2(X2,B2))
 		[8]*argField{ap_Reg_8_11, ap_DispSigned20_20_39, ap_IndexReg_12_15, ap_BaseReg_16_19}},
 	{LAE, 0xff00000000000000, 0x5100000000000000, 0x0, // LOAD ADDRESS EXTENDED (LAE R1,D2(X2,B2))
