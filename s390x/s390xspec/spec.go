@@ -456,7 +456,7 @@ func mnemonic_RRE(mnemonic, opcode string) (string, string) {
 	val, _ := strconv.ParseUint(opcode, 16, 16)
 	str := strconv.Itoa(int(val))
 	switch mnemonic {
-		case "LZER", "LZDR", "LZXR","EFPC","EPAR","EPAIR","ESEA","ESAIR","ESAR","ETND","IAC", "IPM", "MSTA", "PTF", "SFASR", "SSAR", "SSAIR":
+		case "LZER", "LZDR", "LZXR","EFPC","EPAR","EPAIR","ESEA","ESAIR","ESAR","ETND","IAC", "IPM", "MSTA", "PTF", "SFASR", "SFPC", "SSAR", "SSAIR":
 			mnemonic += " R1"
 			enc = str + "@0|//@16|R1@24|//@28|??@32"
 		case "NNPA", "PALB","PCC", "PCKMO":
