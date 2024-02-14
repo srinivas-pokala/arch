@@ -47,13 +47,13 @@
 #define I5 18
 
 
-#define RI2 -100
+#define RI2 0
 #define RI3 294
 #define RI4 -168
 
 
-#define M1 1
+#define M1 7
 #define M3 3
-#define M4 2
-#define M5 3
-#define M6 2
+#define M4 1
+#define M5 9
+#define M6 11

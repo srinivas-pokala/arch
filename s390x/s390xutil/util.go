@@ -24,7 +24,6 @@ import (
 	"strings"
 )
 
-
 // Emit a test file using the generator called name.txt.  This requires
 // a GCC toolchain which supports -march=z16.
 func genOutput(name, tcPfx string, generator func(io.Writer)) {
@@ -58,14 +57,13 @@ func genOutput(name, tcPfx string, generator func(io.Writer)) {
 	for scanner.Scan() {
 		ln := spacere.Split(scanner.Text(), -1)
 		var cnt int16
-		if len(ln) >= 6 {
+		if len(ln) >= 5 {
 			v, _ := strconv.ParseInt(ln[2], 16, 16)
-			if (v >>6 & 0x3) == 0 {
-				//fmt.Printf(" I am zero value, %v\n", v)
+			if (v >> 6 & 0x3) == 0 {
 				cnt = 2
 			} else if v>>6&0x3 == 1 || v>>6&0x3 == 2 {
 				cnt = 4
-			} else  {
+			} else {
 				cnt = 6
 			}
 			opc := strings.Join(ln[2:cnt+2], "")
