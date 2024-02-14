@@ -795,7 +795,6 @@ const (
 	PFMF
 	PLO
 	PPA
-	PPNO
 	PRNO
 	PTFF
 	PTF
@@ -2041,7 +2040,6 @@ var opstr = [...]string{
 	PFMF:    "PFMF",
 	PLO:     "PLO",
 	PPA:     "PPA",
-	PPNO:    "PPNO",
 	PRNO:    "PRNO",
 	PTFF:    "PTFF",
 	PTF:     "PTF",
@@ -2537,12 +2535,17 @@ var (
 	ap_ImmUnsigned_32_39   = &argField{Type: TypeImmUnsigned, flags: 0x0, BitField: BitField{32, 8}}
 	ap_FPReg_32_35         = &argField{Type: TypeFPReg, flags: 0x2, BitField: BitField{32, 4}}
 	ap_Mask_36_39          = &argField{Type: TypeMask, flags: 0x800, BitField: BitField{36, 4}}
-	ap_Reg_32_35           = &argField{Type: TypeReg, flags: 0x1, BitField: BitField{32, 4}}
+	ap_ACReg_24_27         = &argField{Type: TypeACReg, flags: 0x3, BitField: BitField{24, 4}}
+	ap_ACReg_28_31         = &argField{Type: TypeACReg, flags: 0x3, BitField: BitField{28, 4}}
 	ap_VecReg_8_11         = &argField{Type: TypeVecReg, flags: 0x8, BitField: BitField{8, 4}}
 	ap_VecReg_12_15        = &argField{Type: TypeVecReg, flags: 0x8, BitField: BitField{12, 4}}
 	ap_VecReg_16_19        = &argField{Type: TypeVecReg, flags: 0x8, BitField: BitField{16, 4}}
 	ap_ImmUnsigned_36_39   = &argField{Type: TypeImmUnsigned, flags: 0xc00, BitField: BitField{36, 4}}
 	ap_Mask_24_27          = &argField{Type: TypeMask, flags: 0x800, BitField: BitField{24, 4}}
+	ap_ACReg_8_11          = &argField{Type: TypeACReg, flags: 0x3, BitField: BitField{8, 4}}
+	ap_ACReg_12_15         = &argField{Type: TypeACReg, flags: 0x3, BitField: BitField{12, 4}}
+	ap_CReg_8_11           = &argField{Type: TypeCReg, flags: 0x4, BitField: BitField{8, 4}}
+	ap_CReg_12_15          = &argField{Type: TypeCReg, flags: 0x4, BitField: BitField{12, 4}}
 	ap_ImmUnsigned_24_27   = &argField{Type: TypeImmUnsigned, flags: 0x0, BitField: BitField{24, 4}}
 	ap_ImmUnsigned_28_31   = &argField{Type: TypeImmUnsigned, flags: 0x0, BitField: BitField{28, 4}}
 	ap_ImmUnsigned_16_23   = &argField{Type: TypeImmUnsigned, flags: 0x0, BitField: BitField{16, 8}}
@@ -3103,37 +3106,37 @@ var instFormats = [...]instFormat{
 	{CEGR, 0xffff000000000000, 0xb3c4000000000000, 0xff0000000000, // CONVERT FROM FIXED (64 to short HFP) (CEGR R1,R2)
 		[8]*argField{ap_FPReg_24_27, ap_Reg_28_31}},
 	{CXLFBR, 0xffff000000000000, 0xb392000000000000, 0x0, // CONVERT FROM LOGICAL (32 to extended BFP) (CXLFBR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_Reg_28_31, ap_Mask_20_23}},
 	{CXLFTR, 0xffff000000000000, 0xb95b000000000000, 0x0, // CONVERT FROM LOGICAL (32 to extended DFP) (CXLFTR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_Reg_28_31, ap_Mask_20_23}},
 	{CDLFBR, 0xffff000000000000, 0xb391000000000000, 0x0, // CONVERT FROM LOGICAL (32 to long BFP) (CDLFBR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_Reg_28_31, ap_Mask_20_23}},
 	{CDLFTR, 0xffff000000000000, 0xb953000000000000, 0x0, // CONVERT FROM LOGICAL (32 to long DFP) (CDLFTR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_Reg_28_31, ap_Mask_20_23}},
 	{CELFBR, 0xffff000000000000, 0xb390000000000000, 0x0, // CONVERT FROM LOGICAL (32 to short BFP) (CELFBR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_Reg_28_31, ap_Mask_20_23}},
 	{CXLGBR, 0xffff000000000000, 0xb3a2000000000000, 0x0, // CONVERT FROM LOGICAL (64 to extended BFP) (CXLGBR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_Reg_28_31, ap_Mask_20_23}},
 	{CXLGTR, 0xffff000000000000, 0xb95a000000000000, 0x0, // CONVERT FROM LOGICAL (64 to extended DFP) (CXLGTR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_Reg_28_31, ap_Mask_20_23}},
 	{CDLGBR, 0xffff000000000000, 0xb3a1000000000000, 0x0, // CONVERT FROM LOGICAL (64 to long BFP) (CDLGBR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_Reg_28_31, ap_Mask_20_23}},
 	{CDLGTR, 0xffff000000000000, 0xb952000000000000, 0x0, // CONVERT FROM LOGICAL (64 to long DFP) (CDLGTR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_Reg_28_31, ap_Mask_20_23}},
 	{CELGBR, 0xffff000000000000, 0xb3a0000000000000, 0x0, // CONVERT FROM LOGICAL (64 to short BFP) (CELGBR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_Reg_28_31, ap_Mask_20_23}},
 	{CXPT, 0xff00000000ff0000, 0xed00000000af0000, 0x0, // CONVERT FROM PACKED (to extended DFP) (CXPT R1,D2(L2,B2),M3)
 		[8]*argField{ap_FPReg_32_35, ap_DispUnsigned_20_31, ap_Len_8_15, ap_BaseReg_16_19, ap_Mask_36_39}},
 	{CDPT, 0xff00000000ff0000, 0xed00000000ae0000, 0x0, // CONVERT FROM PACKED (to long DFP) (CDPT R1,D2(L2,B2),M3)
 		[8]*argField{ap_FPReg_32_35, ap_DispUnsigned_20_31, ap_Len_8_15, ap_BaseReg_16_19, ap_Mask_36_39}},
 	{CXSTR, 0xffff000000000000, 0xb3fb000000000000, 0xff0000000000, // CONVERT FROM SIGNED PACKED (128 to extended DFP) (CXSTR R1,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31}},
+		[8]*argField{ap_FPReg_24_27, ap_Reg_28_31}},
 	{CDSTR, 0xffff000000000000, 0xb3f3000000000000, 0xff0000000000, // CONVERT FROM SIGNED PACKED (64 to long DFP) (CDSTR R1,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31}},
+		[8]*argField{ap_FPReg_24_27, ap_Reg_28_31}},
 	{CXUTR, 0xffff000000000000, 0xb3fa000000000000, 0xff0000000000, // CONVERT FROM UNSIGNED PACKED (128 to ext. DFP) (CXUTR R1,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31}},
+		[8]*argField{ap_FPReg_24_27, ap_Reg_28_31}},
 	{CDUTR, 0xffff000000000000, 0xb3f2000000000000, 0xff0000000000, // CONVERT FROM UNSIGNED PACKED (64 to long DFP) (CDUTR R1,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31}},
+		[8]*argField{ap_FPReg_24_27, ap_Reg_28_31}},
 	{CXZT, 0xff00000000ff0000, 0xed00000000ab0000, 0x0, // CONVERT FROM ZONED (to extended DFP) (CXZT R1,D2(L2,B2),M3)
 		[8]*argField{ap_FPReg_32_35, ap_DispUnsigned_20_31, ap_Len_8_15, ap_BaseReg_16_19, ap_Mask_36_39}},
 	{CDZT, 0xff00000000ff0000, 0xed00000000aa0000, 0x0, // CONVERT FROM ZONED (to long DFP) (CDZT R1,D2(L2,B2),M3)
@@ -3203,41 +3206,41 @@ var instFormats = [...]instFormat{
 	{CGER, 0xffff000000000000, 0xb3c8000000000000, 0xf0000000000, // CONVERT TO FIXED (short HFP to 64) (CGER R1,M3,R2)
 		[8]*argField{ap_Reg_24_27, ap_Mask_16_19, ap_FPReg_28_31}},
 	{CLFXBR, 0xffff000000000000, 0xb39e000000000000, 0x0, // CONVERT TO LOGICAL (extended BFP to 32) (CLFXBR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_Reg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
 	{CLGXBR, 0xffff000000000000, 0xb3ae000000000000, 0x0, // CONVERT TO LOGICAL (extended BFP to 64) (CLGXBR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_Reg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
 	{CLFXTR, 0xffff000000000000, 0xb94b000000000000, 0x0, // CONVERT TO LOGICAL (extended DFP to 32) (CLFXTR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_Reg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
 	{CLGXTR, 0xffff000000000000, 0xb94a000000000000, 0x0, // CONVERT TO LOGICAL (extended DFP to 64) (CLGXTR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_Reg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
 	{CLFDBR, 0xffff000000000000, 0xb39d000000000000, 0x0, // CONVERT TO LOGICAL (long BFP to 32) (CLFDBR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_Reg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
 	{CLGDBR, 0xffff000000000000, 0xb3ad000000000000, 0x0, // CONVERT TO LOGICAL (long BFP to 64) (CLGDBR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_Reg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
 	{CLFDTR, 0xffff000000000000, 0xb943000000000000, 0x0, // CONVERT TO LOGICAL (long DFP to 32) (CLFDTR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_Reg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
 	{CLGDTR, 0xffff000000000000, 0xb942000000000000, 0x0, // CONVERT TO LOGICAL (long DFP to 64) (CLGDTR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_Reg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
 	{CLFEBR, 0xffff000000000000, 0xb39c000000000000, 0x0, // CONVERT TO LOGICAL (short BFP to 32) (CLFEBR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_Reg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
 	{CLGEBR, 0xffff000000000000, 0xb3ac000000000000, 0x0, // CONVERT TO LOGICAL (short BFP to 64) (CLGEBR R1,M3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_Reg_24_27, ap_Mask_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
 	{CPXT, 0xff00000000ff0000, 0xed00000000ad0000, 0x0, // CONVERT TO PACKED (from extended DFP) (CPXT R1,D2(L2,B2),M3)
 		[8]*argField{ap_FPReg_32_35, ap_DispUnsigned_20_31, ap_Len_8_15, ap_BaseReg_16_19, ap_Mask_36_39}},
 	{CPDT, 0xff00000000ff0000, 0xed00000000ac0000, 0x0, // CONVERT TO PACKED (from long DFP) (CPDT R1,D2(L2,B2),M3)
 		[8]*argField{ap_FPReg_32_35, ap_DispUnsigned_20_31, ap_Len_8_15, ap_BaseReg_16_19, ap_Mask_36_39}},
 	{CSXTR, 0xffff000000000000, 0xb3eb000000000000, 0xf00000000000, // CONVERT TO SIGNED PACKED (extended DFP to 128) (CSXTR R1,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_Reg_24_27, ap_FPReg_28_31, ap_Mask_20_23}},
 	{CSDTR, 0xffff000000000000, 0xb3e3000000000000, 0xf00000000000, // CONVERT TO SIGNED PACKED (long DFP to 64) (CSDTR R1,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_Reg_24_27, ap_FPReg_28_31, ap_Mask_20_23}},
 	{CUXTR, 0xffff000000000000, 0xb3ea000000000000, 0xff0000000000, // CONVERTTOUNSIGNEDPACKED(extendedDFP to 128) (CUXTR R1,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31}},
+		[8]*argField{ap_Reg_24_27, ap_FPReg_28_31}},
 	{CUDTR, 0xffff000000000000, 0xb3e2000000000000, 0xff0000000000, // CONVERT TO UNSIGNED PACKED (long DFP to 64) (CUDTR R1,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31}},
+		[8]*argField{ap_Reg_24_27, ap_FPReg_28_31}},
 	{CZXT, 0xff00000000ff0000, 0xed00000000a90000, 0x0, // CONVERT TO ZONED (from extended DFP) (CZXT R1,D2(L2,B2),M3)
-		[8]*argField{ap_Reg_32_35, ap_DispUnsigned_20_31, ap_Len_8_15, ap_BaseReg_16_19, ap_Mask_36_39}},
+		[8]*argField{ap_FPReg_32_35, ap_DispUnsigned_20_31, ap_Len_8_15, ap_BaseReg_16_19, ap_Mask_36_39}},
 	{CZDT, 0xff00000000ff0000, 0xed00000000a80000, 0x0, // CONVERT TO ZONED (from long DFP) (CZDT R1,D2(L2,B2),M3)
-		[8]*argField{ap_Reg_32_35, ap_DispUnsigned_20_31, ap_Len_8_15, ap_BaseReg_16_19, ap_Mask_36_39}},
+		[8]*argField{ap_FPReg_32_35, ap_DispUnsigned_20_31, ap_Len_8_15, ap_BaseReg_16_19, ap_Mask_36_39}},
 	{CU24, 0xffff000000000000, 0xb9b1000000000000, 0xf0000000000, // CONVERT UTF-16 TO UTF-32 (CU24 R1,R2,M3)
 		[8]*argField{ap_Reg_24_27, ap_Reg_28_31, ap_Mask_16_19}},
 	{CU21, 0xffff000000000000, 0xb2a6000000000000, 0xf0000000000, // CONVERT UTF-16 TO UTF-8 (CU21 R1,R2,M3)
@@ -3251,7 +3254,7 @@ var instFormats = [...]instFormat{
 	{CU41, 0xffff000000000000, 0xb9b2000000000000, 0xff0000000000, // CONVERT UTF-32 TO UTF-8 (CU41 R1,R2)
 		[8]*argField{ap_Reg_24_27, ap_Reg_28_31}},
 	{CPYA, 0xffff000000000000, 0xb24d000000000000, 0xff0000000000, // COPY ACCESS (CPYA R1,R2)
-		[8]*argField{ap_Reg_24_27, ap_Reg_28_31}},
+		[8]*argField{ap_ACReg_24_27, ap_ACReg_28_31}},
 	{CPSDR, 0xffff000000000000, 0xb372000000000000, 0xf0000000000, // COPY SIGN (long) (CPSDR R1,R3,R2)
 		[8]*argField{ap_FPReg_24_27, ap_FPReg_16_19, ap_FPReg_28_31}},
 	{VSCSHP, 0xff00000000ff0000, 0xe6000000007c0000, 0xffff0000000, // DECIMAL SCALE AND CONVERT AND SPLIT TO HFP (VSCSHP V1,V2,V3)
@@ -3347,19 +3350,19 @@ var instFormats = [...]instFormat{
 	{EXRL, 0xff0f000000000000, 0xc600000000000000, 0x0, // EXECUTE RELATIVE LONG (EXRL R1,RI2)
 		[8]*argField{ap_Reg_8_11, ap_RegImSigned32_16_47}},
 	{EAR, 0xffff000000000000, 0xb24f000000000000, 0xff0000000000, // EXTRACT ACCESS (EAR R1,R2)
-		[8]*argField{ap_Reg_24_27, ap_Reg_28_31}},
+		[8]*argField{ap_Reg_24_27, ap_ACReg_28_31}},
 	{ESEA, 0xffff000000000000, 0xb99d000000000000, 0xff0f00000000, // EXTRACT AND SET EXTENDED AUTHORITY (ESEA R1)
 		[8]*argField{ap_Reg_24_27}},
 	{EEXTR, 0xffff000000000000, 0xb3ed000000000000, 0xff0000000000, // EXTRACT BIASED EXPONENT (extended DFP to 64) (EEXTR R1,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31}},
+		[8]*argField{ap_Reg_24_27, ap_FPReg_28_31}},
 	{EEDTR, 0xffff000000000000, 0xb3e5000000000000, 0xff0000000000, // EXTRACT BIASED EXPONENT (long DFP to 64) (EEDTR R1,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31}},
+		[8]*argField{ap_Reg_24_27, ap_FPReg_28_31}},
 	{ECAG, 0xff00000000ff0000, 0xeb000000004c0000, 0x0, // EXTRACT CPU ATTRIBUTE (ECAG R1,R3,D2(B2))
 		[8]*argField{ap_Reg_8_11, ap_Reg_12_15, ap_DispSigned20_20_39, ap_BaseReg_16_19}},
 	{ECTG, 0xff0f000000000000, 0xc801000000000000, 0x0, // EXTRACT CPU TIME (ECTG D1(B1),D2(B2),R3)
 		[8]*argField{ap_DispUnsigned_20_31, ap_BaseReg_16_19, ap_DispUnsigned_36_47, ap_BaseReg_32_35, ap_Reg_8_11}},
 	{EFPC, 0xffff000000000000, 0xb38c000000000000, 0xff0f00000000, // EXTRACT FPC (EFPC R1)
-		[8]*argField{ap_FPReg_24_27}},
+		[8]*argField{ap_Reg_24_27}},
 	{EPAR, 0xffff000000000000, 0xb226000000000000, 0xff0f00000000, // EXTRACT PRIMARY ASN (EPAR R1)
 		[8]*argField{ap_Reg_24_27}},
 	{EPAIR, 0xffff000000000000, 0xb99a000000000000, 0xff0f00000000, // EXTRACT PRIMARY ASN AND INSTANCE (EPAIR R1)
@@ -3371,9 +3374,9 @@ var instFormats = [...]instFormat{
 	{ESAIR, 0xffff000000000000, 0xb99b000000000000, 0xff0f00000000, // EXTRACT SECONDARY ASN AND INSTANCE (ESAIR R1)
 		[8]*argField{ap_Reg_24_27}},
 	{ESXTR, 0xffff000000000000, 0xb3ef000000000000, 0xff0000000000, // EXTRACT SIGNIFICANCE (extended DFP to 64) (ESXTR R1,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31}},
+		[8]*argField{ap_Reg_24_27, ap_FPReg_28_31}},
 	{ESDTR, 0xffff000000000000, 0xb3e7000000000000, 0xff0000000000, // EXTRACT SIGNIFICANCE (long DFP to 64) (ESDTR R1,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31}},
+		[8]*argField{ap_Reg_24_27, ap_FPReg_28_31}},
 	{EREG, 0xffff000000000000, 0xb249000000000000, 0xff0000000000, // EXTRACT STACKED REGISTERS (32) (EREG R1,R2)
 		[8]*argField{ap_Reg_24_27, ap_Reg_28_31}},
 	{EREGG, 0xffff000000000000, 0xb90e000000000000, 0xff0000000000, // EXTRACT STACKED REGISTERS (64) (EREGG R1,R2)
@@ -3393,9 +3396,9 @@ var instFormats = [...]instFormat{
 	{IAC, 0xffff000000000000, 0xb224000000000000, 0xff0f00000000, // INSERT ADDRESS SPACE CONTROL (IAC R1)
 		[8]*argField{ap_Reg_24_27}},
 	{IEXTR, 0xffff000000000000, 0xb3fe000000000000, 0xf0000000000, // INSERT BIASED EXPONENT (64 to extended DFP) (IEXTR R1,R3,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_16_19, ap_FPReg_28_31}},
+		[8]*argField{ap_FPReg_24_27, ap_FPReg_16_19, ap_Reg_28_31}},
 	{IEDTR, 0xffff000000000000, 0xb3f6000000000000, 0xf0000000000, // INSERT BIASED EXPONENT (64 to long DFP) (IEDTR R1,R3,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_16_19, ap_FPReg_28_31}},
+		[8]*argField{ap_FPReg_24_27, ap_FPReg_16_19, ap_Reg_28_31}},
 	{IC, 0xff00000000000000, 0x4300000000000000, 0x0, // INSERT CHARACTER (IC R1,D2(X2,B2))
 		[8]*argField{ap_Reg_8_11, ap_DispUnsigned_20_31, ap_IndexReg_12_15, ap_BaseReg_16_19}},
 	{ICY, 0xff00000000ff0000, 0xe300000000730000, 0x0, // INSERT CHARACTER (ICY R1,D2(X2,B2))
@@ -3461,9 +3464,9 @@ var instFormats = [...]instFormat{
 	{LEY, 0xff00000000ff0000, 0xed00000000640000, 0x0, // LOAD (short) (LEY R1,D2(X2,B2))
 		[8]*argField{ap_FPReg_8_11, ap_DispSigned20_20_39, ap_IndexReg_12_15, ap_BaseReg_16_19}},
 	{LAM, 0xff00000000000000, 0x9a00000000000000, 0x0, // LOAD ACCESS MULTIPLE 7-268 (LAM R1,R3,D2(B2))
-		[8]*argField{ap_Reg_8_11, ap_Reg_12_15, ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
+		[8]*argField{ap_ACReg_8_11, ap_ACReg_12_15, ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
 	{LAMY, 0xff00000000ff0000, 0xeb000000009a0000, 0x0, // LOAD ACCESS MULTIPLE 7-268 (LAMY R1,R3,D2(B2))
-		[8]*argField{ap_Reg_8_11, ap_Reg_12_15, ap_DispSigned20_20_39, ap_BaseReg_16_19}},
+		[8]*argField{ap_ACReg_8_11, ap_ACReg_12_15, ap_DispSigned20_20_39, ap_BaseReg_16_19}},
 	{LA, 0xff00000000000000, 0x4100000000000000, 0x0, // LOAD ADDRESS (LA R1,D2(X2,B2))
 		[8]*argField{ap_Reg_8_11, ap_DispUnsigned_20_31, ap_IndexReg_12_15, ap_BaseReg_16_19}},
 	{LAY, 0xff00000000ff0000, 0xe300000000710000, 0x0, // LOAD ADDRESS (LAY R1,D2(X2,B2))
@@ -3565,9 +3568,9 @@ var instFormats = [...]instFormat{
 	{LCER, 0xff00000000000000, 0x3300000000000000, 0x0, // LOAD COMPLEMENT (short HFP) (LCER R1,R2)
 		[8]*argField{ap_FPReg_8_11, ap_FPReg_12_15}},
 	{LCTL, 0xff00000000000000, 0xb700000000000000, 0x0, // LOAD CONTROL (32) (LCTL R1,R3,D2(B2))
-		[8]*argField{ap_Reg_8_11, ap_Reg_12_15, ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
+		[8]*argField{ap_CReg_8_11, ap_CReg_12_15, ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
 	{LCTLG, 0xff00000000ff0000, 0xeb000000002f0000, 0x0, // LOAD CONTROL (64) (LCTLG R1,R3,D2(B2))
-		[8]*argField{ap_Reg_8_11, ap_Reg_12_15, ap_DispSigned20_20_39, ap_BaseReg_16_19}},
+		[8]*argField{ap_CReg_8_11, ap_CReg_12_15, ap_DispSigned20_20_39, ap_BaseReg_16_19}},
 	{LCBB, 0xff00000000ff0000, 0xe700000000270000, 0xf000000, // LOAD COUNT TO BLOCK BOUNDARY (LCBB R1,D2(X2,B2),M3)
 		[8]*argField{ap_Reg_8_11, ap_DispUnsigned_20_31, ap_IndexReg_12_15, ap_BaseReg_16_19, ap_Mask_32_35}},
 	{FIXBR, 0xffff000000000000, 0xb347000000000000, 0xf0000000000, // LOAD FP INTEGER (extended BFP) (FIXBR R1,M3,R2)
@@ -3597,9 +3600,9 @@ var instFormats = [...]instFormat{
 	{LFAS, 0xffff000000000000, 0xb2bd000000000000, 0x0, // LOAD FPC AND SIGNAL (LFAS D2(B2))
 		[8]*argField{ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
 	{LDGR, 0xffff000000000000, 0xb3c1000000000000, 0xff0000000000, // LOAD FPR FROM GR (64 to long) (LDGR R1,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31}},
+		[8]*argField{ap_FPReg_24_27, ap_Reg_28_31}},
 	{LGDR, 0xffff000000000000, 0xb3cd000000000000, 0xff0000000000, // LOAD GR FROM FPR (long to 64) (LGDR R1,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31}},
+		[8]*argField{ap_Reg_24_27, ap_FPReg_28_31}},
 	{LGG, 0xff00000000ff0000, 0xe3000000004c0000, 0x0, // LOAD GUARDED (64) (LGG R1,D2(X2,B2))
 		[8]*argField{ap_Reg_8_11, ap_DispSigned20_20_39, ap_IndexReg_12_15, ap_BaseReg_16_19}},
 	{LGSC, 0xff00000000ff0000, 0xe3000000004d0000, 0x0, // LOAD GUARDED STORAGE CONTROLS (LGSC R1,D2(X2,B2))
@@ -4138,8 +4141,6 @@ var instFormats = [...]instFormat{
 		[8]*argField{ap_Reg_8_11, ap_DispUnsigned_20_31, ap_BaseReg_16_19, ap_Reg_12_15, ap_DispUnsigned_36_47, ap_BaseReg_32_35}},
 	{PPA, 0xffff000000000000, 0xb2e8000000000000, 0xf0000000000, // PERFORM PROCESSOR ASSIST (PPA R1,R2,M3)
 		[8]*argField{ap_Reg_24_27, ap_Reg_28_31, ap_Mask_16_19}},
-	{PPNO, 0xffff000000000000, 0xb93c000000000000, 0xff0000000000, // PERFORM RANDOM NUMBER OPERATION (PPNO R1,R2)
-		[8]*argField{ap_Reg_24_27, ap_Reg_28_31}},
 	{PRNO, 0xffff000000000000, 0xb93c000000000000, 0xff0000000000, // PERFORM RANDOM NUMBER OPERATION (PRNO R1,R2)
 		[8]*argField{ap_Reg_24_27, ap_Reg_28_31}},
 	{PTFF, 0xffff000000000000, 0x104000000000000, 0x0, // PERFORM TIMING FACILITY FUNCTION (PTFF)
@@ -4171,9 +4172,9 @@ var instFormats = [...]instFormat{
 	{QPACI, 0xffff000000000000, 0xb28f000000000000, 0x0, // QUERY PROCESSOR ACTIVITY COUNTER INFORMATION (QPACI D2(B2))
 		[8]*argField{ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
 	{RRXTR, 0xffff000000000000, 0xb3ff000000000000, 0x0, // REROUND (extended DFP) (RRXTR R1,R3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_FPReg_24_27, ap_FPReg_16_19, ap_Reg_28_31, ap_Mask_20_23}},
 	{RRDTR, 0xffff000000000000, 0xb3f7000000000000, 0x0, // REROUND (long DFP) (RRDTR R1,R3,R2,M4)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_16_19, ap_FPReg_28_31, ap_Mask_20_23}},
+		[8]*argField{ap_FPReg_24_27, ap_FPReg_16_19, ap_Reg_28_31, ap_Mask_20_23}},
 	{RCHP, 0xffff000000000000, 0xb23b000000000000, 0xffff00000000, // RESET CHANNEL PATH (RCHP)
 		[8]*argField{}},
 	{RDP, 0xffff000000000000, 0xb98b000000000000, 0x0, // RESET DAT PROTECTION (RDP R1,R3,R2,M4)
@@ -4215,7 +4216,7 @@ var instFormats = [...]instFormat{
 	{SELFHR, 0xffff000000000000, 0xb9c0000000000000, 0x0, // SELECT HIGH (32) (SELFHR R1,R2,R3,M4)
 		[8]*argField{ap_Reg_24_27, ap_Reg_28_31, ap_Reg_16_19, ap_Mask_20_23}},
 	{SAR, 0xffff000000000000, 0xb24e000000000000, 0xff0000000000, // SET ACCESS (SAR R1,R2)
-		[8]*argField{ap_Reg_24_27, ap_Reg_28_31}},
+		[8]*argField{ap_ACReg_24_27, ap_Reg_28_31}},
 	{SAL, 0xffff000000000000, 0xb237000000000000, 0xffff00000000, // SET ADDRESS LIMIT (SAL)
 		[8]*argField{}},
 	{SAC, 0xffff000000000000, 0xb219000000000000, 0x0, // SET ADDRESS SPACE CONTROL (SAC D2(B2))
@@ -4244,10 +4245,10 @@ var instFormats = [...]instFormat{
 		[8]*argField{ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
 	{SRNMT, 0xffff000000000000, 0xb2b9000000000000, 0x0, // SET DFP ROUNDING MODE (SRNMT D2(B2))
 		[8]*argField{ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
-	{SFPC, 0xffff000000000000, 0xb384000000000000, 0xff0000000000, // SET FPC (SFPC R1,R2)
-		[8]*argField{ap_FPReg_24_27, ap_FPReg_28_31}},
+	{SFPC, 0xffff000000000000, 0xb384000000000000, 0xff0f00000000, // SET FPC (SFPC R1)
+		[8]*argField{ap_Reg_24_27}},
 	{SFASR, 0xffff000000000000, 0xb385000000000000, 0xff0f00000000, // SET FPC AND SIGNAL (SFASR R1)
-		[8]*argField{ap_FPReg_24_27}},
+		[8]*argField{ap_Reg_24_27}},
 	{SPX, 0xffff000000000000, 0xb210000000000000, 0x0, // SET PREFIX (SPX D2(B2))
 		[8]*argField{ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
 	{SPM, 0xff00000000000000, 0x400000000000000, 0xf000000000000, // SET PROGRAM MASK (SPM R1)
@@ -4345,9 +4346,9 @@ var instFormats = [...]instFormat{
 	{STEY, 0xff00000000ff0000, 0xed00000000660000, 0x0, // STORE (short) (STEY R1,D2(X2,B2))
 		[8]*argField{ap_FPReg_8_11, ap_DispSigned20_20_39, ap_IndexReg_12_15, ap_BaseReg_16_19}},
 	{STAM, 0xff00000000000000, 0x9b00000000000000, 0x0, // STORE ACCESS MULTIPLE 7-389 (STAM R1,R3,D2(B2))
-		[8]*argField{ap_Reg_8_11, ap_Reg_12_15, ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
+		[8]*argField{ap_ACReg_8_11, ap_ACReg_12_15, ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
 	{STAMY, 0xff00000000ff0000, 0xeb000000009b0000, 0x0, // STORE ACCESS MULTIPLE 7-389 (STAMY R1,R3,D2(B2))
-		[8]*argField{ap_Reg_8_11, ap_Reg_12_15, ap_DispSigned20_20_39, ap_BaseReg_16_19}},
+		[8]*argField{ap_ACReg_8_11, ap_ACReg_12_15, ap_DispSigned20_20_39, ap_BaseReg_16_19}},
 	{STBEAR, 0xffff000000000000, 0xb201000000000000, 0x0, // STORE BEAR (STBEAR D2(B2))
 		[8]*argField{ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
 	{STCPS, 0xffff000000000000, 0xb23a000000000000, 0x0, // STORE CHANNEL PATH STATUS (STCPS D2(B2))
@@ -4375,9 +4376,9 @@ var instFormats = [...]instFormat{
 	{STCKF, 0xffff000000000000, 0xb27c000000000000, 0x0, // STORE CLOCK FAST (STCKF D2(B2))
 		[8]*argField{ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
 	{STCTL, 0xff00000000000000, 0xb600000000000000, 0x0, // STORE CONTROL (32) (STCTL R1,R3,D2(B2))
-		[8]*argField{ap_Reg_8_11, ap_Reg_12_15, ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
+		[8]*argField{ap_CReg_8_11, ap_CReg_12_15, ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
 	{STCTG, 0xff00000000ff0000, 0xeb00000000250000, 0x0, // STORE CONTROL (64) (STCTG R1,R3,D2(B2))
-		[8]*argField{ap_Reg_8_11, ap_Reg_12_15, ap_DispSigned20_20_39, ap_BaseReg_16_19}},
+		[8]*argField{ap_CReg_8_11, ap_CReg_12_15, ap_DispSigned20_20_39, ap_BaseReg_16_19}},
 	{STAP, 0xffff000000000000, 0xb212000000000000, 0x0, // STORE CPU ADDRESS (STAP D2(B2))
 		[8]*argField{ap_DispUnsigned_20_31, ap_BaseReg_16_19}},
 	{STIDP, 0xffff000000000000, 0xb202000000000000, 0x0, // STORE CPU ID (STIDP D2(B2))
@@ -4547,7 +4548,7 @@ var instFormats = [...]instFormat{
 	{SVC, 0xff00000000000000, 0xa00000000000000, 0x0, // SUPERVISOR CALL (SVC I)
 		[8]*argField{ap_ImmUnsigned_8_15}},
 	{TAR, 0xffff000000000000, 0xb24c000000000000, 0xff0000000000, // TEST ACCESS (TAR R1,R2)
-		[8]*argField{ap_Reg_24_27, ap_Reg_28_31}},
+		[8]*argField{ap_ACReg_24_27, ap_Reg_28_31}},
 	{TAM, 0xffff000000000000, 0x10b000000000000, 0x0, // TEST ADDRESSING MODE (TAM)
 		[8]*argField{}},
 	{TS, 0xff00000000000000, 0x9300000000000000, 0x0, // TEST AND SET (TS D1(B1))
