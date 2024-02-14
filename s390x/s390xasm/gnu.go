@@ -1,6 +1,5 @@
 package s390xasm
 
-//import "fmt"
 
 type typ1_ExtndMnics struct {
 	BaseOpStr string
@@ -55,16 +54,10 @@ func HandleExtndMnemonic(inst *Inst) string {
 		//BIC - BRANCH INDIRECT ON CONDITION instruction
 		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 1, Offset: 0, ExtnOpStr: "BIO"},
 		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 2, Offset: 0, ExtnOpStr: "BIH"},
-		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 3, Offset: 0, ExtnOpStr: "BINLE"},
 		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 4, Offset: 0, ExtnOpStr: "BIL"},
-		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 5, Offset: 0, ExtnOpStr: "BINHE"},
-		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 6, Offset: 0, ExtnOpStr: "BILH"},
 		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 7, Offset: 0, ExtnOpStr: "BINE"},
 		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 8, Offset: 0, ExtnOpStr: "BIE"},
-		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 9, Offset: 0, ExtnOpStr: "BINLH"},
-		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 10, Offset: 0, ExtnOpStr: "BIHE"},
 		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 11, Offset: 0, ExtnOpStr: "BINL"},
-		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 12, Offset: 0, ExtnOpStr: "BILE"},
 		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 13, Offset: 0, ExtnOpStr: "BINH"},
 		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 14, Offset: 0, ExtnOpStr: "BINO"},
 		typ1_ExtndMnics{BaseOpStr: "BIC", Value: 15, Offset: 0, ExtnOpStr: "BI"},
@@ -73,16 +66,10 @@ func HandleExtndMnemonic(inst *Inst) string {
 		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 0, Offset: 0, ExtnOpStr: "NOPR"},
 		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 1, Offset: 0, ExtnOpStr: "BOR"},
 		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 2, Offset: 0, ExtnOpStr: "BHR"},
-		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 3, Offset: 0, ExtnOpStr: "BNLER"},
 		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 4, Offset: 0, ExtnOpStr: "BLR"},
-		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 5, Offset: 0, ExtnOpStr: "BNHER"},
-		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 6, Offset: 0, ExtnOpStr: "BLHR"},
 		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 7, Offset: 0, ExtnOpStr: "BNER"},
 		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 8, Offset: 0, ExtnOpStr: "BER"},
-		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 9, Offset: 0, ExtnOpStr: "BNLHR"},
-		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 10, Offset: 0, ExtnOpStr: "BHER"},
 		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 11, Offset: 0, ExtnOpStr: "BNLR"},
-		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 12, Offset: 0, ExtnOpStr: "BLER"},
 		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 13, Offset: 0, ExtnOpStr: "BNHR"},
 		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 14, Offset: 0, ExtnOpStr: "BNOR"},
 		typ1_ExtndMnics{BaseOpStr: "BCR", Value: 15, Offset: 0, ExtnOpStr: "BR"},
@@ -91,16 +78,10 @@ func HandleExtndMnemonic(inst *Inst) string {
 		typ1_ExtndMnics{BaseOpStr: "BC", Value: 0, Offset: 0, ExtnOpStr: "NOPR"},
 		typ1_ExtndMnics{BaseOpStr: "BC", Value: 1, Offset: 0, ExtnOpStr: "BO"},
 		typ1_ExtndMnics{BaseOpStr: "BC", Value: 2, Offset: 0, ExtnOpStr: "BH"},
-		typ1_ExtndMnics{BaseOpStr: "BC", Value: 3, Offset: 0, ExtnOpStr: "BNLE"},
 		typ1_ExtndMnics{BaseOpStr: "BC", Value: 4, Offset: 0, ExtnOpStr: "BL"},
-		typ1_ExtndMnics{BaseOpStr: "BC", Value: 5, Offset: 0, ExtnOpStr: "BNHE"},
-		typ1_ExtndMnics{BaseOpStr: "BC", Value: 6, Offset: 0, ExtnOpStr: "BLH"},
 		typ1_ExtndMnics{BaseOpStr: "BC", Value: 7, Offset: 0, ExtnOpStr: "BNE"},
 		typ1_ExtndMnics{BaseOpStr: "BC", Value: 8, Offset: 0, ExtnOpStr: "BE"},
-		typ1_ExtndMnics{BaseOpStr: "BC", Value: 9, Offset: 0, ExtnOpStr: "BNLH"},
-		typ1_ExtndMnics{BaseOpStr: "BC", Value: 10, Offset: 0, ExtnOpStr: "BHE"},
 		typ1_ExtndMnics{BaseOpStr: "BC", Value: 11, Offset: 0, ExtnOpStr: "BNL"},
-		typ1_ExtndMnics{BaseOpStr: "BC", Value: 12, Offset: 0, ExtnOpStr: "BLE"},
 		typ1_ExtndMnics{BaseOpStr: "BC", Value: 13, Offset: 0, ExtnOpStr: "BNH"},
 		typ1_ExtndMnics{BaseOpStr: "BC", Value: 14, Offset: 0, ExtnOpStr: "BNO"},
 		typ1_ExtndMnics{BaseOpStr: "BC", Value: 15, Offset: 0, ExtnOpStr: "B"},
@@ -109,16 +90,10 @@ func HandleExtndMnemonic(inst *Inst) string {
 		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 0, Offset: 0, ExtnOpStr: "JNOP"},
 		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 1, Offset: 0, ExtnOpStr: "JO"},
 		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 2, Offset: 0, ExtnOpStr: "JH"},
-		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 3, Offset: 0, ExtnOpStr: "JNLE"},
 		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 4, Offset: 0, ExtnOpStr: "JL"},
-		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 5, Offset: 0, ExtnOpStr: "JNHE"},
-		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 6, Offset: 0, ExtnOpStr: "JLH"},
 		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 7, Offset: 0, ExtnOpStr: "JNE"},
 		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 8, Offset: 0, ExtnOpStr: "JE"},
-		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 9, Offset: 0, ExtnOpStr: "JNLH"},
-		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 10, Offset: 0, ExtnOpStr: "JHE"},
 		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 11, Offset: 0, ExtnOpStr: "JNL"},
-		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 12, Offset: 0, ExtnOpStr: "JLE"},
 		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 13, Offset: 0, ExtnOpStr: "JNH"},
 		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 14, Offset: 0, ExtnOpStr: "JNO"},
 		typ1_ExtndMnics{BaseOpStr: "BRC", Value: 15, Offset: 0, ExtnOpStr: "J"},
@@ -127,16 +102,10 @@ func HandleExtndMnemonic(inst *Inst) string {
 		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 0, Offset: 0, ExtnOpStr: "JGNOP"},
 		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 1, Offset: 0, ExtnOpStr: "JGO"},
 		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 2, Offset: 0, ExtnOpStr: "JGH"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 3, Offset: 0, ExtnOpStr: "JGNLE"},
 		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 4, Offset: 0, ExtnOpStr: "JGL"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 5, Offset: 0, ExtnOpStr: "JGNHE"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 6, Offset: 0, ExtnOpStr: "JGLH"},
 		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 7, Offset: 0, ExtnOpStr: "JGNE"},
 		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 8, Offset: 0, ExtnOpStr: "JGE"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 9, Offset: 0, ExtnOpStr: "JGNLH"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 10, Offset: 0, ExtnOpStr: "JGHE"},
 		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 11, Offset: 0, ExtnOpStr: "JGNL"},
-		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 12, Offset: 0, ExtnOpStr: "JGLE"},
 		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 13, Offset: 0, ExtnOpStr: "JGNH"},
 		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 14, Offset: 0, ExtnOpStr: "JGNO"},
 		typ1_ExtndMnics{BaseOpStr: "BRCL", Value: 15, Offset: 0, ExtnOpStr: "JG"},
@@ -163,23 +132,23 @@ func HandleExtndMnemonic(inst *Inst) string {
 		typ2_ExtndMnics{Value: 7, Offset: 2, ExtnOpStr: "NE"},
 		typ2_ExtndMnics{Value: 8, Offset: 2, ExtnOpStr: "E"},
 		typ2_ExtndMnics{Value: 9, Offset: 2, ExtnOpStr: "NLH"},
-                typ2_ExtndMnics{Value: 10, Offset: 2, ExtnOpStr: "HE"},
+		typ2_ExtndMnics{Value: 10, Offset: 2, ExtnOpStr: "HE"},
 		typ2_ExtndMnics{Value: 11, Offset: 2, ExtnOpStr: "NL"},
 		typ2_ExtndMnics{Value: 12, Offset: 2, ExtnOpStr: "LE"},
 		typ2_ExtndMnics{Value: 13, Offset: 2, ExtnOpStr: "NH"},
 		typ2_ExtndMnics{Value: 14, Offset: 2, ExtnOpStr: "NO"},
 	}
 
-	//Vector instructions
 	vecInstrExtndMnics := []typ2_ExtndMnics{
 		typ2_ExtndMnics{Value: 0, Offset: 3, ExtnOpStr: "B"},
 		typ2_ExtndMnics{Value: 1, Offset: 3, ExtnOpStr: "H"},
 		typ2_ExtndMnics{Value: 2, Offset: 3, ExtnOpStr: "F"},
 		typ2_ExtndMnics{Value: 3, Offset: 3, ExtnOpStr: "G"},
 		typ2_ExtndMnics{Value: 4, Offset: 3, ExtnOpStr: "Q"},
-		typ2_ExtndMnics{Value: 6, Offset: 3, ExtnOpStr: "E"},
+		typ2_ExtndMnics{Value: 6, Offset: 3, ExtnOpStr: "LF"},
 	}
 
+	//VCEQ, VCH, VCHL
 	vec2InstrExtndMnics := []typ3_ExtndMnics{
 		typ3_ExtndMnics{Value1: 0, Value2: 0, Offset1: 3, Offset2: 4, ExtnOpStr: "B"},
 		typ3_ExtndMnics{Value1: 1, Value2: 0, Offset1: 3, Offset2: 4, ExtnOpStr: "H"},
@@ -189,6 +158,16 @@ func HandleExtndMnemonic(inst *Inst) string {
 		typ3_ExtndMnics{Value1: 1, Value2: 1, Offset1: 3, Offset2: 4, ExtnOpStr: "HS"},
 		typ3_ExtndMnics{Value1: 2, Value2: 1, Offset1: 3, Offset2: 4, ExtnOpStr: "FS"},
 		typ3_ExtndMnics{Value1: 3, Value2: 1, Offset1: 3, Offset2: 4, ExtnOpStr: "GS"},
+	}
+
+	//VFAE, VFEE, VFENE
+	vec21InstrExtndMnics := []typ3_ExtndMnics{
+		typ3_ExtndMnics{Value1: 0, Value2: 0, Offset1: 3, Offset2: 4, ExtnOpStr: "B"},
+		typ3_ExtndMnics{Value1: 1, Value2: 0, Offset1: 3, Offset2: 4, ExtnOpStr: "H"},
+		typ3_ExtndMnics{Value1: 2, Value2: 0, Offset1: 3, Offset2: 4, ExtnOpStr: "F"},
+		typ3_ExtndMnics{Value1: 0, Value2: 1, Offset1: 3, Offset2: 4, ExtnOpStr: "BS"},
+		typ3_ExtndMnics{Value1: 1, Value2: 1, Offset1: 3, Offset2: 4, ExtnOpStr: "HS"},
+		typ3_ExtndMnics{Value1: 2, Value2: 1, Offset1: 3, Offset2: 4, ExtnOpStr: "FS"},
 		typ3_ExtndMnics{Value1: 0, Value2: 2, Offset1: 3, Offset2: 4, ExtnOpStr: "ZB"},
 		typ3_ExtndMnics{Value1: 1, Value2: 2, Offset1: 3, Offset2: 4, ExtnOpStr: "ZH"},
 		typ3_ExtndMnics{Value1: 2, Value2: 2, Offset1: 3, Offset2: 4, ExtnOpStr: "ZF"},
@@ -264,34 +243,6 @@ func HandleExtndMnemonic(inst *Inst) string {
 		typ4_ExtndMnics{BaseOpStr: "VFTCI", Value1: 2, Value2: 8, Offset1: 3, Offset2: 4, ExtnOpStr: "WFTCISB"},
 		typ4_ExtndMnics{BaseOpStr: "VFTCI", Value1: 3, Value2: 8, Offset1: 3, Offset2: 4, ExtnOpStr: "WFTCIDB"},
 		typ4_ExtndMnics{BaseOpStr: "VFTCI", Value1: 4, Value2: 8, Offset1: 3, Offset2: 4, ExtnOpStr: "WFTCIXB"},
-	}
-
-	vec5InstrExtndMnics := []typ1_ExtndMnics{
-		// VSCHP - DECIMAL SCALE AND CONVERT TO HFP
-		typ1_ExtndMnics{BaseOpStr: "VSCHP", Value: 2, Offset: 3, ExtnOpStr: "VSCHSP"},
-		typ1_ExtndMnics{BaseOpStr: "VSCHP", Value: 3, Offset: 3, ExtnOpStr: "VSCHDP"},
-		typ1_ExtndMnics{BaseOpStr: "VSCHP", Value: 4, Offset: 3, ExtnOpStr: "VSCHXP"},
-
-		// VAC - VECTOR ADD WITH CARRY instruction
-		typ1_ExtndMnics{BaseOpStr: "VAC", Value: 4, Offset: 4, ExtnOpStr: "VACQ"},
-
-		// VACCC - VECTOR ADD WITH CARRY COMPUTE CARRY instruction
-		typ1_ExtndMnics{BaseOpStr: "VACCC", Value: 4, Offset: 4, ExtnOpStr: "VACCCQ"},
-
-		// VMSL - VECTOR MULTIPLY SUM LOGICAL instruction
-		typ1_ExtndMnics{BaseOpStr: "VMSL", Value: 3, Offset: 4, ExtnOpStr: "VMSLG"},
-
-		// VSBI - VECTOR SUBTRACT WITH BORROW INDICATION instruction
-		typ1_ExtndMnics{BaseOpStr: "VSBI", Value: 4, Offset: 4, ExtnOpStr: "VSBIQ"},
-
-		// VSBCBI - VECTOR SUBTRACT WITH BORROW COMPUTE BORROW INDICATION instruction
-		typ1_ExtndMnics{BaseOpStr: "VSBCBI", Value: 4, Offset: 4, ExtnOpStr: "VSBCBIQ"},
-
-		// VSTEBRF - VECTOR STORE BYTE REVERSED ELEMENT instruction
-		typ1_ExtndMnics{BaseOpStr: "VSTEBRF", Value: 0, Offset: 4, ExtnOpStr: "STERV"},
-
-		// VSTEBRG - VECTOR STORE BYTE REVERSED ELEMENT instruction
-		typ1_ExtndMnics{BaseOpStr: "VSTEBRG", Value: 0, Offset: 4, ExtnOpStr: "STDRV"},
 	}
 
 	vec6InstrExtndMnics := []typ5_ExtndMnics{
@@ -408,12 +359,6 @@ func HandleExtndMnemonic(inst *Inst) string {
 		typ4_ExtndMnics{BaseOpStr: "VFNMS", Value1: 8, Value2: 4, Offset1: 4, Offset2: 5, ExtnOpStr: "WFNMSXB"},
 	}
 
-	vec8InstrExtndMnics := []typ6_ExtndMnics{
-		// VGBM - VECTOR GENERATE BYTE MASK
-		typ6_ExtndMnics{Value: 0, Offset: 1, ExtnOpStr: "VZERO"},
-		typ6_ExtndMnics{Value: 0xFFFF, Offset: 1, ExtnOpStr: "VONE"},
-	}
-
 	opString := inst.Op.String()
 	newOpStr := opString
 
@@ -431,7 +376,6 @@ func HandleExtndMnemonic(inst *Inst) string {
 			if opString == brnchInstrExtndMnics[i].BaseOpStr &&
 				uint8(inst.Args[brnchInstrExtndMnics[i].Offset].(Mask)) == brnchInstrExtndMnics[i].Value {
 				newOpStr = brnchInstrExtndMnics[i].ExtnOpStr
-				//skipArgList[0] = int8(brnchInstrExtndMnics[i].Offset)
 				removeArg(inst, int8(brnchInstrExtndMnics[i].Offset))
 				break
 			}
@@ -451,7 +395,6 @@ func HandleExtndMnemonic(inst *Inst) string {
 			if uint8(inst.Args[cmpInstrExtndMnics[i].Offset].(Mask)) == cmpInstrExtndMnics[i].Value {
 				newOpStr = opString + cmpInstrExtndMnics[i].ExtnOpStr
 				removeArg(inst, int8(cmpInstrExtndMnics[i].Offset))
-				//skipArgList[0] = int8(cmpInstrExtndMnics[i].Offset)
 				break
 			}
 		}
@@ -464,111 +407,523 @@ func HandleExtndMnemonic(inst *Inst) string {
 
 			//For LOCFH, LOC, LOCG, SELR, SELGR, SELFHR, STOCFH, STOC, STOCG instructions,
 			//M-value is the forth operand. Hence, set the offset to "3"
-			if opString == "LOCFH" || opString == "LOC" || opString == "SELR" || opString == "SELGR" ||
+			if opString == "LOCFH" || opString == "LOC" || opString == "LOCG" || opString == "SELR" || opString == "SELGR" ||
 				opString == "SELFHR" || opString == "STOCFH" || opString == "STOC" || opString == "STOCG" {
 				ldSt_InstrExtndMnics[i].Offset = 3
 			}
 
 			if uint8(inst.Args[ldSt_InstrExtndMnics[i].Offset].(Mask)) == ldSt_InstrExtndMnics[i].Value {
 				newOpStr = opString + ldSt_InstrExtndMnics[i].ExtnOpStr
-				//skipArgList[0] = int8(ldSt_InstrExtndMnics[i].Offset)
 				removeArg(inst, int8(ldSt_InstrExtndMnics[i].Offset))
 				break
 			}
 		}
 
 	// Case to handle all "Vector" instructions with one M-field operand
-	case "VA", "VACC", "VAVG", "VAVGL", "VCLZ", "VCTZ", "VEC", "VECL", "VERIM", "VERLLV", "VERLL",
-		"VESLV", "VESL", "VESRAV", "VESRA", "VESRLV", "VESRL", "VGFM", "VGFMA", "VGM", "VLREP", "VLLEBRZ",
-		"VLBR", "VLC", "VLER", "VLGV", "VLLEZ", "VLP", "VLVG", "VMX", "VMXL", "VMRH", "VMRL", "VMN", "VMNL",
-		"VMAE", "VMALE", "VMALO", "VMAL", "VMAH", "VMALH", "VMAO", "VME", "VMH", "VMLE", "VMLH", "VMLO",
-		"VML", "VMO", "VPK", "VPOPCT", "VREP", "VREPI", "VSEG", "VSTBR", "VSTER", "VS", "VSCBI", "VSUMG",
-		"VSUMQ", "VSUM", "VUPH", "VUPL", "VUPLH", "VUPLL", "VLBRREP":
+	case "VAVG", "VAVGL", "VERLLV", "VESLV", "VESRAV", "VESRLV", "VGFM", "VGM", "VMX", "VMXL", "VMRH", "VMRL", "VMN", "VMNL", "VREP",
+		"VCLZ", "VCTZ", "VEC", "VECL", "VLC", "VLP", "VPOPCT", "VREPI", "VERIM", "VERLL", "VESL", "VESRA", "VESRL", "VGFMA", "VLREP",
+		"VLGV", "VLVG", "VLBRREP", "VLER", "VLBR", "VSTBR", "VSTER", "VPK", "VME", "VMH", "VMLE", "VMLH", "VMLO", "VML", "VMO", "VMAE",
+		"VMALE", "VMALO", "VMAL", "VMAH", "VMALH", "VMAO", "VMPH", "VMPLH", "VUPL", "VUPLL", "VSCBI", "VS", "VSUM", "VSUMG", "VSUMQ", "VA", "VACC":
 
 		switch opString {
 
-		case "VCLZ", "VCTZ", "VEC", "VECL", "VLC", "VLP", "VPOPCT",
-			"VREPI", "VSEG", "VUPH", "VUPLH", "VUPL", "VUPLL":
-
+		case "VAVG", "VAVGL", "VERLLV", "VESLV", "VESRAV", "VESRLV", "VGFM", "VGM", "VMX", "VMXL", "VMRH", "VMRL", "VMN", "VMNL", "VREP":
 			//M-field is 3rd arg for all these instructions. Hence, set the offset to "2"
-			for i := 0; i < len(vecInstrExtndMnics); i++ {
-				vecInstrExtndMnics[i].Offset = 2
+			for i := 0; i < len(vecInstrExtndMnics)-2; i++ { // 0,1,2,3
 				if uint8(inst.Args[vecInstrExtndMnics[i].Offset].(Mask)) == vecInstrExtndMnics[i].Value {
 					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
-					//skipArgList[0] = int8(vecInstrExtndMnics[i].Offset)
 					removeArg(inst, int8(vecInstrExtndMnics[i].Offset))
 					break
 				}
 			}
 
-		case "VERLL", "VESL", "VESRA", "VESRL", "VGFMA", "VLREP", "VLBRREP", "VLLEBRZ", "VLBR", "VLER",
-			"VLLEZ", "VMAE", "VMALE", "VMALO", "VMAL", "VMAH", "VMALH", "VMAO", "VSTBR", "VSTER", "VERIM", "VLGV", "VLVG":
-			//M-field is 5th arg for all these instructions. Hence, set the offset to "4"
-			for i := 0; i < len(vecInstrExtndMnics); i++ {
-				vecInstrExtndMnics[i].Offset = 4
-				//fmt.Printf("Srinivas:Mnemonic:%s ExtnOpStr:%s Arg:%s,Type:%T off:%v\n", inst.Op.String(), vecInstrExtndMnics[i].ExtnOpStr, inst.Args[vecInstrExtndMnics[i].Offset].String(0xFFFF), inst.Args[vecInstrExtndMnics[i].Offset], vecInstrExtndMnics[i].Offset)
-				if opString == "VLLEZ" && uint8(inst.Args[vecInstrExtndMnics[i].Offset].(Mask)) == 6 {
-					newOpStr = opString + string("LF")
-					//skipArgList[0] = int8(vecInstrExtndMnics[i].Offset)
-					removeArg(inst, int8(vecInstrExtndMnics[i].Offset))
-					break
-				} else if uint8(inst.Args[vecInstrExtndMnics[i].Offset].(Mask)) == vecInstrExtndMnics[i].Value {
+		case "VCLZ", "VCTZ", "VEC", "VECL", "VLC", "VLP", "VPOPCT", "VREPI":
+			for i := 0; i < len(vecInstrExtndMnics)-2; i++ { //0,1,2,3
+				if uint8(inst.Args[vecInstrExtndMnics[i].Offset-1].(Mask)) == vecInstrExtndMnics[i].Value {
 					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
-					//skipArgList[0] = int8(vecInstrExtndMnics[i].Offset)
+					removeArg(inst, int8(vecInstrExtndMnics[i].Offset-1))
+					break
+				}
+			}
+
+		case "VERIM", "VERLL", "VESL", "VESRA", "VESRL", "VGFMA", "VLREP":
+			for i := 0; i < len(vecInstrExtndMnics)-2; i++ { //0,1,2,3
+				if uint8(inst.Args[vecInstrExtndMnics[i].Offset+1].(Mask)) == vecInstrExtndMnics[i].Value {
+					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
+					removeArg(inst, int8(vecInstrExtndMnics[i].Offset+1))
+					break
+				}
+			}
+
+		case "VLGV", "VLVG":
+			for i := 0; i < len(vecInstrExtndMnics)-2; i++ {
+				if uint8(inst.Args[vecInstrExtndMnics[i].Offset+1].(Mask)) == vecInstrExtndMnics[i].Value {
+					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
+					removeArg(inst, int8(vecInstrExtndMnics[i].Offset+1))
+					break
+				}
+			}
+
+		case "VLBRREP", "VLER", "VSTER":
+			for i := 1; i < len(vecInstrExtndMnics)-2; i++ {
+				if uint8(inst.Args[vecInstrExtndMnics[i].Offset+1].(Mask)) == vecInstrExtndMnics[i].Value {
+					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
+					removeArg(inst, int8(vecInstrExtndMnics[i].Offset+1))
+					break
+				}
+			}
+
+		case "VPK":
+			for i := 1; i < len(vecInstrExtndMnics)-2; i++ {
+				if uint8(inst.Args[vecInstrExtndMnics[i].Offset].(Mask)) == vecInstrExtndMnics[i].Value {
+					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
 					removeArg(inst, int8(vecInstrExtndMnics[i].Offset))
 					break
 				}
 			}
 
-		default:
-
-			//"VA", "VACC", "VAVG", "VAVGL", "VERLLV", "VESLV", "VESRAV", "VESRLV", "VGFM", "VGM", "VMX", "VMXL",
-			//"VMRH", "VMRL", "VMN", "VMNL", "VME", "VMH", "VMLE", "VMLH", "VMLO", "VML", "VMO", "VPK", "VREP",
-			//"VS", "VSCBI", "VSUMG", "VSUMQ", "VSUM"
-			//M-field is 4th arg for all these instructions.
-			for i := 0; i < len(vecInstrExtndMnics); i++ {
-				//fmt.Printf("Srinivas:Mnemonic:%s ExtnOpStr:%s Arg:%s,Type:%T off:%v\n", inst.Op.String(), vecInstrExtndMnics[i].ExtnOpStr, inst.Args[vecInstrExtndMnics[i].Offset].String(0xFFFF), inst.Args[vecInstrExtndMnics[i].Offset], vecInstrExtndMnics[i].Offset)
-				if opString == "VML" && uint8(inst.Args[vecInstrExtndMnics[i].Offset].(Mask)) == 1 {
-					newOpStr = opString + string("HW")
-					//skipArgList[0] = int8(vecInstrExtndMnics[i].Offset)
+		case "VLBR", "VSTBR":
+			for i := 1; i < len(vecInstrExtndMnics)-1; i++ {
+				if uint8(inst.Args[vecInstrExtndMnics[i].Offset+1].(Mask)) == vecInstrExtndMnics[i].Value {
+					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
+					removeArg(inst, int8(vecInstrExtndMnics[i].Offset+1))
+					break
+				}
+			}
+		case "VME", "VMH", "VMLE", "VMLH", "VMLO", "VMO":
+			for i := 0; i < len(vecInstrExtndMnics)-3; i++ { //0,1,2
+				if uint8(inst.Args[vecInstrExtndMnics[i].Offset].(Mask)) == vecInstrExtndMnics[i].Value {
+					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
 					removeArg(inst, int8(vecInstrExtndMnics[i].Offset))
 					break
-				} else if uint8(inst.Args[vecInstrExtndMnics[i].Offset].(Mask)) == vecInstrExtndMnics[i].Value {
+				}
+			}
+
+		case "VML":
+			for i := 0; i < len(vecInstrExtndMnics)-3; i++ { //0,1,2
+				if uint8(inst.Args[vecInstrExtndMnics[i].Offset].(Mask)) == vecInstrExtndMnics[i].Value {
+					if uint8(inst.Args[vecInstrExtndMnics[i].Offset].(Mask)) == 1 {
+						newOpStr = opString + string("HW")
+					} else {
+						newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
+					}
+					removeArg(inst, int8(vecInstrExtndMnics[i].Offset))
+					break
+				}
+			}
+
+		case "VMAE", "VMALE", "VMALO", "VMAL", "VMAH", "VMALH", "VMAO":
+			for i := 0; i < len(vecInstrExtndMnics)-3; i++ { //0,1,2
+				if uint8(inst.Args[vecInstrExtndMnics[i].Offset+1].(Mask)) == vecInstrExtndMnics[i].Value {
 					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
-					//skipArgList[0] = int8(vecInstrExtndMnics[i].Offset)
+					removeArg(inst, int8(vecInstrExtndMnics[i].Offset+1))
+					break
+				}
+			}
+
+		case "VMPH", "VMPLH", "VUPL", "VUPLL": //0,1,2
+			for i := 0; i < len(vecInstrExtndMnics)-3; i++ {
+				if uint8(inst.Args[vecInstrExtndMnics[i].Offset-1].(Mask)) == vecInstrExtndMnics[i].Value {
+					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
+					removeArg(inst, int8(vecInstrExtndMnics[i].Offset-1))
+					break
+				}
+			}
+
+		case "VSCBI", "VS", "VA", "VACC": // 0,1,2,3,4
+			for i := 0; i < len(vecInstrExtndMnics)-1; i++ {
+				if uint8(inst.Args[vecInstrExtndMnics[i].Offset].(Mask)) == vecInstrExtndMnics[i].Value {
+					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
+					removeArg(inst, int8(vecInstrExtndMnics[i].Offset))
+					break
+				}
+			}
+		case "VSUM", "VSUMG":
+			for i := 1; i < len(vecInstrExtndMnics)-4; i++ {
+				if uint8(inst.Args[vecInstrExtndMnics[i].Offset].(Mask)) == vecInstrExtndMnics[i].Value {
+					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
+					removeArg(inst, int8(vecInstrExtndMnics[i].Offset))
+					break
+				}
+			}
+		case "VSUMQ":
+			for i := 2; i < len(vecInstrExtndMnics)-2; i++ {
+				if uint8(inst.Args[vecInstrExtndMnics[i].Offset].(Mask)) == vecInstrExtndMnics[i].Value {
+					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
 					removeArg(inst, int8(vecInstrExtndMnics[i].Offset))
 					break
 				}
 			}
 		}
 
-	// Case to handle all "Vector" instructions with 2 M-field operands
-	case "VCEQ", "VCH", "VCHL", "VPKS", "VPKLS", "VFEE", "VFENE", "VISTR", "VFAE", "VSTRC", "VSTRS":
-		for i := 0; i < len(vec2InstrExtndMnics); i++ {
+	case "VLLEZ":
+		for i := 0; i < len(vecInstrExtndMnics); i++ {
+			if i == 4 {
+				continue
+			}
+			if uint8(inst.Args[vecInstrExtndMnics[i].Offset+1].(Mask)) == vecInstrExtndMnics[i].Value {
+				newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
+				removeArg(inst, int8(vecInstrExtndMnics[i].Offset+1))
+				break
+			}
+		}
+
+	case "VGBM":
+		if uint16(inst.Args[1].(Imm)) == uint16(0) {
+			newOpStr = "VZEO"
+			removeArg(inst, int8(1))
+		} else if uint16(inst.Args[1].(Imm)) == uint16(0xFFFF) {
+			newOpStr = "VONE"
+			removeArg(inst, int8(1))
+		}
+	case "VNO":
+		if uint8(inst.Args[1].(VReg)) == uint8(inst.Args[2].(VReg)) { //Bitwise Not instruction(VNOT)  if V2 equal to v3
+			newOpStr = opString + "T"
+			removeArg(inst, int8(2))
+		}
+
+	case "VMSL":
+		if uint8(inst.Args[4].(Mask)) == uint8(3) {
+			newOpStr = opString + "G"
+			removeArg(inst, int8(4))
+		}
+
+	case "VFLR":
+		if uint8(inst.Args[2].(Mask)) == uint8(3) && ((inst.Args[3].(Mask)>>3)&0x1 == 0x1) {
+			inst.Args[3] = (inst.Args[3].(Mask) ^ 0x8)
+			newOpStr = "WFLRD"
+			removeArg(inst, int8(2))
+		} else if uint8(inst.Args[2].(Mask)) == uint8(4) && ((inst.Args[3].(Mask)>>3)&0x1 == 0x1) {
+			inst.Args[3] = (inst.Args[3].(Mask) ^ 0x8)
+			newOpStr = "WFLRX"
+			removeArg(inst, int8(2))
+		} else if uint8(inst.Args[2].(Mask)) == uint8(3) {
+			newOpStr = "VFLRD"
+			removeArg(inst, int8(2))
+		}
+
+	case "VLLEBRZ":
+		if uint8(inst.Args[4].(Mask)) == uint8(1) {
+			newOpStr = opString + "H"
+			removeArg(inst, int8(4))
+		} else if uint8(inst.Args[4].(Mask)) == uint8(2) {
+			newOpStr = opString + "F"
+			removeArg(inst, int8(4))
+		} else if uint8(inst.Args[4].(Mask)) == uint8(3) {
+			newOpStr = "LDRV"
+			removeArg(inst, int8(4))
+		} else if uint8(inst.Args[4].(Mask)) == uint8(6) {
+			newOpStr = "LERV"
+			removeArg(inst, int8(4))
+		}
+
+	case "VSCHP":
+		if uint8(inst.Args[3].(Mask)) == uint8(2) {
+			newOpStr = "VSCHSP"
+			removeArg(inst, int8(3))
+		} else if uint8(inst.Args[3].(Mask)) == uint8(3) {
+			newOpStr = "VSCHDP"
+			removeArg(inst, int8(3))
+		} else if uint8(inst.Args[3].(Mask)) == uint8(4) {
+			newOpStr = "VSCHXP"
+			removeArg(inst, int8(3))
+		}
+
+	case "VSBCBI", "VSBI":
+		if uint8(inst.Args[4].(Mask)) == uint8(4) {
+			newOpStr = opString + vecInstrExtndMnics[4].ExtnOpStr
+			removeArg(inst, int8(4))
+		}
+
+	case "VAC", "VACCC":
+		if uint8(inst.Args[4].(Mask)) == uint8(4) {
+			newOpStr = opString + vecInstrExtndMnics[3].ExtnOpStr
+			removeArg(inst, int8(3))
+		}
+
+	case "VCEQ", "VCH", "VCHL":
+		for i := 0; i < len(vec2InstrExtndMnics)-6; i++ {
 			if uint8(inst.Args[vec2InstrExtndMnics[i].Offset1].(Mask)) == vec2InstrExtndMnics[i].Value1 &&
 				uint8(inst.Args[vec2InstrExtndMnics[i].Offset2].(Mask)) == vec2InstrExtndMnics[i].Value2 {
 				newOpStr = opString + vec2InstrExtndMnics[i].ExtnOpStr
-				//skipArgList[0] = int8(vec2InstrExtndMnics[i].Offset1)
-				//skipArgList[1] = int8(vec2InstrExtndMnics[i].Offset2)
 				removeArg(inst, int8(vec2InstrExtndMnics[i].Offset1))
-				if (opString != "VFAE" && opString != "VSTRC") &&
-					!((opString == "VFEE" || opString == "VFENE" || opString == "VISTR" || opString == "VSTRS") &&
-						(vec2InstrExtndMnics[i].Value2 == 0)) {
-					removeArg(inst, int8(vec2InstrExtndMnics[i].Offset2-1))
+				removeArg(inst, int8(vec2InstrExtndMnics[i].Offset2-1))
+				break
+			}
+		}
+
+	case "VPKS", "VPKLS":
+		for i := 1; i < len(vec2InstrExtndMnics)-6; i++ {
+			if i == 4 {
+				continue
+			}
+			if uint8(inst.Args[vec2InstrExtndMnics[i].Offset1].(Mask)) == vec2InstrExtndMnics[i].Value1 &&
+				uint8(inst.Args[vec2InstrExtndMnics[i].Offset2].(Mask)) == vec2InstrExtndMnics[i].Value2 {
+				newOpStr = opString + vec2InstrExtndMnics[i].ExtnOpStr
+				removeArg(inst, int8(vec2InstrExtndMnics[i].Offset1))
+				removeArg(inst, int8(vec2InstrExtndMnics[i].Offset2-1))
+				break
+			}
+		}
+	case "VFEE", "VFENE":
+		var check bool
+		for i := 0; i < len(vec21InstrExtndMnics); i++ {
+			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
+				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2].(Mask)) == vec21InstrExtndMnics[i].Value2 {
+				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr
+				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1))
+				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset2-1))
+				check = true
+				break
+			}
+		}
+		if !check {
+			if uint8(inst.Args[3].(Mask)) == 0 && (uint8(inst.Args[4].(Mask)) != uint8(0)) {
+				newOpStr = opString + vec21InstrExtndMnics[0].ExtnOpStr
+				removeArg(inst, int8(vec21InstrExtndMnics[0].Offset1))
+			} else if uint8(inst.Args[3].(Mask)) == 1 && (uint8(inst.Args[4].(Mask)) != uint8(0)) {
+				newOpStr = opString + vec21InstrExtndMnics[1].ExtnOpStr
+				removeArg(inst, int8(vec21InstrExtndMnics[1].Offset1))
+			} else if uint8(inst.Args[3].(Mask)) == 2 && (uint8(inst.Args[4].(Mask)) != uint8(0)) {
+				newOpStr = opString + vec21InstrExtndMnics[2].ExtnOpStr
+				removeArg(inst, int8(vec21InstrExtndMnics[2].Offset1))
+			} else if uint8(inst.Args[4].(Mask)) == 0 {
+				removeArg(inst, int8(vec21InstrExtndMnics[2].Offset2))
+			}
+		}
+
+	case "VFAE", "VSTRC":
+		off := uint8(0)
+		var check bool
+		if opString == "VSTRC" {
+			off = uint8(1)
+		}
+		for i := 0; i < len(vec21InstrExtndMnics)-9; i++ {
+			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1+off].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
+				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2+off].(Mask)) == vec21InstrExtndMnics[i].Value2 {
+				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr
+				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1+off))
+				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset2+off-1))
+				check = true
+				break
+			}
+		}
+
+		for i := 0; !(check) && (i < len(vec21InstrExtndMnics)-9); i++ {
+			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1+off].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
+				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2+off].(Mask)) == vec21InstrExtndMnics[i].Value2 {
+				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr
+				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1+off))
+				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset2+off-1))
+				check = true
+				break
+			}
+		}
+		//for i := 3; !(check) && (i < len(vec21InstrExtndMnics)); i++ {
+		for i := len(vec21InstrExtndMnics) - 1; !(check) && (i > 2); i-- {
+			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1+off].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
+				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2+off].(Mask))&(vec21InstrExtndMnics[i].Value2) == vec21InstrExtndMnics[i].Value2 {
+				x := uint8(inst.Args[vec21InstrExtndMnics[i].Offset2+off].(Mask)) ^ (vec21InstrExtndMnics[i].Value2)
+				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr
+				if x != 0 {
+					inst.Args[vec21InstrExtndMnics[i].Offset2+off] = Mask(x)
+					removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1+off))
+					check = true
+					break
+				} else {
+					removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1+off))
+					removeArg(inst, int8(vec21InstrExtndMnics[i].Offset2+off-1))
+					check = true
+					break
 				}
+			}
+		}
+		if !check && inst.Args[4+off].(Mask) == Mask(0) {
+			removeArg(inst, int8(4+off))
+			break
+		}
+
+	case "VSTRS":
+		var check bool
+		for i := 0; i < len(vec21InstrExtndMnics)-3; i++ {
+			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1+1].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
+				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2+1].(Mask)) == vec21InstrExtndMnics[i].Value2 {
+				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr
+				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1+1))
+				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset2))
+				check = true
+				break
+			}
+			if i == 2 {
+				i = i + 3
+			}
+		}
+
+		for i := 0; !(check) && (i < len(vec21InstrExtndMnics)-9); i++ {
+			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1+1].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
+				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2+1].(Mask)) != 0 {
+				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr
+				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1+1))
+				break
+			}
+		}
+
+	case "VISTR":
+		var check bool
+		for i := 0; i < len(vec21InstrExtndMnics)-6; i++ {
+			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1-1].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
+				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2-1].(Mask)) == vec21InstrExtndMnics[i].Value2 {
+				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr
+				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1-1))
+				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset2-2))
+				check = true
+				break
+			}
+		}
+
+		for i := 0; !(check) && (i < len(vec21InstrExtndMnics)-9); i++ {
+			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1-1].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
+				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2-1].(Mask)) != 0 {
+				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr
+				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1-1))
+				break
+			}
+		}
+
+		if uint8(inst.Args[3].(Mask)) == 0 {
+			removeArg(inst, int8(3))
+			break
+		}
+
+	case "VCFPS":
+		if inst.Args[2].(Mask) == Mask(2) && ((inst.Args[3].(Mask)>>3)&(0x1) == 1) {
+			inst.Args[3] = Mask((inst.Args[3].(Mask)) ^ (0x8))
+			newOpStr = "WCEFB"
+			removeArg(inst, int8(2))
+			break
+		} else if inst.Args[2].(Mask) == Mask(3) && ((inst.Args[3].(Mask)>>3)&(0x1) == 1) {
+			inst.Args[3] = Mask((inst.Args[3].(Mask)) ^ (0x8))
+			newOpStr = "WCDGB"
+			removeArg(inst, int8(2))
+			break
+		} else if uint8(inst.Args[2].(Mask)) == uint8(2) {
+			newOpStr = "VCEFB"
+			removeArg(inst, int8(2))
+			break
+		} else if uint8(inst.Args[2].(Mask)) == uint8(3) {
+			newOpStr = "VCDGB"
+			removeArg(inst, int8(2))
+			break
+		}
+
+	case "VCFPL":
+		if inst.Args[2].(Mask) == Mask(2) && ((inst.Args[3].(Mask)>>3)&(0x1) == 1) {
+			inst.Args[3] = Mask((inst.Args[3].(Mask)) ^ (0x8))
+			newOpStr = "WCELFB"
+			removeArg(inst, int8(2))
+			break
+		} else if inst.Args[2].(Mask) == Mask(3) && ((inst.Args[3].(Mask)>>3)&(0x1) == 1) {
+			inst.Args[3] = Mask((inst.Args[3].(Mask)) ^ (0x8))
+			newOpStr = "WCDLGB"
+			removeArg(inst, int8(2))
+			break
+		} else if inst.Args[2].(Mask) == Mask(2) {
+			newOpStr = "VCELFB"
+			removeArg(inst, int8(2))
+			break
+		} else if inst.Args[2].(Mask) == Mask(3) {
+			newOpStr = "VCDLGB"
+			removeArg(inst, int8(2))
+			break
+		}
+
+	case "VCSFP":
+		if inst.Args[2].(Mask) == Mask(2) && ((inst.Args[3].(Mask)>>3)&(0x1) == 1) {
+			inst.Args[3] = Mask((inst.Args[3].(Mask)) ^ (0x8))
+			newOpStr = "WCFEB"
+			removeArg(inst, int8(2))
+			break
+		} else if inst.Args[2].(Mask) == Mask(3) && ((inst.Args[3].(Mask)>>3)&(0x1) == 1) {
+			inst.Args[3] = Mask((inst.Args[3].(Mask)) ^ (0x8))
+			newOpStr = "WCGDB"
+			removeArg(inst, int8(2))
+			break
+		} else if inst.Args[2].(Mask) == Mask(2) {
+			newOpStr = "VCFEB"
+			removeArg(inst, int8(2))
+			break
+		} else if inst.Args[2].(Mask) == Mask(3) {
+			newOpStr = "VCGDB"
+			removeArg(inst, int8(2))
+			break
+		}
+
+	case "VCLFP":
+		if inst.Args[2].(Mask) == Mask(2) && ((inst.Args[3].(Mask)>>3)&(0x1) == 1) {
+			inst.Args[3] = Mask((inst.Args[3].(Mask)) ^ (0x8))
+			newOpStr = "WCLFEB"
+			removeArg(inst, int8(2))
+			break
+		} else if inst.Args[2].(Mask) == Mask(3) && ((inst.Args[3].(Mask)>>3)&(0x1) == 1) {
+			inst.Args[3] = Mask((inst.Args[3].(Mask)) ^ (0x8))
+			newOpStr = "WCLGDB"
+			removeArg(inst, int8(2))
+			break
+		} else if inst.Args[2].(Mask) == Mask(2) {
+			newOpStr = "VCLFEB"
+			removeArg(inst, int8(2))
+			break
+		} else if inst.Args[2].(Mask) == Mask(3) {
+			newOpStr = "VCLGDB"
+			removeArg(inst, int8(2))
+			break
+		}
+
+	case "VFI":
+		if inst.Args[2].(Mask) == Mask(2) && ((inst.Args[3].(Mask)>>3)&(0x1) == 1) {
+			newOpStr = "WFISB"
+			removeArg(inst, int8(2))
+			inst.Args[2] = Mask((inst.Args[2].(Mask)) ^ (0x8))
+			break
+		} else if inst.Args[2].(Mask) == Mask(3) && ((inst.Args[3].(Mask)>>3)&(0x3) == 1) {
+			newOpStr = "WFIDB"
+			removeArg(inst, int8(2))
+			inst.Args[2] = Mask((inst.Args[2].(Mask)) ^ (0x8))
+			break
+		} else if inst.Args[2].(Mask) == Mask(4) && ((inst.Args[3].(Mask)>>3)&(0x1) == 1) {
+			newOpStr = "WFIXB"
+			removeArg(inst, int8(2))
+			inst.Args[2] = Mask((inst.Args[2].(Mask)) ^ (0x8))
+			break
+		} else if inst.Args[2].(Mask) == Mask(2) {
+			newOpStr = "VFISB"
+			removeArg(inst, int8(2))
+			break
+		} else if inst.Args[2].(Mask) == Mask(3) {
+			newOpStr = "VFIDB"
+			removeArg(inst, int8(2))
+			break
+		}
+
+	// Case to handle few vector instructions with 2 M-field operands
+	case "VFA", "VFD", "VFLL", "VFMAX", "VFMIN", "VFM":
+		for i := 0; i < len(vec4InstrExtndMnics); i++ {
+			if opString == vec4InstrExtndMnics[i].BaseOpStr &&
+				uint8(inst.Args[vec4InstrExtndMnics[i].Offset1].(Mask)) == vec4InstrExtndMnics[i].Value1 &&
+				uint8(inst.Args[vec4InstrExtndMnics[i].Offset2].(Mask)) == vec4InstrExtndMnics[i].Value2 {
+				newOpStr = vec4InstrExtndMnics[i].ExtnOpStr
+				removeArg(inst, int8(vec4InstrExtndMnics[i].Offset1))
+				removeArg(inst, int8(vec4InstrExtndMnics[i].Offset2-1))
 				break
 			}
 		}
 
 	// Case to handle few special "Vector" instructions with 2 M-field operands
 	case "WFC", "WFK":
-
 		for i := 0; i < len(vec3InstrExtndMnics); i++ {
 			if uint8(inst.Args[vec3InstrExtndMnics[i].Offset1].(Mask)) == vec3InstrExtndMnics[i].Value1 &&
 				uint8(inst.Args[vec3InstrExtndMnics[i].Offset2].(Mask)) == vec3InstrExtndMnics[i].Value2 {
 				newOpStr = opString + vec3InstrExtndMnics[i].ExtnOpStr
-				//skipArgList[0] = int8(vec3InstrExtndMnics[i].Offset1)
-				//skipArgList[1] = int8(vec3InstrExtndMnics[i].Offset2)
 				removeArg(inst, int8(vec3InstrExtndMnics[i].Offset1))
 				removeArg(inst, int8(vec3InstrExtndMnics[i].Offset2-1))
 				break
@@ -576,61 +931,26 @@ func HandleExtndMnemonic(inst *Inst) string {
 		}
 
 	// Case to handle few vector instructions with 2 M-field operands
-	case "VFA", "VFD", "VFLL", "VFMAX", "VFMIN", "VFM":
-
-		for i := 0; i < len(vec4InstrExtndMnics); i++ {
-			if opString == vec4InstrExtndMnics[i].BaseOpStr &&
-				uint8(inst.Args[vec4InstrExtndMnics[i].Offset1].(Mask)) == vec4InstrExtndMnics[i].Value1 &&
-				uint8(inst.Args[vec4InstrExtndMnics[i].Offset2].(Mask)) == vec4InstrExtndMnics[i].Value2 {
-				newOpStr = vec4InstrExtndMnics[i].ExtnOpStr
-				//skipArgList[0] = int8(vec4InstrExtndMnics[i].Offset1)
-				//skipArgList[1] = int8(vec4InstrExtndMnics[i].Offset2)
-				removeArg(inst, int8(vec4InstrExtndMnics[i].Offset1))
-				removeArg(inst, int8(vec4InstrExtndMnics[i].Offset2-1))
-				break
-			}
-		}
-
-		// Case to handle few vector instructions with 2 M-field operands
 	case "VFMA", "VFMS", "VFNMA", "VFNMS":
-
 		for i := 0; i < len(vec7InstrExtndMnics); i++ {
 			if opString == vec7InstrExtndMnics[i].BaseOpStr &&
 				uint8(inst.Args[vec7InstrExtndMnics[i].Offset1].(Mask)) == vec7InstrExtndMnics[i].Value1 &&
 				uint8(inst.Args[vec7InstrExtndMnics[i].Offset2].(Mask)) == vec7InstrExtndMnics[i].Value2 {
 				newOpStr = vec7InstrExtndMnics[i].ExtnOpStr
-				//skipArgList[0] = int8(vec7InstrExtndMnics[i].Offse)
-				//skipArgList[1] = int8(vec7InstrExtndMnics[i].Offset2)
 				removeArg(inst, int8(vec7InstrExtndMnics[i].Offset1))
 				removeArg(inst, int8(vec7InstrExtndMnics[i].Offset2-1))
 				break
 			}
 		}
 
-		// Case to handle few vector instructions with one M-field operand
-	case "VSCHP", "VAC", "VACCC", "VMSL", "VSBI", "VSBCBI", "VSTEBRF", "VSTEBRG":
-		//case "VSCHP", "VAC":
-		for i := 0; i < len(vec5InstrExtndMnics); i++ {
-			if (opString == vec5InstrExtndMnics[i].BaseOpStr) && (uint8(inst.Args[vec5InstrExtndMnics[i].Offset].(Mask)) == vec5InstrExtndMnics[i].Value) {
-				newOpStr = vec5InstrExtndMnics[i].ExtnOpStr
-				//skipArgList[0] = int8(vec5InstrExtndMnics[i].Offset)
-				removeArg(inst, int8(vec5InstrExtndMnics[i].Offset))
-				break
-			}
-		}
-
 	// List of instructions with 3 M-field operands.
 	case "VFCE", "VFCH", "VFCHE", "VFPSO":
-
 		for i := 0; i < len(vec6InstrExtndMnics); i++ {
 			if opString == vec6InstrExtndMnics[i].BaseOpStr &&
 				uint8(inst.Args[vec6InstrExtndMnics[i].Offset1].(Mask)) == vec6InstrExtndMnics[i].Value1 &&
 				uint8(inst.Args[vec6InstrExtndMnics[i].Offset2].(Mask)) == vec6InstrExtndMnics[i].Value2 &&
 				uint8(inst.Args[vec6InstrExtndMnics[i].Offset3].(Mask)) == vec6InstrExtndMnics[i].Value3 {
 				newOpStr = vec6InstrExtndMnics[i].ExtnOpStr
-				//skipArgList[0] = int8(vec6InstrExtndMnics[i].Offset1)
-				// skipArgList[1] = int8(vec6InstrExtndMnics[i].Offset2)
-				// skipArgList[2] = int8(vec6InstrExtndMnics[i].Offset3)
 				removeArg(inst, int8(vec6InstrExtndMnics[i].Offset1))
 				removeArg(inst, int8(vec6InstrExtndMnics[i].Offset2-1))
 				removeArg(inst, int8(vec6InstrExtndMnics[i].Offset3-2))
@@ -638,20 +958,9 @@ func HandleExtndMnemonic(inst *Inst) string {
 			}
 		}
 
-	case "VGBM":
-		for i := 0; i < len(vec8InstrExtndMnics); i++ {
-			if uint16(inst.Args[vec8InstrExtndMnics[i].Offset].(Imm)) == vec8InstrExtndMnics[i].Value {
-				newOpStr = vec8InstrExtndMnics[i].ExtnOpStr
-				removeArg(inst, int8(vec8InstrExtndMnics[i].Offset))
-				break
-			}
-		}
-
 	default:
 		return opString
-
 	}
-
 	return newOpStr
 }
 
