@@ -23,8 +23,8 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
-	gofmt "go/format"
 	asm "github.com/srinivas-pokala/arch/s390x/s390xasm"
+	gofmt "go/format"
 	"log"
 	"os"
 	"regexp"
@@ -75,7 +75,6 @@ func main() {
 	log.Printf("Parsed %d instruction forms.", len(p.Insts))
 	print(p)
 }
-
 
 // readCSV reads the CSV file and returns the corresponding Prog.
 // It may print details about problems to standard error using the log package.
@@ -272,7 +271,6 @@ func computeMaskValueReserved(args Args, text string) (mask, value, reserved uin
 	return
 }
 
-
 func Imm_signed_8bit_check(op string) bool {
 	imm_8 := []string{"ASI", "AGSI", "ALSI", "ALGSI", "CIB", "CGIB", "CIJ", "CGIJ"}
 	var ret bool
@@ -283,11 +281,11 @@ func Imm_signed_8bit_check(op string) bool {
 			break
 		}
 	}
-return ret
+	return ret
 }
 
 func Imm_signed_16bit_check(op string) bool {
-	imm_16 := []string{"AHI", "AGHI", "ALHSIK","ALGHSIK", "AHIK", "AGHIK", "LHI", "LGHI", "MVGHI","CIT", "CGIT","CGHI","CGHSI", "CHHSI","CHI","CHSI","CRJ", "CGRJ"}
+	imm_16 := []string{"AHI", "AGHI", "ALHSIK", "ALGHSIK", "AHIK", "AGHIK", "LHI", "LGHI", "MVGHI", "CIT", "CGIT", "CGHI", "CGHSI", "CHHSI", "CHI", "CHSI", "CRJ", "CGRJ"}
 	var ret bool
 	ret = false
 	for _, str := range imm_16 {
@@ -296,12 +294,11 @@ func Imm_signed_16bit_check(op string) bool {
 			break
 		}
 	}
-return ret
+	return ret
 }
 
-
 func Imm_signed_32bit_check(op string) bool {
-	imm_32 := []string{"AFI", "AGFI", "AIH", "CIH","CFI","CGFI", "CRL", "STRL", "STGRL"}
+	imm_32 := []string{"AFI", "AGFI", "AIH", "CIH", "CFI", "CGFI", "CRL", "STRL", "STGRL"}
 	var ret bool
 	ret = false
 	for _, str := range imm_32 {
@@ -310,19 +307,19 @@ func Imm_signed_32bit_check(op string) bool {
 			break
 		}
 	}
-return ret
+	return ret
 }
 
 func check_flags(flags string) bool {
-        if strings.Contains(flags, "Da") {
-                return true
-        } else if strings.Contains(flags, "Db") {
-                return true
-        } else if strings.Contains(flags, "Dt") {
-                return true
-        } else {
-                return false
-        }
+	if strings.Contains(flags, "Da") {
+		return true
+	} else if strings.Contains(flags, "Db") {
+		return true
+	} else if strings.Contains(flags, "Dt") {
+		return true
+	} else {
+		return false
+	}
 }
 
 // Parse a row from the CSV describing the instructions, and place the
@@ -355,45 +352,78 @@ func add(p *Prog, text, mnemonics, encoding, flags string) {
 		flag := uint16(0)
 		switch opr {
 		case "R1", "R2", "R3":
+			s := strings.Split(mnemonics, " ")
 			switch opr {
-                                case "R1":
-                                        if check_flags(flags) {
-                                                if strings.Contains(text, "CONVERT TO") {
-                                                        typ = asm.TypeReg
-                                                        flag = 0x1
-                                                } else {
-                                                        typ = asm.TypeFPReg
-                                                        flag = 0x2
-                                                }
-                                        } else {
-                                                typ = asm.TypeReg
-                                                flag = 0x1
-                                        }
-                                case "R2":
-                                        if check_flags(flags) {
-                                                if strings.Contains(text, "CONVERT FROM") {
-                                                        typ = asm.TypeReg
-                                                        flag = 0x1
-                                                } else {
-                                                        typ = asm.TypeFPReg
-                                                        flag = 0x2
-                                                }
-                                        } else {
-                                                typ = asm.TypeReg
-                                                flag = 0x1
-                                        }
-                                case "R3":
-                                        if check_flags(flags) {
-                                                typ = asm.TypeFPReg
-                                                flag = 0x2
-                                        } else {
-                                                typ = asm.TypeReg
-                                                flag = 0x1
-                                        }
-                                }
+			case "R1":
+				switch s[0] {
+				case "CPDT", "CPXT", "CDXT", "CZXT", "CZDT":
+					typ = asm.TypeFPReg
+					flag = 0x2
+				case "CUXTR", "EEXTR", "EEDTR", "EFPC", "ESXTR", "ESDTR", "LGDR", "SFPC", "SFASR":
+					typ = asm.TypeReg
+					flag = 0x1
+				case "CPYA", "LAM", "LAMY", "STAM", "STAMY", "SAR", "TAR":
+					typ = asm.TypeACReg
+					flag = 0x3
+				case "LCTL", "LCTLG", "STCTL", "STCTG":
+					typ = asm.TypeCReg
+					flag = 0x4
+				default:
+					if check_flags(flags) {
+						if strings.Contains(text, "CONVERT TO") {
+							typ = asm.TypeReg
+							flag = 0x1
+						} else {
+							typ = asm.TypeFPReg
+							flag = 0x2
+						}
+					} else {
+						typ = asm.TypeReg
+						flag = 0x1
+					}
+				}
+			case "R2":
+				switch s[0] {
+				case "IEXTR", "IEDTR", "LDGR", "RRXTR", "RRDTR":
+					typ = asm.TypeReg
+					flag = 0x1
+				case "CPYA", "EAR":
+					typ = asm.TypeACReg
+					flag = 0x3
+				default:
+					if check_flags(flags) {
+						if strings.Contains(text, "CONVERT FROM") {
+							typ = asm.TypeReg
+							flag = 0x1
+						} else {
+							typ = asm.TypeFPReg
+							flag = 0x2
+						}
+					} else {
+						typ = asm.TypeReg
+						flag = 0x1
+					}
+				}
+			case "R3":
+				switch s[0] {
+				case "LAM", "LAMY", "STAM", "STAMY":
+					typ = asm.TypeACReg
+					flag = 0x3
+				case "LCTL", "LCTLG", "STCTL", "STCTG":
+					typ = asm.TypeCReg
+					flag = 0x4
+				default:
+					if check_flags(flags) {
+						typ = asm.TypeFPReg
+						flag = 0x2
+					} else {
+						typ = asm.TypeReg
+						flag = 0x1
+					}
+				}
+			}
 
-
-		case "I", "I1", "I2","I3", "I4", "I5":
+		case "I", "I1", "I2", "I3", "I4", "I5":
 			flag = 0x0
 			switch opr {
 			case "I", "I1":
@@ -403,10 +433,10 @@ func add(p *Prog, text, mnemonics, encoding, flags string) {
 				if Imm_signed_8bit_check(inst.Op) {
 					typ = asm.TypeImmSigned8
 					break
-				} else if Imm_signed_16bit_check(inst.Op) {	// "ASI", "AGSI", "ALSI", "ALGSI"
-					typ =asm. TypeImmSigned16
+				} else if Imm_signed_16bit_check(inst.Op) { // "ASI", "AGSI", "ALSI", "ALGSI"
+					typ = asm.TypeImmSigned16
 					break
-				} else if Imm_signed_32bit_check(inst.Op) {	// "AHI", "AGHI", "AHIK", "AGHIK", "LHI", "LGHI"
+				} else if Imm_signed_32bit_check(inst.Op) { // "AHI", "AGHI", "AHIK", "AGHIK", "LHI", "LGHI"
 					typ = asm.TypeImmSigned32
 					break
 				} else {
@@ -540,21 +570,21 @@ func printDecoder(p *Prog) {
 	// Build list of opcodes, using the csv order (which corresponds to ISA docs order)
 	m := map[string]bool{}
 	fmt.Fprintf(&buf, "const (\n\t_ Op = iota\n")
-	for i:=0;i<len(p.Insts);i++ {
-                name := p.Insts[i].Op
-                switch name {
-                case "CUUTF", "CUTFU":
-                        m[name] = false
-                        p.Insts = append(p.Insts[:i], p.Insts[i+1:]...)
-                        i--
-                default:
-                        m[name] = true
-                }
-                if ok := m[name]; !ok {
-                        continue
-                }
-	fmt.Fprintf(&buf, "\t%s\n", name)
-        }
+	for i := 0; i < len(p.Insts); i++ {
+		name := p.Insts[i].Op
+		switch name {
+		case "CUUTF", "CUTFU", "PPNO":
+			m[name] = false
+			p.Insts = append(p.Insts[:i], p.Insts[i+1:]...)
+			i--
+		default:
+			m[name] = true
+		}
+		if ok := m[name]; !ok {
+			continue
+		}
+		fmt.Fprintf(&buf, "\t%s\n", name)
+	}
 	fmt.Fprint(&buf, ")\n\n\n")
 
 	// Emit slice mapping opcode number to name string.
