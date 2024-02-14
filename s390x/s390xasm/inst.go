@@ -20,10 +20,11 @@ type Inst struct {
 func (i Inst) String(pc uint64) string {
 	var buf bytes.Buffer
 	var rxb_check bool
-	mnemonic := HandleExtndMnemonic(&i)
-	if strings.HasPrefix(mnemonic,"V") || strings.Contains(mnemonic,"WFC") || strings.Contains(mnemonic, "WFK") {
+	m := i.Op.String()
+	if strings.HasPrefix(m,"V") || strings.Contains(m,"WFC") || strings.Contains(m, "WFK") {
 		rxb_check = true
 	}
+	mnemonic := HandleExtndMnemonic(&i)
 	buf.WriteString(fmt.Sprintf("%s",strings.ToLower(mnemonic)))
 	for j, arg := range i.Args {
 		if arg == nil {
@@ -33,15 +34,24 @@ func (i Inst) String(pc uint64) string {
 			buf.WriteString(" ")
 		} else {
 			switch arg.(type) {
-			case Index, Base, Len:
-			default:
-				buf.WriteString(",")
+				case VReg, Reg:
+                                       if _,ok := i.Args[j-1].(Disp12); ok {
+                                               buf.WriteString("")
+                                       } else if _,ok := i.Args[j-1].(Disp20); ok {
+                                               buf.WriteString("")
+                                       } else {
+                                               buf.WriteString(",")
+                                       }
+                               case Base:
+                                       if _,ok := i.Args[j-1].(VReg); ok {
+                                               buf.WriteString(",")
+                                       } else if _,ok := i.Args[j-1].(Reg); ok {
+                                               buf.WriteString(",")
+                                       }
+                               case Index, Len:
+                               default:
+                                       buf.WriteString(",")
 			}
-		}
-		switch arg.(type) {
-			case Reg,VReg:
-				buf.WriteString("%")
-			default:
 		}
 		buf.WriteString(arg.String(pc))
 		if rxb_check && i.Args[j+2] == nil {
@@ -278,15 +288,16 @@ const (
 
 func (Reg) IsArg() {}
 func (r Reg) String(pc uint64) string {
+	s := "%"
 	switch {
 	case R0 <= r && r <= R15:
-		return fmt.Sprintf("r%d", int(r-R0))
+		return fmt.Sprintf("%sr%d", s, int(r-R0))
 	case F0 <= r && r <= F15:
-		return fmt.Sprintf("f%d", int(r-F0))
+		return fmt.Sprintf("%sf%d", s, int(r-F0))
 	case A0 <= r && r <= A15:
-		return fmt.Sprintf("a%d", int(r-A0))
+		return fmt.Sprintf("%sa%d", s, int(r-A0))
 	case C0 <= r && r <= C15:
-		return fmt.Sprintf("c%d", int(r-C0))
+		return fmt.Sprintf("%sc%d", s, int(r-C0))
 	default:
 		return fmt.Sprintf("Reg(%d)", int(r))
 	}
@@ -333,8 +344,9 @@ const (
 
 func (VReg) IsArg() {}
 func (r VReg) String(pc uint64) string {
+	s := "%"
 	if V0 <= r && r <= V31 {
-		return fmt.Sprintf("v%d", int(r-V0))
+		return fmt.Sprintf("%sv%d", s, int(r-V0))
 	} else {
 		return fmt.Sprintf("VReg(%d)", int(r))
 	}
