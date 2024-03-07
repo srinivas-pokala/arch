@@ -7,23 +7,13 @@ package s390xasm
 import (
 	"encoding/binary"
 	"fmt"
-	"log"
 )
-
-const debugDecode = false
-
-const prefixOpcode = 1
 
 // instFormat is a decoding rule for one specific instruction form.
 // an instruction ins matches the rule if ins&Mask == Value
-// DontCare bits should be zero, but the machine might not reject
-// ones in those bits, they are mainly reserved for future expansion
-// of the instruction set.
+// DontCare bits are mainly used for finding the same instruction 
+// name differing with the number of argument fields.
 // The Args are stored in the same order as the instruction manual.
-//
-// Prefixed instructions are stored as:
-//
-//	prefix << 32 | suffix,
 //
 // Regular instructions are:
 //
@@ -128,7 +118,6 @@ const (
 	TypeMask		// 4-bit Mask
 	TypeLen			// Length of Memory Operand
 	TypeLast
-
 )
 
 func (t ArgType) String() string {
@@ -228,26 +217,16 @@ func Decode(src []byte ) (inst Inst, err error) {
 	case 6:
 		u1 := binary.BigEndian.Uint32(src[:(inst.Len-2)])
 		u2 := binary.BigEndian.Uint16(src[(inst.Len-2):inst.Len])
-		//fmt.Printf("case 6:u1: 0x%x u2: 0x%x\n", u1, u2)
 		ui_extn = uint64(u1)<<16 |uint64(u2)
-		//fmt.Printf("case 6: ui_extn: 0x:%x\n", ui_extn)
 		ui_extn =  ui_extn << 16
 		inst.Enc = ui_extn
 	default:
 		return inst, errShort
 	}
-	//fmt.Printf("ui_extn: 0x%x\n", ui_extn)
-	for i, iform := range instFormats {
-		//if ui_extn&iform.Mask != iform.Value {
+	for _, iform := range instFormats {
 		if ui_extn&iform.Mask != iform.Value	{
 			continue
 		}
-		/*if ui&iform.DontCare != 0 {
-			if debugDecode {
-				log.Printf("Decode(%#x): unused bit is 1 for Op %s", ui, iform.Op)
-			}
-			// to match GNU objdump (libopcodes), we ignore don't care bits
-		}*/
 		if (iform.DontCare & ^(ui_extn)) != iform.DontCare  {
 			continue
 		}
@@ -258,10 +237,6 @@ func Decode(src []byte ) (inst Inst, err error) {
 			inst.Args[j] = argfield.Parse(ui_extn)
 		}
 		inst.Op = iform.Op
-		if debugDecode {
-			log.Printf("%#x: search entry %d", ui_extn, i)
-			continue
-		}
 		break
 	}
 	if inst.Op == 0 && inst.Enc != 0 {
@@ -269,3 +244,4 @@ func Decode(src []byte ) (inst Inst, err error) {
 	}
 	return inst, nil
 }
+

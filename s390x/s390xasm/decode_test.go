@@ -75,15 +75,6 @@ func decode(data []byte, t *testing.T, filename string) {
 			switch syntax {
 			case "gnu":
 				out = GNUSyntax(inst, pc)
-			/*case "plan9":
-			pc := pc
-			// Hack: Setting PC to 0 effectively transforms the PC relative address
-			// of CALL (bl) into an absolute address when decoding in GoSyntax. This
-			// simplifies the testing of symbol lookups via symlookup above.
-			if inst.Op == BL {
-				pc = 0
-			}
-			out = GoSyntax(inst, pc, symlookup)*/
 			default:
 				t.Errorf("unknown syntax %q", syntax)
 				continue

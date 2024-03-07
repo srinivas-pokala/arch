@@ -21,11 +21,11 @@ func (i Inst) String(pc uint64) string {
 	var buf bytes.Buffer
 	var rxb_check bool
 	m := i.Op.String()
-	if strings.HasPrefix(m,"V") || strings.Contains(m,"WFC") || strings.Contains(m, "WFK") {
+	if strings.HasPrefix(m,"v") || strings.Contains(m,"wfc") || strings.Contains(m, "wfk") {
 		rxb_check = true
 	}
 	mnemonic := HandleExtndMnemonic(&i)
-	buf.WriteString(fmt.Sprintf("%s",strings.ToLower(mnemonic)))
+	buf.WriteString(fmt.Sprintf("%s", mnemonic))
 	for j, arg := range i.Args {
 		if arg == nil {
 			break
@@ -399,3 +399,4 @@ func (Len) IsArg() {}
 func (i Len) String(pc uint64) string {
 	return fmt.Sprintf("%d,",uint16(i)+1)
 }
+

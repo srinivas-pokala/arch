@@ -33,7 +33,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-
 	"rsc.io/pdf"
 )
 
@@ -43,8 +42,6 @@ type Inst struct {
 	Enc  string
 	Flags string
 }
-
-const debugPage = 0
 
 var stdout *bufio.Writer
 
@@ -62,17 +59,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var all = []Inst{
-		// Split across multiple columns and pages!
-	}
+	// Split across multiple columns and pages!
+	var all = []Inst{}
 
 	// Scan document looking for instructions.
 	// Must find exactly the ones in the outline.
 	n := f.NumPage()
 	for pageNum := 1; pageNum <= n; pageNum++ {
-		if debugPage > 0 && pageNum != debugPage {
-			continue
-		}
 		if checkPage(pageNum) {
 			for n := pageNum; n < pageNum+24; n++ {
 				page := f.Page(n)
@@ -120,6 +113,7 @@ func parsePage(num int, p pdf.Page) []Inst {
 
 	for {
 		var heading, mnemonic, format string
+		//The float numbers below are the horizontal X-coordinate values to be parsed out of the Z-ISA pdf book.
 		for len(text) > 0 && !(match(text[0], "Helvetica-Narrow", 8, "") && (matchXCord(text[0], 73.9) || matchXCord(text[0], 55.9))) {
 			text = text[1:]
 		}
@@ -128,6 +122,7 @@ func parsePage(num int, p pdf.Page) []Inst {
 		}
 		heading = text[0].S
 		text = text[1:]
+		//The float numbers below are the horizontal X-coordinate values to be parsed out of the Z-ISA pdf book.
 		for !(matchXCord(text[0], 212.2) || matchXCord(text[0], 230.1) || matchXCord(text[0], 246.2) || matchXCord(text[0], 264.2)) {
 			heading += text[0].S
 			if match(text[0], "Wingdings3", 0, "") {
@@ -160,6 +155,7 @@ func parsePage(num int, p pdf.Page) []Inst {
 		}
 		before, _, _ := strings.Cut(format, " ")
 		format = before
+		//The float numbers below are the horizontal X-coordinate values to be parsed out of the Z-ISA pdf book.
 		for len(text) > 0 && !(match(text[0], "Helvetica-Narrow", 8, "") && (matchXCord(text[0], 350.82) || matchXCord(text[0], 363.84) || matchXCord(text[0], 332.82) || matchXCord(text[0],345.84)))	{
 			if text[0].X > 405.48  {
 				break
@@ -167,6 +163,7 @@ func parsePage(num int, p pdf.Page) []Inst {
 			text = text[1:]
 		}
 		flags := text[0].S
+		//The float numbers below are the horizontal X-coordinate values to be parsed out of the Z-ISA pdf book.
 		for len(text) > 0 && !(match(text[0], "Helvetica-Narrow", 8, "") && ((matchXCord(text[0], 481.7) && (!matchXCord(text[1], 496.1))) || matchXCord(text[0], 496.1) || (matchXCord(text[0],499.6) && (!matchXCord(text[1], 514))) ||(matchXCord(text[0], 514)))) {
 			text = text[1:]
 		}

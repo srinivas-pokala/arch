@@ -54,18 +54,18 @@ func main() {
 
 	inputFile = flag.Arg(0)
 
-	var print func(*Prog)
+	var printTyp func(*Prog)
 	switch *format {
 	default:
 		log.Fatalf("unknown output format %q", *format)
 	case "text":
-		print = printText
+		printTyp = printText
 	case "decoder":
-		print = printDecoder
+		printTyp = printDecoder
 	case "asm":
-		print = printASM
+		printTyp = printASM
 	case "encoder":
-		print = printEncoder
+		printTyp = printEncoder
 	}
 
 	p, err := readCSV(flag.Arg(0))
@@ -73,7 +73,7 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Printf("Parsed %d instruction forms.", len(p.Insts))
-	print(p)
+	printTyp(p)
 }
 
 // readCSV reads the CSV file and returns the corresponding Prog.
@@ -536,11 +536,6 @@ func printEncoder(p *Prog) {
 	log.Fatal("-fmt=encoder not implemented")
 }
 
-// printASM implements the -fmt=asm mode.which is not implemented (yet?).
-/*func printASM(p *Prog) {
-	log.Fatal("-fmt=encoder not implemented")
-}*/
-
 func printASM(p *Prog) {
 	fmt.Printf("#include \"hack.h\"\n")
 	fmt.Printf(".text\n")
@@ -596,7 +591,7 @@ func printDecoder(p *Prog) {
 			continue
 		}
 		m[name] = true
-		fmt.Fprintf(&buf, "\t%s: %q,\n", inst.Op, inst.Op)
+		fmt.Fprintf(&buf, "\t%s: %q,\n", inst.Op, strings.ToLower(inst.Op))
 	}
 	fmt.Fprint(&buf, "}\n\n\n")
 
