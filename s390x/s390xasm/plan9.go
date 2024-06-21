@@ -6,8 +6,6 @@ package s390xasm
 
 import (
 	"fmt"
-	"io"
-	"sort"
 	"strings"
 	"strconv"
 )
@@ -91,15 +89,21 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 //
 // NOTE: because Plan9Syntax is the only caller of this func, and it receives a copy
 // of inst, it's ok to modify inst.Args here.
-func plan9Arg(inst *Inst,  pc uint64, arg Arg, symname func(uint64) (string, uint64)) string {
+func plan9Arg(inst *Inst,  pc uint64, symname func(uint64) (string, uint64)) string {
 	switch arg := arg.(type) {
 	case Reg:
 		if arg == R13 {
 			return "g"
 		}
 		return strings.ToUpper(arg.String(pc)[1:])
-	case Base, Index:
-		n := uint8(arg)
+	case Base:
+		n := uint8(arg.Base)
+		if n == 0 {
+			return ""
+		}
+		return strings.ToUpper(arg.String(pc)[1:])
+	case Index:
+		n := uint8(arg.Index)
 		if n == 0 {
 			return ""
 		}
