@@ -91,7 +91,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 //
 // NOTE: because Plan9Syntax is the only caller of this func, and it receives a copy
 // of inst, it's ok to modify inst.Args here.
-func plan9Arg(inst *Inst, argIndex int, pc uint64, arg Arg, symname func(uint64) (string, uint64)) string {
+func plan9Arg(inst *Inst,  pc uint64, arg Arg, symname func(uint64) (string, uint64)) string {
 	switch arg := arg.(type) {
 	case Reg:
 		if arg == R13 {
