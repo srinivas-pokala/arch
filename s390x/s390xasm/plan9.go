@@ -40,16 +40,16 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	case BRASL:
 		return "CALL " + args[1]
 	case LCGR:
-		return "NEG " + arg[1] + arg[0]
+		return "NEG " + args[1] + args[0]
 	case SRAG:
 		return "SRAD " + args[0]
 	case LG,LGF,LLGF,LGH, LLGH, LGB, LLGC, LDY, LEY, LRVG, LRV, LRVH:
-		if arg[2] != "" && arg[3] != "" {
-			arg[2]=fmt.Sprintf("(%s, %s)",arg[2], arg[3])
-		} else if arg[2] != "" {
-			arg[2]=fmt.Sprintf("(%s)",arg[2])
-		} else if arg[3] != "" {
-			arg[2]=fmt.Sprintf("(%s)",arg[3])
+		if args[2] != "" && args[3] != "" {
+			args[2]=fmt.Sprintf("(%s, %s)",args[2], args[3])
+		} else if args[2] != "" {
+			args[2]=fmt.Sprintf("(%s)",args[2])
+		} else if args[3] != "" {
+			args[2]=fmt.Sprintf("(%s)",args[3])
 		}
 		switch inst.Op {
 			case LG:
@@ -97,17 +97,17 @@ func plan9Arg(inst *Inst,  pc uint64, arg Arg, symname func(uint64) (string, uin
 		if arg == R13 {
 			return "g"
 		}
-		return strings.ToUpper(arg.String()[1:])
+		return strings.ToUpper(arg.String(pc)[1:])
 	case Base, Index:
 		n := uint8(arg)
 		if n == 0 {
 			return ""
 		}
-		return strings.ToUpper(arg.String()[1:])
+		return strings.ToUpper(arg.String(pc)[1:])
 	case VReg:
-		return strings.ToUpper(arg.String()[1:])
+		return strings.ToUpper(arg.String(pc)[1:])
 	case Disp20, Disp12:
-		numstr := arg.String()
+		numstr := arg.String(pc)
 		num, err := strconv.Atoi(numstr[:len(numstr)-1])
 		if err != 0 {
 			return fmt.Sprintf("plan9Arg: error in converting Atoi:%s", err)
@@ -118,7 +118,7 @@ func plan9Arg(inst *Inst,  pc uint64, arg Arg, symname func(uint64) (string, uin
 			return strconv.Itoa(num)
 		}
 	case RegIm12, RegIm16, RegIm24, RegIm32:
-		addr, err := strconv.ParseUint(arg.String()[2:], 16, 64)
+		addr, err := strconv.ParseUint(arg.String(pc)[2:], 16, 64)
 		if err != 0 {
 			return fmt.Sprintf("plan9Arg: error in converting ParseUint:%s", err)
 		}
@@ -128,10 +128,10 @@ func plan9Arg(inst *Inst,  pc uint64, arg Arg, symname func(uint64) (string, uin
 		}
 		return fmt.Sprintf("%#x", addr)
 	case Imm, Sign8, Sign16, Sign32:
-		numImm := arg.String()
+		numImm := arg.String(pc)
 		return fmt.Sprintf("$%s", numImm)
 	case Mask, Len:
-		num := arg.String()
+		num := arg.String(pc)
 		return fmt.Sprintf("$%s", num)
 	}
 	return fmt.Sprintf("???(%v)", arg)
