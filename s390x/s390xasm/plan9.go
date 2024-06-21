@@ -103,12 +103,18 @@ func plan9Arg(inst *Inst,  pc uint64, symname func(uint64) (string, uint64), arg
 		}
 		return strings.ToUpper(arg.String(pc)[1:])
 	case Base:
+		if arg == R13 {
+			return "g"
+		}
 		s := arg.String(pc)
 		if s != "" {
 			return strings.ToUpper(s[1:len(s)-1])
 		}
 		return ""
 	case Index:
+		if arg == R13 {
+			return "g"
+		}
 		s := arg.String(pc)
 		if s != "" {
 			return strings.ToUpper(s[1:])
