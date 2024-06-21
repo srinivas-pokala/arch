@@ -44,18 +44,17 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	case LG,LGF,LLGF,LGH, LLGH, LGB, LLGC, LDY, LEY, LRVG, LRV, LRVH:
 		if args[2] != "" && args[3] != "" {
 			args[2] = fmt.Sprintf("(%s, %s)",args[2], args[3])
-			args[3] = ""
 		} else if args[2] != "" {
 			args[2]=fmt.Sprintf("(%s)",args[2])
-			args[3] = ""
 		} else if args[3] != "" {
 			args[2]=fmt.Sprintf("(%s)",args[3])
-			args[3] = ""
 		}
 		if args[1] != "" {
 			args[1] = fmt.Sprintf("%s%s", args[1], args[2])
-			args[2] = ""
+		} else {
+			args[1]=args[2]
 		}
+		args = args[:2]
 		switch inst.Op {
 			case LG:
 				op ="MOVD"
