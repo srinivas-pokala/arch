@@ -43,11 +43,14 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		return "SRAD " + args[0]
 	case LG,LGF,LLGF,LGH, LLGH, LGB, LLGC, LDY, LEY, LRVG, LRV, LRVH:
 		if args[2] != "" && args[3] != "" {
-			args[2]=fmt.Sprintf("(%s, %s)",args[2], args[3])
+			args[2] = fmt.Sprintf("(%s, %s)",args[2], args[3])
+			args[3] = ""
 		} else if args[2] != "" {
 			args[2]=fmt.Sprintf("(%s)",args[2])
+			args[3] = ""
 		} else if args[3] != "" {
 			args[2]=fmt.Sprintf("(%s)",args[3])
+			args[3] = ""
 		}
 		switch inst.Op {
 			case LG:
@@ -97,17 +100,17 @@ func plan9Arg(inst *Inst,  pc uint64, symname func(uint64) (string, uint64), arg
 		}
 		return strings.ToUpper(arg.String(pc)[1:])
 	case Base:
-		n := uint8(a)
-		if n == 0 {
-			return ""
+		s := arg.String(pc)
+		if s != "" {
+			return strings.ToUpper(s[1:len(s)-1])
 		}
-		return strings.ToUpper(arg.String(pc)[1:])
+		return ""
 	case Index:
-		n := uint8(a)
-		if n == 0 {
-			return ""
+		s := arg.String(pc)
+		if s != "" {
+			return strings.ToUpper(s[1:])
 		}
-		return strings.ToUpper(arg.String(pc)[1:])
+		return ""
 	case VReg:
 		return strings.ToUpper(arg.String(pc)[1:])
 	case Disp20, Disp12:
