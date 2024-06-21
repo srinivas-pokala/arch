@@ -130,7 +130,7 @@ func plan9Arg(inst *Inst,  pc uint64, symname func(uint64) (string, uint64), arg
 		if s != "" && addr == base {
 			return fmt.Sprintf("%s(SB)", s)
 		}
-		return fmt.Sprintf("%#x", addr)
+		return fmt.Sprintf("%#x %s",addr, s)
 	case Imm, Sign8, Sign16, Sign32:
 		numImm := arg.String(pc)
 		return fmt.Sprintf("$%s", numImm)
