@@ -89,7 +89,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 //
 // NOTE: because Plan9Syntax is the only caller of this func, and it receives a copy
 // of inst, it's ok to modify inst.Args here.
-func plan9Arg(inst *Inst,  pc uint64, symname func(uint64) (string, uint64)) string {
+func plan9Arg(inst *Inst,  pc uint64, symname func(uint64) (string, uint64), arg Arg) string {
 	switch arg := arg.(type) {
 	case Reg:
 		if arg == R13 {
@@ -113,7 +113,7 @@ func plan9Arg(inst *Inst,  pc uint64, symname func(uint64) (string, uint64)) str
 	case Disp20, Disp12:
 		numstr := arg.String(pc)
 		num, err := strconv.Atoi(numstr[:len(numstr)-1])
-		if err != 0 {
+		if err != nil {
 			return fmt.Sprintf("plan9Arg: error in converting Atoi:%s", err)
 		}
 		if num == 0 {
@@ -123,7 +123,7 @@ func plan9Arg(inst *Inst,  pc uint64, symname func(uint64) (string, uint64)) str
 		}
 	case RegIm12, RegIm16, RegIm24, RegIm32:
 		addr, err := strconv.ParseUint(arg.String(pc)[2:], 16, 64)
-		if err != 0 {
+		if err != nil {
 			return fmt.Sprintf("plan9Arg: error in converting ParseUint:%s", err)
 		}
 		s, base := symname(addr)
