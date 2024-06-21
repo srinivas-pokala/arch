@@ -97,13 +97,13 @@ func plan9Arg(inst *Inst,  pc uint64, symname func(uint64) (string, uint64), arg
 		}
 		return strings.ToUpper(arg.String(pc)[1:])
 	case Base:
-		n := uint8(arg.Base)
+		n := uint8(ar.Base)
 		if n == 0 {
 			return ""
 		}
 		return strings.ToUpper(arg.String(pc)[1:])
 	case Index:
-		n := uint8(arg.Index)
+		n := uint8(ar.Index)
 		if n == 0 {
 			return ""
 		}
