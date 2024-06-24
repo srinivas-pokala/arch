@@ -55,6 +55,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[1]=args[2]
 		}
 		args = args[:2]
+		args[0], args[1] = args[1], args[0]
 		switch inst.Op {
 			case LG:
 				op ="MOVD"
@@ -81,6 +82,30 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			case LRVH:
 				op ="MOVHBR"
 		}
+	case LGR, LGFR, LGHR, LGBR, LLGFR, LLGHR, LLGCR, LRVGR, LRVR, LDR:
+		switch inst.Op {
+			case LGR:
+				op = "MOVD"
+			case LGFR:
+				op = "MOVW"
+			case LGHR:
+				op = "MOVH"
+			case LGBR:
+				op = "MOVB"
+			case LLGFR:
+				op = "MOVWZ"
+			case LLGHR:
+				op = "MOVHZ"
+			case LLGCR:
+				op = "MOVBZ"
+			case LRVGR:
+				op = "MOVDBR"
+			case LRVR:
+				op = "MOVWBR"
+			case LDR:
+				op = "FMOVD"
+		}
+		args[0], args[1] = args[1], args[0]
 	}
 
 	if args != nil {
