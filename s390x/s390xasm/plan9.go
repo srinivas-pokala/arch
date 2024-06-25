@@ -6,8 +6,8 @@ package s390xasm
 
 import (
 	"fmt"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 // GoSyntax returns the Go assembler syntax for the instruction.
@@ -41,71 +41,83 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		return "NEG " + args[1] + args[0]
 	case SRAG:
 		return "SRAD " + args[0]
-	case LG,LGF,LLGF,LGH, LLGH, LGB, LLGC, LDY, LEY, LRVG, LRV, LRVH:
+	case LD, LE LG, LGF, LLGF, LGH, LLGH, LGB, LLGC, LDY, LEY, LRVG, LRV, LRVH:
 		if args[2] != "" && args[3] != "" {
-			args[2] = fmt.Sprintf("(%s, %s)",args[2], args[3])
+			args[2] = fmt.Sprintf("(%s, %s)", args[2], args[3])
 		} else if args[2] != "" {
-			args[2]=fmt.Sprintf("(%s)",args[2])
+			args[2] = fmt.Sprintf("(%s)", args[2])
 		} else if args[3] != "" {
-			args[2]=fmt.Sprintf("(%s)",args[3])
+			args[2] = fmt.Sprintf("(%s)", args[3])
 		}
 		if args[1] != "" {
 			args[1] = fmt.Sprintf("%s%s", args[1], args[2])
 		} else {
-			args[1]=args[2]
+			args[1] = args[2]
 		}
 		args = args[:2]
 		args[0], args[1] = args[1], args[0]
 		switch inst.Op {
-			case LG:
-				op ="MOVD"
-			case LGF:
-				op ="MOVW"
-			case LLGF:
-				op ="MOVWZ"
-			case LGH:
-				op ="MOVH"
-			case LLGH:
-				op ="MOVHZ"
-			case LGB:
-				op ="MOVB"
-			case LLGC:
-				op ="MOVBZ"
-			case LDY:
-				op ="FMOVD"
-			case LEY:
-				op ="FMOVS"
-			case LRVG:
-				op ="MOVDBR"
-			case LRV:
-				op ="MOVWBR"
-			case LRVH:
-				op ="MOVHBR"
+		case LG:
+			op = "MOVD"
+		case LGF:
+			op = "MOVW"
+		case LLGF:
+			op = "MOVWZ"
+		case LGH:
+			op = "MOVH"
+		case LLGH:
+			op = "MOVHZ"
+		case LGB:
+			op = "MOVB"
+		case LLGC:
+			op = "MOVBZ"
+		case LDY, LD:
+			op = "FMOVD"
+		case LEY, LE:
+			op = "FMOVS"
+		case LRVG:
+			op = "MOVDBR"
+		case LRV:
+			op = "MOVWBR"
+		case LRVH:
+			op = "MOVHBR"
+		case LD:
+			op = "FMOVD"
+		case LE:
+			op = "FMOVS"
 		}
 	case LGR, LGFR, LGHR, LGBR, LLGFR, LLGHR, LLGCR, LRVGR, LRVR, LDR:
 		switch inst.Op {
-			case LGR:
-				op = "MOVD"
-			case LGFR:
-				op = "MOVW"
-			case LGHR:
-				op = "MOVH"
-			case LGBR:
-				op = "MOVB"
-			case LLGFR:
-				op = "MOVWZ"
-			case LLGHR:
-				op = "MOVHZ"
-			case LLGCR:
-				op = "MOVBZ"
-			case LRVGR:
-				op = "MOVDBR"
-			case LRVR:
-				op = "MOVWBR"
-			case LDR:
-				op = "FMOVD"
+		case LGR:
+			op = "MOVD"
+		case LGFR:
+			op = "MOVW"
+		case LGHR:
+			op = "MOVH"
+		case LGBR:
+			op = "MOVB"
+		case LLGFR:
+			op = "MOVWZ"
+		case LLGHR:
+			op = "MOVHZ"
+		case LLGCR:
+			op = "MOVBZ"
+		case LRVGR:
+			op = "MOVDBR"
+		case LRVR:
+			op = "MOVWBR"
+		case LDR:
+			op = "FMOVD"
 		}
 		args[0], args[1] = args[1], args[0]
+	/*case LD, LE:
+		switch {
+		case LD:
+			op = "FMOVD"
+		case LE:
+			op = "FMOVS"
+		}*/
+
 	}
 
 	if args != nil {
@@ -115,12 +127,11 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	return op
 }
 
-
 // plan9Arg formats arg (which is the argIndex's arg in inst) according to Plan 9 rules.
 //
 // NOTE: because Plan9Syntax is the only caller of this func, and it receives a copy
 // of inst, it's ok to modify inst.Args here.
-func plan9Arg(inst *Inst,  pc uint64, symname func(uint64) (string, uint64), arg Arg) string {
+func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg Arg) string {
 	switch arg.(type) {
 	case Reg:
 		if arg == R13 {
@@ -133,7 +144,7 @@ func plan9Arg(inst *Inst,  pc uint64, symname func(uint64) (string, uint64), arg
 		}
 		s := arg.String(pc)
 		if s != "" {
-			return strings.ToUpper(s[1:len(s)-1])
+			return strings.ToUpper(s[1 : len(s)-1])
 		}
 		return ""
 	case Index:
@@ -167,7 +178,7 @@ func plan9Arg(inst *Inst,  pc uint64, symname func(uint64) (string, uint64), arg
 		if s != "" && addr == base {
 			return fmt.Sprintf("%s(SB)", s)
 		}
-		return fmt.Sprintf("%#x %s",addr, s)
+		return fmt.Sprintf("%#x %s", addr, s)
 	case Imm, Sign8, Sign16, Sign32:
 		numImm := arg.String(pc)
 		return fmt.Sprintf("$%s", numImm)
