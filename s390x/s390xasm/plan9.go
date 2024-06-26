@@ -41,7 +41,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		return "NEG " + args[1] + args[0]
 	case SRAG:
 		return "SRAD " + args[0]
-	case LD, LE LG, LGF, LLGF, LGH, LLGH, LGB, LLGC, LDY, LEY, LRVG, LRV, LRVH:
+	case LD, LE,LG, LGF, LLGF, LGH, LLGH, LGB, LLGC, LDY, LEY, LRVG, LRV, LRVH:
 		if args[2] != "" && args[3] != "" {
 			args[2] = fmt.Sprintf("(%s, %s)", args[2], args[3])
 		} else if args[2] != "" {
@@ -81,10 +81,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "MOVWBR"
 		case LRVH:
 			op = "MOVHBR"
-		case LD:
-			op = "FMOVD"
-		case LE:
-			op = "FMOVS"
 		}
 	case LGR, LGFR, LGHR, LGBR, LLGFR, LLGHR, LLGCR, LRVGR, LRVR, LDR:
 		switch inst.Op {
@@ -110,14 +106,15 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "FMOVD"
 		}
 		args[0], args[1] = args[1], args[0]
-	/*case LD, LE:
-		switch {
-		case LD:
-			op = "FMOVD"
-		case LE:
-			op = "FMOVS"
-		}*/
-
+	case  ARK, AGRK, ALGRK:
+		switch inst.Op {
+			case ARK:
+				op = "ADDW"
+			case AGRK:
+				op = "ADDW"
+			case ALGRK:
+				op = "ADDW"
+		}
 	}
 
 	if args != nil {
