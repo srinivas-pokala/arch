@@ -128,6 +128,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "SUBE"
 		case SR, SRK:
 			op = "SUBW"
+		}
 
 
 	case NGR,NGRK, NR, NRK,OGR, OGRK, OR, ORK, XGR, XGRK, XR, XRK:
