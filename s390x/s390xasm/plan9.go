@@ -106,17 +106,49 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "FMOVD"
 		}
 		args[0], args[1] = args[1], args[0]
+	case LGHI, LLILH,LLIHL, LLIHH, LGFI, LLILF, LLIHF:
+		op = "MOVD"
+		args[0], args[1] = args[1], args[0]
 	case  ARK, AGRK, ALGRK:
 		switch inst.Op {
 			case ARK:
 				op = "ADDW"
 			case AGRK:
-				op = "ADDW"
+				op = "ADD"
 			case ALGRK:
-				op = "ADDW"
+				op = "ADDC"
 		}
-	}
+	case SGR,SGRK,SLGR, SLGRK,SLBGR, SR, SRK:
+		switch inst.Op {
+		case SGR, SGRK:
+			op = "SUB"
+		case SLGR, SLGRK:
+			op = "SUBC"
+		case SLBGR:
+			op = "SUBE"
+		case SR, SRK:
+			op = "SUBW"
 
+
+	case NGR,NGRK, NR, NRK,OGR, OGRK, OR, ORK, XGR, XGRK, XR, XRK:
+		switch inst.Op {
+			case NGR, NGRK:
+				op = "AND"
+			case NR, NRK:
+				op = "ANDW"
+			case OGR, OGRK:
+				op = "OR"
+			case OR, ORK:
+				op = "ORW"
+			case XGR, XGRK:
+				op = "XOR"
+			case XR, XRK:
+				op = "XORW"
+		}
+	case SLLG, SRLG,SLLK, SRLK, RLL, RLLG,SRAK, SRAG:
+	case TRAP2, SVC:
+		op = "SYSCALL"
+	}
 	if args != nil {
 		op += " " + strings.Join(args, ", ")
 	}
