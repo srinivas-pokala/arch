@@ -41,6 +41,7 @@ type Inst struct {
 	Text string
 	Enc  string
 	Flags string
+	InstFormat string
 }
 
 var stdout *bufio.Writer
@@ -84,7 +85,7 @@ func main() {
 			r := rune(0x2192)
 			inst.Name = strings.Replace(inst.Name, "I\x00", string(r), -1)
 		}
-		fmt.Fprintf(stdout, "%q,%q,%q,%q\n", inst.Name, inst.Text, inst.Enc, inst.Flags)
+		fmt.Fprintf(stdout, "%q,%q,%q,%q,%q\n", inst.Name, inst.Text, inst.Enc, inst.Flags, inst.InstFormat)
 	}
 	stdout.Flush()
 
@@ -188,7 +189,7 @@ func parsePage(num int, p pdf.Page) []Inst {
 		}
 		if match(text[0], "Helvetica-Oblique", 9, "") {
 			text = text[2:]
-			insts = append(insts, Inst{heading, mnemonic1, encoding, flags})
+			insts = append(insts, Inst{heading, mnemonic1, encoding, flags, format})
 			continue
 		}
 		if strings.HasPrefix(text[0].S, "(") {
@@ -201,7 +202,7 @@ func parsePage(num int, p pdf.Page) []Inst {
 			heading += " " + text[0].S
 			text = text[1:]
 		}
-		insts = append(insts, Inst{heading, mnemonic1, encoding, flags})
+		insts = append(insts, Inst{heading, mnemonic1, encoding, flags, format})
 		if match(text[0], "Helvetica-Oblique", 9, "") {
 			break
 		}

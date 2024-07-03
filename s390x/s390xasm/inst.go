@@ -12,9 +12,10 @@ import (
 
 type Inst struct {
 	Op   Op     // Opcode mnemonic
-	Enc  uint64 // Raw encoding bits (if Len == 8, this is the prefix word)
+	Enc  uint64 // Raw encoding bits
 	Len  int    // Length of encoding in bytes.
-	Args Args   // Instruction arguments, in Power ISA manual order.
+	Args Args   // Instruction arguments, in s390x ISA manual order.
+	FormatType string // Instruction format type ex: RR,RRE,RXY etc
 }
 
 func (i Inst) String(pc uint64) string {

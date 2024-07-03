@@ -23,6 +23,7 @@ type instFormat struct {
 	Mask     uint64
 	Value    uint64
 	DontCare uint64
+	FormatType string
 	Args     [8]*argField
 }
 
@@ -237,6 +238,7 @@ func Decode(src []byte ) (inst Inst, err error) {
 			inst.Args[j] = argfield.Parse(ui_extn)
 		}
 		inst.Op = iform.Op
+		inst.FormatType = iform.FormatType
 		break
 	}
 	if inst.Op == 0 && inst.Enc != 0 {

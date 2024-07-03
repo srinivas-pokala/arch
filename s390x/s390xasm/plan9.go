@@ -39,10 +39,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		return "CALL " + args[1]
 	case LCGR:
 		return "NEG " + args[1] + args[0]
-	case SRAG:
-		return "SRAD " + args[0]
-	case LD, LE,LG, LGF, LLGF, LGH, LLGH, LGB, LLGC, LDY, LEY, LRVG, LRV, LRVH:
-		if args[2] != "" && args[3] != "" {
+	/*case SRAG:
+	return "SRAD " + args[0] */
+	case LD, LE, LG, LGF, LLGF, LGH, LLGH, LGB, LLGC, LDY, LEY, LRVG, LRV, LRVH:
+		/*if args[2] != "" && args[3] != "" {
 			args[2] = fmt.Sprintf("(%s, %s)", args[2], args[3])
 		} else if args[2] != "" {
 			args[2] = fmt.Sprintf("(%s)", args[2])
@@ -53,7 +53,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[1] = fmt.Sprintf("%s%s", args[1], args[2])
 		} else {
 			args[1] = args[2]
-		}
+		}*/
+		args[1] = mem_operandx(args[1:4])	//D(X,B)
 		args = args[:2]
 		args[0], args[1] = args[1], args[0]
 		switch inst.Op {
@@ -106,19 +107,19 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "FMOVD"
 		}
 		args[0], args[1] = args[1], args[0]
-	case LGHI, LLILH,LLIHL, LLIHH, LGFI, LLILF, LLIHF:
+	case LGHI, LLILH, LLIHL, LLIHH, LGFI, LLILF, LLIHF:
 		op = "MOVD"
 		args[0], args[1] = args[1], args[0]
-	case  ARK, AGRK, ALGRK:
+	case ARK, AGRK, ALGRK:
 		switch inst.Op {
-			case ARK:
-				op = "ADDW"
-			case AGRK:
-				op = "ADD"
-			case ALGRK:
-				op = "ADDC"
+		case ARK:
+			op = "ADDW"
+		case AGRK:
+			op = "ADD"
+		case ALGRK:
+			op = "ADDC"
 		}
-	case SGR,SGRK,SLGR, SLGRK,SLBGR, SR, SRK:
+	case SGR, SGRK, SLGR, SLGRK, SLBGR, SR, SRK:
 		switch inst.Op {
 		case SGR, SGRK:
 			op = "SUB"
@@ -130,23 +131,38 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "SUBW"
 		}
 
-
-	case NGR,NGRK, NR, NRK,OGR, OGRK, OR, ORK, XGR, XGRK, XR, XRK:
+	case NGR, NGRK, NR, NRK, OGR, OGRK, OR, ORK, XGR, XGRK, XR, XRK:
 		switch inst.Op {
-			case NGR, NGRK:
-				op = "AND"
-			case NR, NRK:
-				op = "ANDW"
-			case OGR, OGRK:
-				op = "OR"
-			case OR, ORK:
-				op = "ORW"
-			case XGR, XGRK:
-				op = "XOR"
-			case XR, XRK:
-				op = "XORW"
+		case NGR, NGRK:
+			op = "AND"
+		case NR, NRK:
+			op = "ANDW"
+		case OGR, OGRK:
+			op = "OR"
+		case OR, ORK:
+			op = "ORW"
+		case XGR, XGRK:
+			op = "XOR"
+		case XR, XRK:
+			op = "XORW"
 		}
-	case SLLG, SRLG,SLLK, SRLK, RLL, RLLG,SRAK, SRAG:
+	case SLLG, SRLG, SLLK, SRLK, RLL, RLLG, SRAK, SRAG:
+		switch inst.Op {
+		case SLLG:
+			op = "SLD"
+		case SRLG:
+			op = "SRD"
+		case SLLK:
+			op = "SLW"
+		case SRLK:
+			op = "SRW"
+		case SRAK:
+			op = "SRAW"
+		case SRAG:
+			op = "SRAD"
+		}
+		args[2] = mem_operand(args[2:])
+		args = args[:3]
 	case TRAP2, SVC:
 		op = "SYSCALL"
 	}
@@ -155,6 +171,32 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	}
 
 	return op
+}
+
+func mem_operand(args []string) string { //D(B)
+	if args[1] != "" {
+		args[1] = fmt.Sprintf("(%s)", args[1])
+	}
+	if args[0] != "" {
+		args[0] = fmt.Sprintf("%s%s", args[0], args[1])
+	}
+	return args[0]
+}
+
+func mem_operandx(args []string) string { //D(X,B)
+	if args[1] != "" && args[2] != "" {
+		args[1] = fmt.Sprintf("(%s, %s)", args[1], args[2])
+	} else if args[1] != "" {
+		args[1] = fmt.Sprintf("(%s)", args[1])
+	} else if args[2] != "" {
+		args[1] = fmt.Sprintf("(%s)", args[2])
+	}
+	if args[0] != "" {
+		args[0] = fmt.Sprintf("%s%s", args[0], args[1])
+	} else {
+		args[0] = args[1]
+	}
+	return args[0]
 }
 
 // plan9Arg formats arg (which is the argIndex's arg in inst) according to Plan 9 rules.
