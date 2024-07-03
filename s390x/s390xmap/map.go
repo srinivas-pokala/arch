@@ -100,7 +100,7 @@ func readCSV(file string) (*Prog, error) {
 
 	p := &Prog{}
 	for _, row := range table {
-		add(p, row[0], row[1], row[2], row[3])
+		add(p, row[0], row[1], row[2], row[3], row[4])
 	}
 	return p, nil
 }
@@ -123,14 +123,15 @@ func (f Field) String() string {
 }
 
 type Inst struct {
-	Text     string
-	Encoding string
-	Op       string
-	Mask     uint64
-	Value    uint64
-	DontCare uint64
-	Len      uint16
-	Fields   []Field
+	Text       string
+	Encoding   string
+	Op         string
+	Mask       uint64
+	Value      uint64
+	DontCare   uint64
+	Len        uint16
+	FormatType string
+	Fields     []Field
 }
 
 func (i Inst) String() string {
@@ -327,7 +328,7 @@ func check_flags(flags string) bool {
 // entries as each extended mnemonic listed in text is treated like a unique
 // instruction.
 // func add(p *Prog, text, mnemonics, encoding, format string) {
-func add(p *Prog, text, mnemonics, encoding, flags string) {
+func add(p *Prog, text, mnemonics, encoding, flags, instype string) {
 	// Parse encoding, building size and offset of each field.
 	// The first field in the encoding is the smallest offset.
 	// And note the MSB is bit 0, not bit 31.
@@ -339,7 +340,7 @@ func add(p *Prog, text, mnemonics, encoding, flags string) {
 
 	// split mnemonics into individual instructions
 	// example: "b target_addr (AA=0 LK=0)|ba target_addr (AA=1 LK=0)|bl target_addr (AA=0 LK=1)|bla target_addr (AA=1 LK=1)"
-	inst := Inst{Text: text, Encoding: mnemonics, Value: value, Mask: mask, DontCare: dontCare}
+	inst := Inst{Text: text, Encoding: mnemonics, Value: value, Mask: mask, DontCare: dontCare, FormatType: instype}
 
 	// order inst.Args according to mnemonics order
 	for i, opr := range operandRe.FindAllString(mnemonics, -1) {
@@ -617,7 +618,7 @@ func printDecoder(p *Prog) {
 	fmt.Fprintf(&buf, "var instFormats = [...]instFormat{\n")
 	for _, inst := range p.Insts {
 		m, v, dc := inst.Mask, inst.Value, inst.DontCare
-		fmt.Fprintf(&buf, "\t{ %s, %#x, %#x, %#x,", inst.Op, m, v, dc)
+		fmt.Fprintf(&buf, "\t{ %s, %#x, %#x, %#x, %q,", inst.Op, m, v, dc, inst.FormatType)
 		fmt.Fprintf(&buf, " // %s (%s)\n\t\t[8]*argField{", inst.Text, inst.Encoding)
 		for _, f := range inst.Fields {
 			fmt.Fprintf(&buf, "%s, ", argFieldName(f))
