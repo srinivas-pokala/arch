@@ -161,6 +161,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case SRAG:
 			op = "SRAD"
 		}
+		fmt.Printf("Srinivas SRLK: %v \n", args)
 		args[2] = mem_operand(args[2:])
 		args = args[:3]
 	case TRAP2, SVC:
