@@ -35,8 +35,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 
 	op := inst.Op.String()
 	switch inst.Op {
-	case BRASL:
-		return "CALL " + args[1]
+	/*case BRASL:
+		return "CALL " + args[1] */
 	case LCGR:
 		return "NEG " + args[1] + args[0]
 	/*case SRAG:
@@ -165,6 +165,14 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args = args[:3]
 	case TRAP2, SVC:
 		op = "SYSCALL"
+	case BRC, BRCL, BRASL:
+		switch inst.Op {
+			case BRC, BRCL:
+				op = "JMP"
+			case BRASL:
+				op = "CALL"
+		}
+		return op + args[1]
 	}
 	if args != nil {
 		op += " " + strings.Join(args, ", ")
