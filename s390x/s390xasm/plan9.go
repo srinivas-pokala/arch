@@ -173,7 +173,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			case BRASL:
 				op = "CALL"
 		}
-		return op + args[1]
+		return op + " " + args[1]
 	}
 	if args != nil {
 		op += " " + strings.Join(args, ", ")
