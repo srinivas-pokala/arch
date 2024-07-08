@@ -245,7 +245,7 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 		return strings.ToUpper(arg.String(pc)[1:])
 	case Disp20, Disp12:
 		numstr := arg.String(pc)
-		num, err := strconv.Atoi(numstr[:len(numstr)-1])
+		num, err := strconv.Atoi(numstr[:len(numstr)])
 		if err != nil {
 			return fmt.Sprintf("plan9Arg: error in converting Atoi:%s", err)
 		}
