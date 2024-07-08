@@ -163,8 +163,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 		fmt.Printf("Srinivas %s: %v \n", inst.Op.String(), args)
 		args[2] = mem_operand(args[2:])
-		fmt.Printf("Srinivas>> %s: %v \n", inst.Op.String(), args)
 		args = args[:3]
+		fmt.Printf("Srinivas>> %s: %v \n", inst.Op.String(), args)
 	case TRAP2, SVC:
 		op = "SYSCALL"
 	case BRC, BRCL, BRASL:
@@ -184,11 +184,14 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 }
 
 func mem_operand(args []string) string { //D(B)
-	if args[1] != "" {
-		args[1] = fmt.Sprintf("(%s)", args[1])
-	}
-	if args[0] != "" {
-		args[0] = fmt.Sprintf("%s%s", args[0], args[1])
+	if args[0] != "" && args[1] != "" {
+		args[0] = fmt.Sprintf("%s(%s)", args[0], args[1])
+	} else if args[0] != "" {
+		args[0] = fmt.Sprintf("%s", args[0])
+	} else if args[1] != "" {
+		args[0] = fmt.Sprintf("(%s)", args[1])
+	} else {
+		args[0] = ""
 	}
 	return args[0]
 }
