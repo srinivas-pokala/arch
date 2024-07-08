@@ -35,26 +35,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 
 	op := inst.Op.String()
 	switch inst.Op {
-	/*case BRASL:
-		return "CALL " + args[1] */
 	case LCGR:
 		return "NEG " + args[1] + args[0]
-	/*case SRAG:
-	return "SRAD " + args[0] */
 	case LD, LE, LG, LGF, LLGF, LGH, LLGH, LGB, LLGC, LDY, LEY, LRVG, LRV, LRVH:
-		/*if args[2] != "" && args[3] != "" {
-			args[2] = fmt.Sprintf("(%s, %s)", args[2], args[3])
-		} else if args[2] != "" {
-			args[2] = fmt.Sprintf("(%s)", args[2])
-		} else if args[3] != "" {
-			args[2] = fmt.Sprintf("(%s)", args[3])
-		}
-		if args[1] != "" {
-			args[1] = fmt.Sprintf("%s%s", args[1], args[2])
-		} else {
-			args[1] = args[2]
-		}*/
-		args[1] = mem_operandx(args[1:4])	//D(X,B)
+		args[1] = mem_operandx(args[1:4]) //D(X,B)
 		args = args[:2]
 		args[0], args[1] = args[1], args[0]
 		switch inst.Op {
@@ -169,12 +153,100 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		op = "SYSCALL"
 	case BRC, BRCL, BRASL:
 		switch inst.Op {
-			case BRC, BRCL:
-				op = "JMP"
-			case BRASL:
-				op = "CALL"
+		case BRC, BRCL:
+			op = "JMP"
+		case BRASL:
+			op = "CALL"
 		}
 		return op + " " + args[1]
+	case X, XY, XG:
+		switch {
+		case X, XY:
+			op = "XORW"
+		case XG:
+			op = "XOR"
+		}
+		args[1] = mem_operandx(args[1:])
+		args = args[:2]
+	case O, OY, OG:
+		switch {
+		case O, OY:
+			op = "ORW"
+		case OG:
+			op = "OR"
+		}
+		args[1] = mem_operandx(args[1:])
+		args = args[:2]
+	case N, NY, NG:
+		switch {
+		case N, NY:
+			op = "ANDW"
+		case NG:
+			op = "AND"
+		}
+		args[1] = mem_operandx(args[1:])
+		args = args[:2]
+	case S, SY, SLBG, SLG, SG:
+		switch {
+		case S, SY:
+			op = "SUBW"
+		case SLBG:
+			op = "SUBE"
+		case SLG:
+			op = "SUBC"
+		case SG:
+			op = "SUB"
+		}
+		args[1] = mem_operandx(args[1:])
+		args = args[:2]
+	case MSG, MSY, MS:
+		switch {
+		case MSG:
+			op = "MULLD"
+		case MSY, MS:
+			op = "MULLW"
+		}
+		args[1] = mem_operandx(args[1:])
+		args = args[:2]
+	case A, AY, ALCG, ALG, AG:
+		switch {
+		case A, AY:
+			op = "ADDW"
+		case ALCG:
+			op = "ADDE"
+		case ALG:
+			op = "ADDC"
+		case AG:
+			op = "ADD"
+		}
+		args[1] = mem_operandx(args[1:])
+		args = args[:2]
+	case RISBG, RISBGN, RISBHG, RISBLG, RNSBG, RXSBG, ROSBG:
+		switch {
+		case RNSBG, RXSBG, ROSBG:
+			num, err := strconv.Atoi(args[2])
+			if err != nil {
+				return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
+			}
+			if ((num >> 7) & 0x1) != 0 {
+				op = op + "T"
+			}
+		case RISBG, RISBGN, RISBHG, RISBLG:
+			num, err := strconv.Atoi(args[3])
+			if err != nil {
+				return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
+			}
+			if ((num >> 7) & 0x1) != 0 {
+				op = op + "Z"
+			}
+		}
+		if len(args) == 5 {
+			args[0], args[1], args[2], args[3], args[4] = args[4], args[3], args[2], args[1], args[0]
+		} else {
+			args[0], args[1], args[2], args[3] = args[3], args[2], args[1], args[0]
+		}
+		return op + " " + strings.Join(args, ", ")
+
 	}
 	if args != nil {
 		op += " " + strings.Join(args, ", ")
