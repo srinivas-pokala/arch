@@ -50,6 +50,7 @@ func (i Inst) String(pc uint64) string {
                                                buf.WriteString(",")
                                        }
                                case Index, Len:
+				       buf.WriteString("(")
                                default:
                                        buf.WriteString(",")
 			}
@@ -162,9 +163,9 @@ type Disp20 uint32
 func (Disp20) IsArg() {}
 func (r Disp20) String(pc uint64) string {
 	if (r >> 19) & 0x01 == 1 {
-		return fmt.Sprintf("%d(", int32(r | 0xfff<<20))
+		return fmt.Sprintf("%d", int32(r | 0xfff<<20))
 	} else {
-		return fmt.Sprintf("%d(", int32(r))
+		return fmt.Sprintf("%d", int32(r))
 	}
 }
 
@@ -173,7 +174,7 @@ type Disp12 uint16
 
 func (Disp12) IsArg() {}
 func (r Disp12) String(pc uint64) string {
-	return fmt.Sprintf("%d(", r)
+	return fmt.Sprintf("%d", r)
 }
 
 // RegIm12 represents an 12-bit Register immediate number.
