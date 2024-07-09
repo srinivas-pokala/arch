@@ -150,12 +150,12 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	case TRAP2, SVC:
 		op = "SYSCALL"
 	case CLGRJ, CLGIJ:
-		num, err := strconv.Atoi(args[2])
+		mask, err := strconv.Atoi(args[2][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
 		var check bool
-		switch num & 0xf {
+		switch mask & 0xf {
 		case 2:
 			op = "CMPUBGT"
 			check = true
@@ -182,12 +182,12 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		return op + " " + strings.Join(args, ", ")
 
 	case BRC, BRCL, BCR:
-		num, err := strconv.Atoi(args[0])
+		mask, err := strconv.Atoi(args[0][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
 		var check bool
-		switch num & 0xf {
+		switch mask & 0xf {
 		case 2:
 			op = "BGT"
 			check = true
@@ -216,12 +216,12 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			return op + " " + strings.Join(args, ", ")
 		}
 	case LOCGR:
-		num, err := strconv.Atoi(args[2])
+		mask, err := strconv.Atoi(args[2][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
 		var check bool
-		switch num & 0xf {
+		switch mask & 0xf {
 		case 2: //Greaterthan (M=2)
 			op = "MOVDGT"
 			check = true
