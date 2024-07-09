@@ -148,8 +148,39 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args[2] = mem_operand(args[2:])
 		args = args[:3]
 	case TRAP2, SVC:
-		op = "SYSCALL"
-	case CLGRJ, CLGIJ:
+		op = "SYSALL"
+	case CGIJ,CGRJ  :
+		mask, err := strconv.Atoi(args[2][1:])
+		if err != nil {
+			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
+		}
+		var check bool
+		switch mask & 0xf {
+		case 2:
+			op = "CMPBGT"
+			check = true
+		case 4:
+			op = "CMPBLT"
+			check = true
+		case 7:
+			op = "CMPBNE"
+			check = true
+		case 8:
+			op = "CMPBEQ"
+			check = true
+		case 10:
+			op = "CMPBGE"
+			check = true
+		case 12:
+			op = "CMPBLE"
+			check = true
+		}
+		if check {
+			args[2] = args[3]
+			args = args[:3]
+		}
+		return op + " " + strings.Join(args, ", ")
+	case CLGRJ, CLGIJ, :
 		mask, err := strconv.Atoi(args[2][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
