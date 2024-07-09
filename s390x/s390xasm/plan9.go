@@ -33,7 +33,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args = append(args, plan9Arg(&inst, pc, symname, a))
 	}
 
-	op := inst.Op.String()
+	op := strings.ToUpper(inst.Op.String())
 	switch inst.Op {
 	case LCGR:
 		return "NEG " + args[1] + args[0]
