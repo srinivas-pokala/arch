@@ -149,7 +149,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args = args[:3]
 	case TRAP2, SVC:
 		op = "SYSALL"
-	case CGIJ, CGRJ:
+	case CGRJ, CGIJ:
 		mask, err := strconv.Atoi(args[2][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
@@ -211,7 +211,9 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args = args[:3]
 		}
 		return op + " " + strings.Join(args, ", ")
-
+	case CLRJ, CRJ, CIJ, CLIJ:
+		args[0], args[1], args[2], args[3] = args[2], args[0], args[1], args[3]
+		return op + " " + strings.Join(args, ", ")
 	case BRC, BRCL, BCR:
 		mask, err := strconv.Atoi(args[0][1:])
 		if err != nil {
