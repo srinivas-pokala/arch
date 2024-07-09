@@ -149,34 +149,66 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args = args[:3]
 	case TRAP2, SVC:
 		op = "SYSCALL"
+	case CLGRJ, CLGIJ:
+		num, err := strconv.Atoi(args[2])
+		if err != nil {
+			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
+		}
+		var check bool
+		switch num & 0xf {
+		case 2:
+			op = "CMPUBGT"
+			check = true
+		case 4:
+			op = "CMPUBLT"
+			check = true
+		case 7:
+			op = "CMPUBNE"
+			check = true
+		case 8:
+			op = "CMPUBEQ"
+			check = true
+		case 10:
+			op = "CMPUBGE"
+			check = true
+		case 12:
+			op = "CMPUBLE"
+			check = true
+		}
+		if check {
+			args[2] = args[3]
+			args = args[:3]
+		}
+		return op + " " + strings.Join(args, ", ")
+
 	case BRC, BRCL, BCR:
 		num, err := strconv.Atoi(args[0])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
 		var check bool
-		switch num&0xf {
-			case 2:
-				op = "BGT"
-				check = true
-			case 4:
-				op = "BLT"
-				check = true
-			case 7:
-				op = "BNE"
-				check = true
-			case 8:
-				op = "BEQ"
-				check = true
-			case 10:
-				op = "BGE"
-				check = true
-			case 12:
-				op = "BLE"
-				check = true
-			case 15:
-				op = "JMP"
-				check = true
+		switch num & 0xf {
+		case 2:
+			op = "BGT"
+			check = true
+		case 4:
+			op = "BLT"
+			check = true
+		case 7:
+			op = "BNE"
+			check = true
+		case 8:
+			op = "BEQ"
+			check = true
+		case 10:
+			op = "BGE"
+			check = true
+		case 12:
+			op = "BLE"
+			check = true
+		case 15:
+			op = "JMP"
+			check = true
 		}
 		if check {
 			return op + " " + args[1]
@@ -189,23 +221,23 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
 		var check bool
-		switch (num & 0xf) {
-		case 2:			//Greaterthan (M=2)
+		switch num & 0xf {
+		case 2: //Greaterthan (M=2)
 			op = "MOVDGT"
 			check = true
-		case 4:			//Lessthan (M=4)
+		case 4: //Lessthan (M=4)
 			op = "MOVDLT"
 			check = true
-		case 7:			// Not Equal (M=7)
+		case 7: // Not Equal (M=7)
 			op = "MOVDNE"
 			check = true
-		case 8:			// Equal (M=8)
+		case 8: // Equal (M=8)
 			op = "MODEQ"
 			check = true
-		case 10:		// Greaterthan or Equal (M=10)
+		case 10: // Greaterthan or Equal (M=10)
 			op = "MOVDGE"
 			check = true
-		case 12:		// Lessthan or Equal (M=12)
+		case 12: // Lessthan or Equal (M=12)
 			op = "MOVDLE"
 			check = true
 		}
@@ -218,10 +250,9 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 
 		return op + " " + strings.Join(args, ", ")
 
-
 	case BRASL:
 		op = "CALL"
-		return  op + " " + args[1]
+		return op + " " + args[1]
 	case X, XY, XG:
 		switch {
 		case X, XY:
