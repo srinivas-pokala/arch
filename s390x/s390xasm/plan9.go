@@ -254,7 +254,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		op = "CALL"
 		return op + " " + args[1]
 	case X, XY, XG:
-		switch {
+		switch inst.Op {
 		case X, XY:
 			op = "XORW"
 		case XG:
@@ -263,7 +263,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args[1] = mem_operandx(args[1:])
 		args = args[:2]
 	case O, OY, OG:
-		switch {
+		switch inst.Op {
 		case O, OY:
 			op = "ORW"
 		case OG:
@@ -272,7 +272,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args[1] = mem_operandx(args[1:])
 		args = args[:2]
 	case N, NY, NG:
-		switch {
+		switch inst.Op {
 		case N, NY:
 			op = "ANDW"
 		case NG:
@@ -281,7 +281,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args[1] = mem_operandx(args[1:])
 		args = args[:2]
 	case S, SY, SLBG, SLG, SG:
-		switch {
+		switch inst.Op {
 		case S, SY:
 			op = "SUBW"
 		case SLBG:
@@ -294,7 +294,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args[1] = mem_operandx(args[1:])
 		args = args[:2]
 	case MSG, MSY, MS:
-		switch {
+		switch inst.Op {
 		case MSG:
 			op = "MULLD"
 		case MSY, MS:
@@ -303,7 +303,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args[1] = mem_operandx(args[1:])
 		args = args[:2]
 	case A, AY, ALCG, ALG, AG:
-		switch {
+		switch inst.Op {
 		case A, AY:
 			op = "ADDW"
 		case ALCG:
@@ -316,7 +316,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args[1] = mem_operandx(args[1:])
 		args = args[:2]
 	case RISBG, RISBGN, RISBHG, RISBLG, RNSBG, RXSBG, ROSBG:
-		switch {
+		switch inst.Op {
 		case RNSBG, RXSBG, ROSBG:
 			num, err := strconv.Atoi(args[2])
 			if err != nil {
