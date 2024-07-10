@@ -91,6 +91,22 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "FMOVD"
 		}
 		args[0], args[1] = args[1], args[0]
+	case LZDR:
+		op = "FMOVD"
+		return op + " " + "$0" + ", " + args[0]
+	case LZER:
+		op = "FMOVS"
+		return op + " " + "$0" + ", " + args[0]
+	case STD, STDY, STE, STEY:
+		switch inst.Op {
+		case STD, STDY:
+			op = "FMOVD"
+		case STE, STEY:
+			op = "FMOVS"
+		}
+		args[1] = mem_operandx(args[1:])
+		return op + " " + strings.Join(args, ", ")
+
 	case LGHI, LLILH, LLIHL, LLIHH, LGFI, LLILF, LLIHF:
 		op = "MOVD"
 		args[0], args[1] = args[1], args[0]
@@ -103,6 +119,31 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case ALGRK:
 			op = "ADDC"
 		}
+		if args[0] == args[1] {
+			args[0], args[1] = args[2], args[0]
+			args = args[:2]
+		} else {
+			args[0], args[1], args[2] = args[3], args[1], args[0]
+		}
+		return op + " " + strings.Join(args, ", ")
+	case AGHIK, AHIK:
+		switch inst.Op {
+		case AGHIK:
+			op = "ADD"
+		case AHIK:
+			op = "ADDW"
+		}
+		args[0], args[1], args[2] = args[2], args[1], args[0]
+		return op + " " + strings.Join(args, ", ")
+	case AGHI, AHI, AGFI, AFI:
+		switch inst.Op {
+		case AGHI, AGFI:
+			op = "ADD"
+		case AHI, AFI:
+			op = "ADDW"
+		}
+		args[0], args[1] = args[1], args[0]
+		return op + " " + strings.Join(args, ", ")
 	case SGR, SGRK, SLGR, SLGRK, SLBGR, SR, SRK:
 		switch inst.Op {
 		case SGR, SGRK:
