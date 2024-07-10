@@ -149,6 +149,12 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args = args[:3]
 	case TRAP2, SVC:
 		op = "SYSALL"
+	case CEFBRA, CDFBRA, CEGBRA, CDGBRA, CELFBR, CDLFBR, CELGBR, CDLGBR:
+		return op + " " + args[2] + ", " + args[0]
+	case CFEBRA, CFDBRA, CGEBRA, CGDBRA, CLFEBR, CLFDBR, CLGEBR, CLGDBR:
+		return op + " " + args[2] + ", " + args[0]
+	case CGR, CGHI, CGFI, CLGR, CLGFI, CR, CHI, CFI, CLR, CLFI:
+		return op + " " + strings.Join(args, ", ")
 	case CGRJ, CGIJ:
 		mask, err := strconv.Atoi(args[2][1:])
 		if err != nil {
@@ -227,6 +233,9 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case 4:
 			op = "BLT"
 			check = true
+		case 5:
+			op = "BLTU"
+			check = true
 		case 7:
 			op = "BNE"
 			check = true
@@ -238,6 +247,9 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			check = true
 		case 12:
 			op = "BLE"
+			check = true
+		case 13:
+			op = "BLEU"
 			check = true
 		case 15:
 			op = "JMP"
@@ -282,7 +294,9 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 
 		return op + " " + strings.Join(args, ", ")
-
+	case LOCR:
+		args[0], args[1], args[2] = args[2], args[1], args[0]
+		return op + " " + strings.Join(args, ", ")
 	case BRASL:
 		op = "CALL"
 		return op + " " + args[1]
@@ -351,7 +365,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	case RISBG, RISBGN, RISBHG, RISBLG, RNSBG, RXSBG, ROSBG:
 		switch inst.Op {
 		case RNSBG, RXSBG, ROSBG:
-			num, err := strconv.Atoi(args[2])
+			num, err := strconv.Atoi(args[2][1:])
 			if err != nil {
 				return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 			}
@@ -359,7 +373,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				op = op + "T"
 			}
 		case RISBG, RISBGN, RISBHG, RISBLG:
-			num, err := strconv.Atoi(args[3])
+			num, err := strconv.Atoi(args[3][1:])
 			if err != nil {
 				return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 			}
