@@ -123,7 +123,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1] = args[2], args[0]
 			args = args[:2]
 		} else {
-			args[0], args[1], args[2] = args[3], args[1], args[0]
+			args[0], args[1], args[2] = args[2], args[1], args[0]
 		}
 		return op + " " + strings.Join(args, ", ")
 	case AGHIK, AHIK:
