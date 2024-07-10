@@ -126,35 +126,55 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1], args[2] = args[2], args[1], args[0]
 		}
 		return op + " " + strings.Join(args, ", ")
-	case AGHIK, AHIK:
+	case AGHIK, AHIK, ALGHSIK:
 		switch inst.Op {
 		case AGHIK:
 			op = "ADD"
 		case AHIK:
 			op = "ADDW"
+		case ALGHSIK:
+			op = "ADDC"
 		}
 		args[0], args[1], args[2] = args[2], args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
-	case AGHI, AHI, AGFI, AFI:
+	case AGHI, AHI, AGFI, AFI, AR, ALCGR:
 		switch inst.Op {
 		case AGHI, AGFI:
 			op = "ADD"
-		case AHI, AFI:
+		case AHI, AFI, AR:
 			op = "ADDW"
+		case ALCGR:
+			op = "ADDE"
 		}
 		args[0], args[1] = args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
-	case SGR, SGRK, SLGR, SLGRK, SLBGR, SR, SRK:
+	case SGR, SLGR:
 		switch inst.Op {
-		case SGR, SGRK:
+		case SGR:
 			op = "SUB"
-		case SLGR, SLGRK:
+		case SLGR:
+			op = "SUBC"
+		}
+		args[0], args[1] = args[1], args[0]
+		return op + " " + strings.Join(args, ", ")
+	case SGRK, SLGRK, SLBGR, SR, SRK:
+		switch inst.Op {
+		case SGRK:
+			op = "SUB"
+		case SLGRK:
 			op = "SUBC"
 		case SLBGR:
 			op = "SUBE"
 		case SR, SRK:
 			op = "SUBW"
 		}
+		if args[0] == args[1] {
+			args[0], args[1] = args[2], args[0]
+			args = args[:2]
+		} else {
+			args[0], args[1], args[2] = args[2], args[1], args[0]
+		}
+		return op + " " + strings.Join(args, ", ")
 
 	case NGR, NGRK, NR, NRK, OGR, OGRK, OR, ORK, XGR, XGRK, XR, XRK:
 		switch inst.Op {
