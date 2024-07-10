@@ -148,8 +148,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 		args[0], args[1] = args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
-	case SGR, SLGR:
+	case SR, SGR, SLGR:
 		switch inst.Op {
+		case SR:
+			op = "SUBW"
 		case SGR:
 			op = "SUB"
 		case SLGR:
@@ -157,7 +159,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 		args[0], args[1] = args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
-	case SGRK, SLGRK, SLBGR, SR, SRK:
+	case SGRK, SLGRK, SLBGR, SRK:
 		switch inst.Op {
 		case SGRK:
 			op = "SUB"
@@ -165,7 +167,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "SUBC"
 		case SLBGR:
 			op = "SUBE"
-		case SR, SRK:
+		case SRK:
 			op = "SUBW"
 		}
 		if args[0] == args[1] {
