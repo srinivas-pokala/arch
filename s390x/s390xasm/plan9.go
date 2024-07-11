@@ -148,9 +148,9 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 		args[0], args[1] = args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
-	case SR, SGR, SLGR:
+	case SR, SGR, SLGR, SLFI:
 		switch inst.Op {
-		case SR:
+		case SR, SLFI:
 			op = "SUBW"
 		case SGR:
 			op = "SUB"
@@ -177,22 +177,25 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1], args[2] = args[2], args[1], args[0]
 		}
 		return op + " " + strings.Join(args, ", ")
-
-	case NGR, NGRK, NR, NRK, OGR, OGRK, OR, ORK, XGR, XGRK, XR, XRK:
+	case MSGFR, MHI, MSFI, MSGFI:
 		switch inst.Op {
-		case NGR, NGRK:
-			op = "AND"
-		case NR, NRK:
-			op = "ANDW"
-		case OGR, OGRK:
-			op = "OR"
-		case OR, ORK:
-			op = "ORW"
-		case XGR, XGRK:
-			op = "XOR"
-		case XR, XRK:
-			op = "XORW"
+		case MSGFR, MHI, MSFI:
+			op = "MULLW"
+		case MSGFI:
+			op = "MULLD"
 		}
+		args[0], args[1] = args[1], args[0]
+		return op + " " + strings.Join(args, ", ")
+
+	case NGR, NR, OGR, OR, XGR, XR:
+		op = bitwise_op(inst.Op)
+		args[0], args[1] = args[1], args[0]
+		return op + " " + strings.Join(args, ", ")
+
+	case NGRK, NRK, OGRK, ORK, XGRK, XRK: // opcode R1, R2, R3
+		op = bitwise_op(inst.Op)
+		args[0], args[1], args[2] = args[1], args[2], args[0]
+		return op + " " + strings.Join(args, ", ")
 	case SLLG, SRLG, SLLK, SRLK, RLL, RLLG, SRAK, SRAG:
 		switch inst.Op {
 		case SLLG:
@@ -210,6 +213,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 		args[2] = mem_operand(args[2:])
 		args = args[:3]
+		args[0], args[1], args[2] = args[2], args[1], args[0]
+		return op + " " + strings.Join(args, ", ")
 	case TRAP2, SVC:
 		op = "SYSALL"
 	case CEFBRA, CDFBRA, CEGBRA, CDGBRA, CELFBR, CDLFBR, CELGBR, CDLGBR:
@@ -289,34 +294,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
 		var check bool
-		switch mask & 0xf {
-		case 2:
-			op = "BGT"
-			check = true
-		case 4:
-			op = "BLT"
-			check = true
-		case 5:
-			op = "BLTU"
-			check = true
-		case 7:
-			op = "BNE"
-			check = true
-		case 8:
-			op = "BEQ"
-			check = true
-		case 10:
-			op = "BGE"
-			check = true
-		case 12:
-			op = "BLE"
-			check = true
-		case 13:
-			op = "BLEU"
-			check = true
-		case 15:
-			op = "JMP"
-			check = true
+		op, check = branch_op(mask)
+		if op == "SYNC" {
+			args = args[:0]
+			return op
 		}
 		if check {
 			return op + " " + args[1]
@@ -459,11 +440,67 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	return op
 }
 
+func branch_op(mask int) (op string, check bool) {
+	switch mask & 0xf {
+	case 2:
+		op = "BGT"
+		check = true
+	case 4:
+		op = "BLT"
+		check = true
+	case 5:
+		op = "BLTU"
+		check = true
+	case 7:
+		op = "BNE"
+		check = true
+	case 8:
+		op = "BEQ"
+		check = true
+	case 10:
+		op = "BGE"
+		check = true
+	case 12:
+		op = "BLE"
+		check = true
+	case 13:
+		op = "BLEU"
+		check = true
+	case 14:
+		if inst.Op == BCR {
+			op = "SYNC"
+		}
+	case 15:
+		op = "JMP"
+		check = true
+	}
+	return op, check
+}
+
+func bitwise_op(op Op) string {
+	var ret string
+	switch op {
+	case NGR, NGRK:
+		ret = "AND"
+	case NR, NRK:
+		ret = "ANDW"
+	case OGR, OGRK:
+		ret = "OR"
+	case OR, ORK:
+		ret = "ORW"
+	case XGR, XRK:
+		ret = "XOR"
+	case XR, XRK:
+		ret = "XORW"
+	}
+	return ret
+}
+
 func mem_operand(args []string) string { //D(B)
 	if args[0] != "" && args[1] != "" {
 		args[0] = fmt.Sprintf("%s(%s)", args[0], args[1])
 	} else if args[0] != "" {
-		args[0] = fmt.Sprintf("%s", args[0])
+		args[0] = fmt.Sprintf("$%s", args[0])
 	} else if args[1] != "" {
 		args[0] = fmt.Sprintf("(%s)", args[1])
 	} else {
@@ -479,11 +516,17 @@ func mem_operandx(args []string) string { //D(X,B)
 		args[1] = fmt.Sprintf("(%s)", args[1])
 	} else if args[2] != "" {
 		args[1] = fmt.Sprintf("(%s)", args[2])
+	} else if args[0] != "" {
+		args[1] = ""
 	}
-	if args[0] != "" {
+	if args[0] != "" && args[1] != "" {
 		args[0] = fmt.Sprintf("%s%s", args[0], args[1])
+	} else if args[0] != "" {
+		args[0] = fmt.Sprintf("$%s", args[0])
+	} else if args[1] != "" {
+		args[0] = fmt.Sprintf("%s", args[1])
 	} else {
-		args[0] = args[1]
+		args[0] = ""
 	}
 	return args[0]
 }
