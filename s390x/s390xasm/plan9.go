@@ -35,8 +35,19 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 
 	op := strings.ToUpper(inst.Op.String())
 	switch inst.Op {
-	case LCGR:
-		return "NEG " + args[1] + args[0]
+	case LCGR, LCGFR:
+		switch inst.Op {
+		case LCGR:
+			op = "NEG"
+		case LCGFR:
+			op = "NEGW"
+		}
+		if args[0] == args[1] {
+			args = args[:1]
+		} else {
+			args[0], args[1] = args[1], args[0]
+		}
+		return op + " " + strings.Join(args, ", ")
 	case LD, LE, LG, LGF, LLGF, LGH, LLGH, LGB, LLGC, LDY, LEY, LRVG, LRV, LRVH:
 		args[1] = mem_operandx(args[1:4]) //D(X,B)
 		args = args[:2]
@@ -187,7 +198,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args[0], args[1] = args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
 
-	case NGR, NR, OGR, OR, XGR, XR:
+	case NGR, NR, NILL, NILF, NILH, OGR, OR, OILL, OILF, OILH, XGR, XR, XILF:
 		op = bitwise_op(inst.Op)
 		args[0], args[1] = args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
@@ -480,15 +491,15 @@ func branch_op(mask int, opconst Op) (op string, check bool) {
 func bitwise_op(op Op) string {
 	var ret string
 	switch op {
-	case NGR, NGRK:
+	case NGR, NGRK, NILL, NILF:
 		ret = "AND"
-	case NR, NRK:
+	case NR, NRK, NILH:
 		ret = "ANDW"
-	case OGR, OGRK:
+	case OGR, OGRK, OILL, OILF:
 		ret = "OR"
-	case OR, ORK:
+	case OR, ORKi, OILH:
 		ret = "ORW"
-	case XGR, XGRK:
+	case XGR, XGRK, XILF:
 		ret = "XOR"
 	case XR, XRK:
 		ret = "XORW"
