@@ -497,7 +497,7 @@ func bitwise_op(op Op) string {
 		ret = "ANDW"
 	case OGR, OGRK, OILL, OILF:
 		ret = "OR"
-	case OR, ORKi, OILH:
+	case OR, ORK, OILH:
 		ret = "ORW"
 	case XGR, XGRK, XILF:
 		ret = "XOR"
