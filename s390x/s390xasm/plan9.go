@@ -294,7 +294,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
 		var check bool
-		op, check = branch_op(mask)
+		op, check = branch_op(mask, inst.Op)
 		if op == "SYNC" {
 			args = args[:0]
 			return op
@@ -440,7 +440,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	return op
 }
 
-func branch_op(mask int) (op string, check bool) {
+func branch_op(mask int, opconst Op) (op string, check bool) {
 	switch mask & 0xf {
 	case 2:
 		op = "BGT"
@@ -467,7 +467,7 @@ func branch_op(mask int) (op string, check bool) {
 		op = "BLEU"
 		check = true
 	case 14:
-		if inst.Op == BCR {
+		if opconst == BCR {
 			op = "SYNC"
 		}
 	case 15:
@@ -488,7 +488,7 @@ func bitwise_op(op Op) string {
 		ret = "OR"
 	case OR, ORK:
 		ret = "ORW"
-	case XGR, XRK:
+	case XGR, XGRK:
 		ret = "XOR"
 	case XR, XRK:
 		ret = "XORW"
