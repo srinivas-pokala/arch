@@ -78,6 +78,29 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case LRVH:
 			op = "MOVHBR"
 		}
+	case LAA, LAAG, LAAL, LAALG, LAN, LANG, LAX, LAXG, LAO, LAOG:
+		args[2] = mem_operand(args[2:4]) //D(B)
+		args[0], args[1] = args[1], args[0]
+		args = args[:3]
+		return op + " " + strings.Join(args, ", ")
+	case LM, LMY, LMG:		// Load Multiple
+		switch inst.Op {
+		case LM, LMY:
+			op = "LMY"
+		}
+		args[2] = mem_operand(args[2:4]) //D(B)
+		args[0], args[1], args[2]  = args[2], args[0], args[1]
+		args = args[:3]
+		return op + " " + strings.Join(args, ", ")
+
+	case STM, STMY, STMG:		// Store Multiple
+		switch inst.Op {
+		case STM, STMY:
+			op = "STMY"
+		}
+		args[2] = mem_operand(args[2:4]) //D(B)
+		args = args[:3]
+		return op + " " + strings.Join(args, ", ")
 	case LGR, LGFR, LGHR, LGBR, LLGFR, LLGHR, LLGCR, LRVGR, LRVR, LDR:
 		switch inst.Op {
 		case LGR:
@@ -170,14 +193,12 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 		args[0], args[1] = args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
-	case SGRK, SLGRK, SLBGR, SRK:
+	case SGRK, SLGRK, SRK:
 		switch inst.Op {
 		case SGRK:
 			op = "SUB"
 		case SLGRK:
 			op = "SUBC"
-		case SLBGR:
-			op = "SUBE"
 		case SRK:
 			op = "SUBW"
 		}
@@ -187,6 +208,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		} else {
 			args[0], args[1], args[2] = args[2], args[1], args[0]
 		}
+		return op + " " + strings.Join(args, ", ")
+	case SLBGR:
+		op = "SUBE"
+		args[0], args[1] = args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
 	case MSGFR, MHI, MSFI, MSGFI:
 		switch inst.Op {

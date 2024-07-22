@@ -48,7 +48,9 @@ func (i Inst) String(pc uint64) string {
                                                buf.WriteString(",")
                                        } else if _,ok := i.Args[j-1].(Reg); ok {
                                                buf.WriteString(",")
-                                       }
+                                       } else if _,ok := i.Args[j-1].(Index); !ok {
+                                               buf.WriteString("(")
+					}
                                case Index, Len:
 				       buf.WriteString("(")
                                default:
