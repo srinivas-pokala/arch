@@ -52,6 +52,8 @@ func (i Inst) String(pc uint64) string {
                                                buf.WriteString("(")
                                        } else if _,ok := i.Args[j-1].(Disp20); ok {
                                                buf.WriteString("(")
+                                       } else if _,ok := i.Args[j-1].(Len); ok {
+                                               buf.WriteString(",")
                                        }
                                case Index, Len:
 				       buf.WriteString("(")
