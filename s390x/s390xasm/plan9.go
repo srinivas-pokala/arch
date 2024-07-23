@@ -79,7 +79,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "MOVHBR"
 		}
 	case LA, LAY:
-		args[1] = mem_operandx(args[1:3]) //D(X,B)
+		args[1] = mem_operandx(args[1:4]) //D(X,B)
 		args[0], args[1] = args[1], args[0]
 		args = args[:2]
 		return op + " " + strings.Join(args, ", ")
