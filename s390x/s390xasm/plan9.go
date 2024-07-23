@@ -115,7 +115,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case STG:
 			op = "MOVD"
 		}
-		args[1] = mem_operand(args[1:4]) //D(X,B)
+		args[1] = mem_operandx(args[1:4]) //D(X,B)
 		args = args[:2]
 		return op + " " + strings.Join(args, ", ")
 	case LGR, LGFR, LGHR, LGBR, LLGFR, LLGHR, LLGCR, LRVGR, LRVR, LDR:
