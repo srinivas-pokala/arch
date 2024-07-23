@@ -58,6 +58,8 @@ func (i Inst) String(pc uint64) string {
 				} else if _, ok := i.Args[j-1].(Index); ok {
 					if ((i.Args[j-1].String(pc)) != "") && str != "" {
 						str = "," + str
+					} else if str == "" {
+						str = ")"
 					}
 				}
 			case Index, Len:
