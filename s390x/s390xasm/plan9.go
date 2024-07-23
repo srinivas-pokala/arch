@@ -78,6 +78,12 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case LRVH:
 			op = "MOVHBR"
 		}
+	case LA, LAY:
+		args[1] = mem_operandx(args[1:3]) //D(X,B)
+		args[0], args[1] = args[1], args[0]
+		args = args[:2]
+		return op + " " + strings.Join(args, ", ")
+
 	case LAA, LAAG, LAAL, LAALG, LAN, LANG, LAX, LAXG, LAO, LAOG:
 		args[2] = mem_operand(args[2:4]) //D(B)
 		args[0], args[1] = args[1], args[0]
@@ -100,6 +106,16 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 		args[2] = mem_operand(args[2:4]) //D(B)
 		args = args[:3]
+		return op + " " + strings.Join(args, ", ")
+	case ST, STY, STG:
+		switch inst.Op {
+		case ST, STY:
+			op = MOVW
+		case STG:
+			op = MOVD
+		}
+		args[1] = mem_operand(args[1:4]) //D(X,B)
+		args = args[:2]
 		return op + " " + strings.Join(args, ", ")
 	case LGR, LGFR, LGHR, LGBR, LLGFR, LLGHR, LLGCR, LRVGR, LRVR, LDR:
 		switch inst.Op {
