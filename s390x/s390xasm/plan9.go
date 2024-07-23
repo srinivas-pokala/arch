@@ -110,9 +110,9 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	case ST, STY, STG:
 		switch inst.Op {
 		case ST, STY:
-			op = MOVW
+			op = "MOVW"
 		case STG:
-			op = MOVD
+			op = "MOVD"
 		}
 		args[1] = mem_operand(args[1:4]) //D(X,B)
 		args = args[:2]
