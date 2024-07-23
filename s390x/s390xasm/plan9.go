@@ -389,6 +389,13 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 		args[1] = mem_operandx(args[1:])
 		args = args[:2]
+	case XC, NC, OC, MVC, MVCIN, CLC:
+		args[0], args[1] = args[1], args[0]
+		args[1]= mem_operand(args[1:3])
+		args[2]= mem_operand(args[3:])
+		args[1], args[2] = args[2], args[1]
+		args = args[:3]
+		return op + " " + strings.Join(args, ", ")
 	case O, OY, OG:
 		switch inst.Op {
 		case O, OY:
