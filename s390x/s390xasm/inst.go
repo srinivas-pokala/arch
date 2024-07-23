@@ -11,10 +11,10 @@ import (
 )
 
 type Inst struct {
-	Op   Op     // Opcode mnemonic
-	Enc  uint64 // Raw encoding bits
-	Len  int    // Length of encoding in bytes.
-	Args Args   // Instruction arguments, in s390x ISA manual order.
+	Op         Op     // Opcode mnemonic
+	Enc        uint64 // Raw encoding bits
+	Len        int    // Length of encoding in bytes.
+	Args       Args   // Instruction arguments, in s390x ISA manual order.
 	FormatType string // Instruction format type ex: RR,RRE,RXY etc
 }
 
@@ -22,7 +22,7 @@ func (i Inst) String(pc uint64) string {
 	var buf bytes.Buffer
 	var rxb_check bool
 	m := i.Op.String()
-	if strings.HasPrefix(m,"v") || strings.Contains(m,"wfc") || strings.Contains(m, "wfk") {
+	if strings.HasPrefix(m, "v") || strings.Contains(m, "wfc") || strings.Contains(m, "wfk") {
 		rxb_check = true
 	}
 	mnemonic := HandleExtndMnemonic(&i)
@@ -31,45 +31,55 @@ func (i Inst) String(pc uint64) string {
 		if arg == nil {
 			break
 		}
+		str := arg.String(pc)
 		if j == 0 {
 			buf.WriteString(" ")
 		} else {
 			switch arg.(type) {
-				case VReg, Reg:
-                                       if _,ok := i.Args[j-1].(Disp12); ok {
-                                               buf.WriteString("")
-                                       } else if _,ok := i.Args[j-1].(Disp20); ok {
-                                               buf.WriteString("")
-                                       } else {
-                                               buf.WriteString(",")
-                                       }
-                               case Base:
-                                       if _,ok := i.Args[j-1].(VReg); ok {
-                                               buf.WriteString(",")
-                                       } else if _,ok := i.Args[j-1].(Reg); ok {
-                                               buf.WriteString(",")
-				       } else if _,ok := i.Args[j-1].(Disp12); ok {
-                                               buf.WriteString("(")
-                                       } else if _,ok := i.Args[j-1].(Disp20); ok {
-                                               buf.WriteString("(")
-                                       } else if _,ok := i.Args[j-1].(Len); ok {
-                                               buf.WriteString(",")
-                                       }
-                               case Index, Len:
-				       buf.WriteString("(")
-                               default:
-                                       buf.WriteString(",")
+			case VReg, Reg:
+				if _, ok := i.Args[j-1].(Disp12); ok {
+					buf.WriteString("")
+				} else if _, ok := i.Args[j-1].(Disp20); ok {
+					buf.WriteString("")
+				} else {
+					buf.WriteString(",")
+				}
+			case Base:
+				if _, ok := i.Args[j-1].(VReg); ok {
+					buf.WriteString(",")
+				} else if _, ok := i.Args[j-1].(Reg); ok {
+					buf.WriteString(",")
+				} else if _, ok := i.Args[j-1].(Disp12); ok {
+					buf.WriteString("(")
+				} else if _, ok := i.Args[j-1].(Disp20); ok {
+					buf.WriteString("(")
+				} else if _, ok := i.Args[j-1].(Len); ok {
+					buf.WriteString(",")
+				} else if _, ok := i.Args[j-1].(Index); ok {
+					if str != "" {
+						str = "," + str
+					} else {
+						str = ")"
+					}
+				}
+			case Index, Len:
+				if str != "" || (i.Args[j+1].String(pc)) != "" {
+					buf.WriteString("(")
+				} else {
+					j = j + 1
+				}
+			default:
+				buf.WriteString(",")
 			}
 		}
-		buf.WriteString(arg.String(pc))
+		//buf.WriteString(arg.String(pc))
+		buf.WriteString(str)
 		if rxb_check && i.Args[j+2] == nil {
 			break
 		}
 	}
 	return buf.String()
 }
-
-
 
 // An Op is an instruction operation.
 type Op uint16
@@ -81,7 +91,7 @@ func (o Op) String() string {
 	return opstr[o]
 }
 
-// An Arg is a single instruction argument. 
+// An Arg is a single instruction argument.
 // One of these types: Reg, Base, Index, Disp20, Disp12, Len, Mask, Sign8, Sign16, Sign32, RegIm12, RegIm16, RegIm24, RegIm32.
 type Arg interface {
 	IsArg()
@@ -122,7 +132,7 @@ func (r Base) String(pc uint64) string {
 		s := "%"
 		return fmt.Sprintf("%sr%d)", s, int(r-B0))
 	case B0 == r:
-		return fmt.Sprintf(")")
+		return fmt.Sprintf("")
 	default:
 		return fmt.Sprintf("Base(%d)", int(r))
 	}
@@ -155,7 +165,7 @@ func (r Index) String(pc uint64) string {
 	switch {
 	case X1 <= r && r <= X15:
 		s := "%"
-		return fmt.Sprintf("%sr%d,", s, int(r-X0))
+		return fmt.Sprintf("%sr%d", s, int(r-X0))
 	case X0 == r:
 		return fmt.Sprintf("")
 	default:
@@ -168,8 +178,8 @@ type Disp20 uint32
 
 func (Disp20) IsArg() {}
 func (r Disp20) String(pc uint64) string {
-	if (r >> 19) & 0x01 == 1 {
-		return fmt.Sprintf("%d", int32(r | 0xfff<<20))
+	if (r>>19)&0x01 == 1 {
+		return fmt.Sprintf("%d", int32(r|0xfff<<20))
 	} else {
 		return fmt.Sprintf("%d", int32(r))
 	}
@@ -188,10 +198,10 @@ type RegIm12 uint16
 
 func (RegIm12) IsArg() {}
 func (r RegIm12) String(pc uint64) string {
-	if (r >> 11) & 0x01 == 1 {
-		return fmt.Sprintf("%#x", pc + (2*uint64(int16(r | 0xf<<12))))
+	if (r>>11)&0x01 == 1 {
+		return fmt.Sprintf("%#x", pc+(2*uint64(int16(r|0xf<<12))))
 	} else {
-		return fmt.Sprintf("%#x", pc + (2*uint64(int16(r))))
+		return fmt.Sprintf("%#x", pc+(2*uint64(int16(r))))
 	}
 }
 
@@ -200,7 +210,7 @@ type RegIm16 uint16
 
 func (RegIm16) IsArg() {}
 func (r RegIm16) String(pc uint64) string {
-	return fmt.Sprintf("%#x", pc+ (2*uint64(int16(r))))
+	return fmt.Sprintf("%#x", pc+(2*uint64(int16(r))))
 }
 
 // RegIm24 represents an 24-bit Register immediate number.
@@ -208,10 +218,10 @@ type RegIm24 uint32
 
 func (RegIm24) IsArg() {}
 func (r RegIm24) String(pc uint64) string {
-	if (r >> 23) & 0x01 == 1 {
-		return fmt.Sprintf("%#x", pc + (2*uint64(int32(r | 0xff<<24))))
+	if (r>>23)&0x01 == 1 {
+		return fmt.Sprintf("%#x", pc+(2*uint64(int32(r|0xff<<24))))
 	} else {
-		return fmt.Sprintf("%#x", pc + (2*uint64(int32(r))))
+		return fmt.Sprintf("%#x", pc+(2*uint64(int32(r))))
 	}
 }
 
@@ -220,7 +230,7 @@ type RegIm32 uint32
 
 func (RegIm32) IsArg() {}
 func (r RegIm32) String(pc uint64) string {
-	return fmt.Sprintf("%#x", pc+ (2*uint64(int32(r))))
+	return fmt.Sprintf("%#x", pc+(2*uint64(int32(r))))
 }
 
 // A Reg is a single register. The zero value means R0, not the absence of a register.
@@ -405,6 +415,5 @@ type Len uint8
 
 func (Len) IsArg() {}
 func (i Len) String(pc uint64) string {
-	return fmt.Sprintf("%d",uint16(i)+1)
+	return fmt.Sprintf("%d", uint16(i)+1)
 }
-
