@@ -607,7 +607,7 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 			return "g"
 		}
 		s := arg.String(pc)
-		if s != "" && s != ")" {
+		if s != "" {
 			return strings.ToUpper(s[1 : len(s)-1])
 		}
 		return ""
