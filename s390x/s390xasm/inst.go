@@ -50,9 +50,13 @@ func (i Inst) String(pc uint64) string {
 				} else if _, ok := i.Args[j-1].(Reg); ok {
 					buf.WriteString(",")
 				} else if _, ok := i.Args[j-1].(Disp12); ok {
-					buf.WriteString("(")
+					if str  != "" {
+						buf.WriteString("(")
+					}
 				} else if _, ok := i.Args[j-1].(Disp20); ok {
-					buf.WriteString("(")
+					if str  != "" {
+						buf.WriteString("(")
+					}
 				} else if _, ok := i.Args[j-1].(Len); ok {
 					buf.WriteString(",")
 				} else if _, ok := i.Args[j-1].(Index); ok {
