@@ -56,7 +56,7 @@ func (i Inst) String(pc uint64) string {
 				} else if _, ok := i.Args[j-1].(Len); ok {
 					buf.WriteString(",")
 				} else if _, ok := i.Args[j-1].(Index); ok {
-					if str != "" {
+					if ((i.Args[j-1].String(pc)) != "") && str != "" {
 						str = "," + str
 					} else {
 						str = ")"
