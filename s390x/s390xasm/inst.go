@@ -122,7 +122,7 @@ func (r Base) String(pc uint64) string {
 		s := "%"
 		return fmt.Sprintf("%sr%d)", s, int(r-B0))
 	case B0 == r:
-		return fmt.Sprintf("")
+		return fmt.Sprintf(")")
 	default:
 		return fmt.Sprintf("Base(%d)", int(r))
 	}
