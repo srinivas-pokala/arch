@@ -403,6 +403,6 @@ type Len uint8
 
 func (Len) IsArg() {}
 func (i Len) String(pc uint64) string {
-	return fmt.Sprintf("%d,",uint16(i)+1)
+	return fmt.Sprintf("%d",uint16(i)+1)
 }
 
