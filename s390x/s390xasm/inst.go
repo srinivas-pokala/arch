@@ -37,14 +37,16 @@ func (i Inst) String(pc uint64) string {
 			buf.WriteString(" ")
 		} else {
 			switch i.Args[j].(type) {
-			case VReg, Reg:
+			case VReg:
 				if _, ok := i.Args[j-1].(Disp12); ok {
-					buf.WriteString("")
+					buf.WriteString("(")
 				} else if _, ok := i.Args[j-1].(Disp20); ok {
-					buf.WriteString("")
+					buf.WriteString("(")
 				} else {
 					buf.WriteString(",")
 				}
+			case Reg:
+				buf.WriteString(",")
 			case Base:
 				if _, ok := i.Args[j-1].(VReg); ok {
 					buf.WriteString(",")
