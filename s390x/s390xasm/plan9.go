@@ -290,8 +290,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		return op + " " + args[2] + ", " + args[0]
 	case CFEBRA, CFDBRA, CGEBRA, CGDBRA, CLFEBR, CLFDBR, CLGEBR, CLGDBR:
 		return op + " " + args[2] + ", " + args[0]
-	case CGR, CGHI, CGFI, CLGR, CLGFI, CR, CHI, CFI, CLR, CLFI:
-		return op + " " + strings.Join(args, ", ")
 	case CGRJ, CGIJ:
 		mask, err := strconv.Atoi(args[2][1:])
 		if err != nil {
