@@ -270,6 +270,22 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		return op + " " + strings.Join(args, ", ")
 	case TRAP2, SVC:
 		op = "SYSALL"
+	case CR, CLR, CGR, CLGR, KDBR, CDBR, CEBR, CGHI, CHI, CGFI, CLGFI, CFI, CLFI:
+		switch inst.Op {
+		case CGHI, CGFI, CGR:
+			op = "CMP"
+		case CHI, CFI, CR:
+			op = "CMPW"
+		case CLGFI, CLGR:
+			op = "CMPU"
+		case CLFI,  CLR:
+			op = "CMPWU"
+		case CDBR:
+			op = "FCMPU"
+		case KDBR:
+			op = "FCMPO"
+		}
+		return op + " " + strings.Join(args, ", ")
 	case CEFBRA, CDFBRA, CEGBRA, CDGBRA, CELFBR, CDLFBR, CELGBR, CDLGBR:
 		return op + " " + args[2] + ", " + args[0]
 	case CFEBRA, CFDBRA, CGEBRA, CGDBRA, CLFEBR, CLFDBR, CLGEBR, CLGDBR:
