@@ -90,17 +90,25 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args[0], args[1] = args[1], args[0]
 		args = args[:3]
 		return op + " " + strings.Join(args, ", ")
-	case LM, LMY, LMG:		// Load Multiple
+	case LM, LMY, LMG: // Load Multiple
 		switch inst.Op {
 		case LM, LMY:
 			op = "LMY"
 		}
 		args[2] = mem_operand(args[2:4]) //D(B)
-		args[0], args[1], args[2]  = args[2], args[0], args[1]
+		args[0], args[1], args[2] = args[2], args[0], args[1]
 		args = args[:3]
 		return op + " " + strings.Join(args, ", ")
 
-	case STM, STMY, STMG:		// Store Multiple
+	case LTEBR, LTDBR:	// Load and test
+		args[0], args[1] = args[1], args[0]
+		return op + " " + strings.Join(args, ", ")
+
+	case TCEB, TCDB:	// Test Data class
+		args[1] = mem_operandx(args[1:4])	//D(X,B)
+		args = args[:2]
+		return op + " " + strings.Join(args, ", ")
+	case STM, STMY, STMG: // Store Multiple
 		switch inst.Op {
 		case STM, STMY:
 			op = "STMY"
@@ -156,6 +164,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "FMOVS"
 		}
 		args[1] = mem_operandx(args[1:])
+		args = args[:2]
 		return op + " " + strings.Join(args, ", ")
 
 	case LGHI, LLILH, LLIHL, LLIHH, LGFI, LLILF, LLIHF:
@@ -196,6 +205,39 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "ADDW"
 		case ALCGR:
 			op = "ADDE"
+		}
+		args[0], args[1] = args[1], args[0]
+		return op + " " + strings.Join(args, ", ")
+	case AEBR, ADBR, DDBR, DEBR, MDBR, MEEBR, SDBR, SEBR, LPDBR, LNDBR, LPDFR, LNDFR, LCDFR, LCEBR, LEDBR, LDEBR, SQDBR, SQEBR:
+		switch inst.Op {
+		case AEBR:
+			op = "FADDS"
+		case ADBR:
+			op = "FADD"
+		case DDBR:
+			op = "FDIV"
+		case DEBR:
+			op = "FDIVS"
+		case MDBR:
+			op = "FMUL"
+		case MEEBR:
+			op = "FMULS"
+		case SDBR:
+			op = "FSUB"
+		case SEBR:
+			op = "FSUBS"
+		case LPDBR:
+			op = "FABS"
+		case LNDBR:
+			op = "FNABS"
+		case LCDFR:
+			op = "FNEG"
+		case LCEBR:
+			op = "FNEGS"
+		case SQDBR:
+			op = "FSQRT"
+		case SQEBR:
+			op = "FSQRTS"
 		}
 		args[0], args[1] = args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
@@ -278,7 +320,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "CMPW"
 		case CLGFI, CLGR:
 			op = "CMPU"
-		case CLFI,  CLR:
+		case CLFI, CLR:
 			op = "CMPWU"
 		case CDBR:
 			op = "FCMPU"
@@ -422,8 +464,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args = args[:2]
 	case XC, NC, OC, MVC, MVCIN, CLC:
 		args[0], args[1] = args[1], args[0]
-		args[1]= mem_operand(args[1:3])
-		args[2]= mem_operand(args[3:])
+		args[1] = mem_operand(args[1:3])
+		args[2] = mem_operand(args[3:])
 		args[1], args[2] = args[2], args[1]
 		args = args[:3]
 		return op + " " + strings.Join(args, ", ")
