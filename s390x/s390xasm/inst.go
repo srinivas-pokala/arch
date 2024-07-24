@@ -36,7 +36,7 @@ func (i Inst) String(pc uint64) string {
 		if j == 0 {
 			buf.WriteString(" ")
 		} else {
-			switch arg.(type) {
+			switch i.Args[j].(type) {
 			case VReg, Reg:
 				if _, ok := i.Args[j-1].(Disp12); ok {
 					buf.WriteString("")
