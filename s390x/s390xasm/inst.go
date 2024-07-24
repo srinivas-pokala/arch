@@ -27,11 +27,12 @@ func (i Inst) String(pc uint64) string {
 	}
 	mnemonic := HandleExtndMnemonic(&i)
 	buf.WriteString(fmt.Sprintf("%s", mnemonic))
-	for j, arg := range i.Args {
-		if arg == nil {
+	//for j, arg := range i.Args {
+	for j := 0; j< len(i.Args); j++ {
+		if i.Args[j] == nil {
 			break
 		}
-		str := arg.String(pc)
+		str := i.Args[j].String(pc)
 		if j == 0 {
 			buf.WriteString(" ")
 		} else {
