@@ -100,12 +100,12 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args = args[:3]
 		return op + " " + strings.Join(args, ", ")
 
-	case LTEBR, LTDBR:	// Load and test
+	case LTEBR, LTDBR: // Load and test
 		args[0], args[1] = args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
 
-	case TCEB, TCDB:	// Test Data class
-		args[1] = mem_operandx(args[1:4])	//D(X,B)
+	case TCEB, TCDB: // Test Data class
+		args[1] = mem_operandx(args[1:4]) //D(X,B)
 		args = args[:2]
 		return op + " " + strings.Join(args, ", ")
 	case STM, STMY, STMG: // Store Multiple
@@ -403,8 +403,11 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
 		var check bool
-		op, check = branch_op(mask, inst.Op)
-		if op == "SYNC" {
+		opStr, check = branch_op(mask, inst.Op)
+		if opStr != "" {
+			op = opStr
+		}
+		if op == "SYNC"|op == "NOPH" {
 			args = args[:0]
 			return op
 		}
@@ -451,7 +454,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args[0], args[1], args[2] = args[2], args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
 	case BRASL:
-		op = "CALL"
+		op = "CALL" // BL
 		return op + " " + args[1]
 	case X, XY, XG:
 		switch inst.Op {
@@ -558,6 +561,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 
 func branch_op(mask int, opconst Op) (op string, check bool) {
 	switch mask & 0xf {
+	case 0:
+		op = "NOPH"
 	case 2:
 		op = "BGT"
 		check = true
@@ -587,7 +592,7 @@ func branch_op(mask int, opconst Op) (op string, check bool) {
 			op = "SYNC"
 		}
 	case 15:
-		op = "JMP"
+		op = "JMP" // BR
 		check = true
 	}
 	return op, check
@@ -694,11 +699,13 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 		if err != nil {
 			return fmt.Sprintf("plan9Arg: error in converting ParseUint:%s", err)
 		}
+		off := addr - pc
+		off = off / 4
 		s, base := symname(addr)
 		if s != "" && addr == base {
 			return fmt.Sprintf("%s(SB)", s)
 		}
-		return fmt.Sprintf("%#x %s", addr, s)
+		return fmt.Sprintf("%v(PC)", off)
 	case Imm, Sign8, Sign16, Sign32:
 		numImm := arg.String(pc)
 		return fmt.Sprintf("$%s", numImm)
