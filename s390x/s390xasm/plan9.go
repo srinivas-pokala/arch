@@ -402,8 +402,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
-		var check bool
-		opStr, check = branch_op(mask, inst.Op)
+		opStr, check := branch_op(mask, inst.Op)
 		if opStr != "" {
 			op = opStr
 		}
