@@ -406,7 +406,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		if opStr != "" {
 			op = opStr
 		}
-		if op == "SYNC"|op == "NOPH" {
+		if op == "SYNC" || op == "NOPH" {
 			args = args[:0]
 			return op
 		}
