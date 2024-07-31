@@ -565,7 +565,11 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		return op + " " + strings.Join(args, ", ")
 	case VA:
 		mask, err := strconv.Atoi(args[3][1:])
-		op = vectorAddOp(mask)
+		if err != nil {
+			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
+		}
+		var check bool
+		op, check = vectorAddOp(mask)
 		if check {
 			args[0], args[1], args[2] = args[3], args[2], args[1], args[0]
 			args = args[:3]
