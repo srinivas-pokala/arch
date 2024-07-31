@@ -563,6 +563,16 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1], args[2], args[3] = args[3], args[2], args[1], args[0]
 		}
 		return op + " " + strings.Join(args, ", ")
+	case VA:
+		mask, err := strconv.Atoi(args[3][1:])
+		op = vectorAddOp(mask)
+		if check {
+			args[0], args[1], args[2] = args[3], args[2], args[1], args[0]
+			args = args[:3]
+		} else {
+			args[0], args[1], args[2], args[3] = args[3], args[2], args[1], args[0], args[3]
+			args = args[:4]
+		}
 
 	}
 	if args != nil {
@@ -572,6 +582,28 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	return op
 }
 
+func vectorAddOp(mask int) (op string, check bool) {
+	switch mask & 0x7 {
+	case 0:
+		op = "VAB"
+		check = true
+	case 1:
+		op = "VAH"
+		check = true
+	case 2:
+		op = "VAF"
+		check = true
+	case 3:
+		op = "VAG"
+		check = true
+	case 4:
+		op = "VAQ"
+		check = true
+	default:
+		op = "VA"
+	}
+	return op, check
+}
 func branch_relative_op(mask int, opconst Op) (op string, check bool) {
 	switch mask & 0xf {
 	case 2:
