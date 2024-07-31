@@ -397,12 +397,26 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	case CLRJ, CRJ, CIJ, CLIJ:
 		args[0], args[1], args[2], args[3] = args[2], args[0], args[1], args[3]
 		return op + " " + strings.Join(args, ", ")
-	case BRC, BRCL, BCR:
+	case BRC, BRCL:
 		mask, err := strconv.Atoi(args[0][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
-		opStr, check := branch_op(mask, inst.Op)
+		opStr, check := branch_relative_op(mask, inst.Op)
+		if opStr != "" {
+			op = opStr
+		}
+		if check {
+			return op + " " + args[1]
+		} else {
+			return op + " " + strings.Join(args, ", ")
+		}
+	case BCR:
+		mask, err := strconv.Atoi(args[0][1:])
+		if err != nil {
+			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
+		}
+		opStr, check := branchOnConditionOp(mask, inst.Op)
 		if opStr != "" {
 			op = opStr
 		}
@@ -558,10 +572,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	return op
 }
 
-func branch_op(mask int, opconst Op) (op string, check bool) {
+func branch_relative_op(mask int, opconst Op) (op string, check bool) {
 	switch mask & 0xf {
-	case 0:
-		op = "NOPH"
 	case 2:
 		op = "BGT"
 		check = true
@@ -586,12 +598,21 @@ func branch_op(mask int, opconst Op) (op string, check bool) {
 	case 13:
 		op = "BLEU"
 		check = true
-	case 14:
-		if opconst == BCR {
-			op = "SYNC"
-		}
 	case 15:
 		op = "JMP" // BR
+		check = true
+	}
+	return op, check
+}
+
+func branchOnConditionOp(mask int, opconst Op) (op string, check bool) {
+	switch mask & 0xf {
+	case 0:
+		op = "NOPH"
+	case 14:
+		op = "SYNC"
+	case 15:
+		op = "JMP"
 		check = true
 	}
 	return op, check
@@ -703,7 +724,7 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 		if s != "" && addr == base {
 			return fmt.Sprintf("%s(SB)", s)
 		}
-		off = off/4
+		off = off / 4
 		return fmt.Sprintf("%v(PC)", off)
 	case Imm, Sign8, Sign16, Sign32:
 		numImm := arg.String(pc)
