@@ -20,6 +20,9 @@ import (
 // otherwise it returns "", 0.
 // The reader text should read from the text segment using text addresses
 // as offsets; it is used to display pc-relative loads as constant loads.
+
+var vectorSize = map[int]string{0: "B", 1: "H", 2: "F", 3: "G", 4: "Q"}
+
 func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) string {
 	if symname == nil {
 		symname = func(uint64) (string, uint64) { return "", 0 }
@@ -563,20 +566,44 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1], args[2], args[3] = args[3], args[2], args[1], args[0]
 		}
 		return op + " " + strings.Join(args, ", ")
-	case VA, VS:
+	case VA, VS, VACC, VAVG, VAVGL:
 		mask, err := strconv.Atoi(args[3][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
-		s, check := vectorAddOp(mask)
-		if check {
-			op = op + s
+		val := mask & 0x7
+		switch {
+		case VA, VS, VACC:
+			if val && val < 5 {
+				op = op + vectorSize[val]
+				args[0], args[1], args[2] = args[1], args[2], args[0]
+				args = args[:3]
+			} else {
+				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
+			}
+		}
+	case VAVG, VAVGL:
+		if val && val < 4 {
+			op = op + vectorSize[val]
 			args[0], args[1], args[2] = args[1], args[2], args[0]
 			args = args[:3]
 		} else {
-			args[0], args[1], args[2], args[3] = args[1], args[2], args[0], args[3]
-			args = args[:4]
+			return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
 		}
+	case VAC, VACCC:
+		mask, err := strconv.Atoi(args[4][1:])
+		if err != nil {
+			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
+		}
+		if mask&0x04 == 0 {
+			return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
+		}
+		op = op + "Q"
+		args[0], args[1], args[2], args[3] = args[1], args[2], args[3], args[0]
+		args = args[:5]
+	case VN, VNC:
+		args[0], args[1], args[2] = args[1], args[2], args[0]
+		args = args[:3]
 
 	}
 	if args != nil {
@@ -586,27 +613,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	return op
 }
 
-func vectorAddOp(mask int) (op string, check bool) {
-	switch mask & 0x7 {
-	case 0:
-		op = "B"
-		check = true
-	case 1:
-		op = "H"
-		check = true
-	case 2:
-		op = "F"
-		check = true
-	case 3:
-		op = "G"
-		check = true
-	case 4:
-		op = "Q"
-		check = true
-	default:
-	}
-	return op, check
-}
 func branch_relative_op(mask int, opconst Op) (op string, check bool) {
 	switch mask & 0xf {
 	case 2:
