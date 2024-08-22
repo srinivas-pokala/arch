@@ -563,14 +563,14 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1], args[2], args[3] = args[3], args[2], args[1], args[0]
 		}
 		return op + " " + strings.Join(args, ", ")
-	case VA:
+	case VA, VS:
 		mask, err := strconv.Atoi(args[3][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
-		var check bool
-		op, check = vectorAddOp(mask)
+		s, check := vectorAddOp(mask)
 		if check {
+			op = op + s
 			args[0], args[1], args[2] = args[1], args[2], args[0]
 			args = args[:3]
 		} else {
@@ -589,22 +589,21 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 func vectorAddOp(mask int) (op string, check bool) {
 	switch mask & 0x7 {
 	case 0:
-		op = "VAB"
+		op = "B"
 		check = true
 	case 1:
-		op = "VAH"
+		op = "H"
 		check = true
 	case 2:
-		op = "VAF"
+		op = "F"
 		check = true
 	case 3:
-		op = "VAG"
+		op = "G"
 		check = true
 	case 4:
-		op = "VAQ"
+		op = "Q"
 		check = true
 	default:
-		op = "VA"
 	}
 	return op, check
 }
