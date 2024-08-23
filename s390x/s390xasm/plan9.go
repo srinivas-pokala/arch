@@ -22,6 +22,7 @@ import (
 // as offsets; it is used to display pc-relative loads as constant loads.
 
 var vectorSize = map[int]string{0: "B", 1: "H", 2: "F", 3: "G", 4: "Q"}
+var vectorCS = map[int]string{0: "BS", 1: "HS", 2: "FS", 3: "GS"}
 
 func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) string {
 	if symname == nil {
@@ -566,7 +567,20 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1], args[2], args[3] = args[3], args[2], args[1], args[0]
 		}
 		return op + " " + strings.Join(args, ", ")
-	case VA, VS, VACC, VAVG, VAVGL:
+	case VEC, VECL:
+		mask, err := strconv.Atoi(args[2][1:])
+		if err != nil {
+			return fmt.Sprintf("GoSyntax: error in converting Atoi for %q:%s", op, err)
+		}
+		val := mask & 0x7
+		if val >=0 && val < 4 {
+			op = op + vectorSize[val]
+			args = args[:2]
+		} else {
+			return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
+		}
+
+	case VA, VS, VACC, VAVG, VAVGL, VMX, VMXL, VGFM :
 		mask, err := strconv.Atoi(args[3][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
@@ -581,7 +595,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			} else {
 				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
 			}
-		case VAVG, VAVGL:
+		case VAVG, VAVGL, VMX, VMXL, VGFM:
 			if val >= 0 && val < 4 {
 				op = op + vectorSize[val]
 				args[0], args[1], args[2] = args[1], args[2], args[0]
@@ -589,6 +603,35 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			} else {
 				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
 			}
+		}
+	case VCEQ, VCH, VCHL:
+		m4, err := strconv.Atoi(args[3][1:])
+		if err != nil {
+			return fmt.Sprintf("GoSyntax: %q error in converting Atoi:%s",op, err)
+		}
+		m5, err := strconv.Atoi(args[4][1:])
+		if err != nil {
+			return fmt.Sprintf("GoSyntax: %q error in converting Atoi:%s", op, err)
+		}
+		val := (m4 & 0x7)
+		if m5 == 0 {
+			if val >= 0 && val < 4 {
+				op = op + vectorSize[val]
+				args[0], args[1], args[2] = args[1], args[2], args[0]
+				args = args[:3]
+			} else {
+				return fmt.Sprintf("Specefication exception is recognized for %q with mask(m4) value: %v \n", op, mask)
+			}
+		} else m5 == 1{
+			if val >= 0 && val < 4 {
+				op = op + vectorCS[val]
+				args[0], args[1], args[2] = args[1], args[2], args[0]
+				args = args[:3]
+			} else {
+				return fmt.Sprintf("Specefication exception is recognized for %q with mask(m4) value: %v \n", op, mask)
+			}
+		} else {
+				return fmt.Sprintf("Specefication exception is recognized for %q with mask(m5) value: %v \n", op, mask)
 		}
 	case VAC, VACCC:
 		mask, err := strconv.Atoi(args[4][1:])
