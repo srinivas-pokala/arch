@@ -574,7 +574,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		val := mask & 0x7
 		switch inst.Op {
 		case VA, VS, VACC:
-			if val != 0 && val < 5 {
+			if val >= 0 && val < 5 {
 				op = op + vectorSize[val]
 				args[0], args[1], args[2] = args[1], args[2], args[0]
 				args = args[:3]
@@ -582,7 +582,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
 			}
 		case VAVG, VAVGL:
-			if val != 0 && val < 4 {
+			if val >= 0 && val < 4 {
 				op = op + vectorSize[val]
 				args[0], args[1], args[2] = args[1], args[2], args[0]
 				args = args[:3]
@@ -595,7 +595,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
-		if mask&0x04 == 0 {
+		if mask & 0x04 == 0 {
 			return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
 		}
 		op = op + "Q"
