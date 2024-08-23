@@ -567,7 +567,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1], args[2], args[3] = args[3], args[2], args[1], args[0]
 		}
 		return op + " " + strings.Join(args, ", ")
-	case VEC, VECL:
+
+	case VEC, VECL, VCLZ, VCTZ:		//mnemonic V1, V2, M3
 		mask, err := strconv.Atoi(args[2][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi for %q:%s", op, err)
@@ -578,6 +579,11 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args = args[:2]
 		} else {
 			return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
+		}
+		switch inst.Op {
+			case VCLZ, VCTZ:
+				args[0], args[1] = args[1], args[0]
+			default :
 		}
 
 	case VA, VS, VACC, VAVG, VAVGL, VMX, VMXL, VGFM :
@@ -604,7 +610,22 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
 			}
 		}
-	case VCEQ, VCH, VCHL:
+	
+	case VGFMA: 		// Mnemonic V1, V2, V3, V4, M5
+		mask, err := strconv.Atoi(args[4][1:])
+		if err != nil {
+			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
+		}
+		val := mask & 0x7
+		if val >= 0 && val < 4 {
+			op = op + vectorSize[val]
+			args[0], args[1], args[2], args[3] = args[1], args[2], args[3], args[0]
+			args = args[:4]
+		} else {
+			return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
+		}
+
+	case VCEQ, VCH, VCHL:		// Mnemonic V1, V2, V3, M4, M5
 		m4, err := strconv.Atoi(args[3][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: %q error in converting Atoi:%s",op, err)
@@ -644,7 +665,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		op = op + "Q"
 		args[0], args[1], args[2], args[3] = args[1], args[2], args[3], args[0]
 		args = args[:5]
-	case VN, VNC:
+	case VN, VNC:	// Mnemonic V1, V2, V3
 		args[0], args[1], args[2] = args[1], args[2], args[0]
 		args = args[:3]
 
