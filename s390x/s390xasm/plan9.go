@@ -745,14 +745,13 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		if val == 0 {
 			op = "VZERO"
 			args = args[:1]
-		} else val == 0xffff {
+		} else if val == 0xffff {
 			op = "VONE"
 			args = args[:1]
 		} else {
 			args[0], args[1] = args[1], args[0]
 			args = args[:2]
 		}
-
 	}
 	if args != nil {
 		op += " " + strings.Join(args, ", ")
