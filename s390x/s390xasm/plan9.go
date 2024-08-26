@@ -681,7 +681,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				default:
 					return fmt.Sprintf("Specefication exception is recognized for %q with mask(m4) value: %v \n", op, mask)
 			}
-		} else m5 == 8 { 
+		} else if m5 == 8 { 
 			switch val {
 				case 2:
 					op = "W" + op[1:] + "SB"
