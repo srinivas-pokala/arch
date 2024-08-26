@@ -651,7 +651,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			} else {
 				return fmt.Sprintf("Specefication exception is recognized for %q with mask(m4) value: %v \n", op, mask)
 			}
-		} else m5 == 1 {
+		} else if m5 == 1 {
 			if val >= 0 && val < 4 {
 				op = op + vectorCS[val]
 				args[0], args[1], args[2] = args[1], args[2], args[0]
