@@ -745,7 +745,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		if val == 0 {
 			op = "VZERO"
 			args = args[:1]
-		} els val == 0xffff {
+		} else val == 0xffff {
 			op = "VONE"
 			args = args[:1]
 		} else {
