@@ -795,10 +795,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				args[0], args[1], args[2] = args[2], args[0], args[1]
 				args = args[:3]
 		}
-	case VSTM, VSTL, VESL:	//Mnemonic V1, V3, D2(B2)[,M4] or V1, R3,D2(B2)
+	case VSTM, VSTL, VESL, VLM:	//Mnemonic V1, V3, D2(B2)[,M4] or V1, R3,D2(B2)
 		args[2] = mem_operand(args[2:4]) // D(B)
 		switch inst.Op {
-			case VSTM:
+			case VSTM, VLM:
 				m, err := strconv.Atoi(args[4][1:])
 				if err != nil {
 					return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
@@ -806,13 +806,16 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				if !(m == 0 || (m > 2 && m < 5)) {
 					return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, m)
 				}
+				if inst.Op == VLM {
+					args[0], args[1], args[2] = args[2], args[0], args[1]
+				}
 				args = args[:3]
 			case VESL:
 				m, err := strconv.Atoi(args[4][1:])
 				if err != nil {
 					return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 				}
-				if m>=0 && m <4) {
+				if m>=0 && m <4 {
 					op = op + vectorSize[m]
 				} else {
 					return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, m)
