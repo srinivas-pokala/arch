@@ -32,14 +32,14 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	var args []string
 	opString := inst.Op.String()
 	op := strings.ToUpper(opString)
-	if strings.HasPrefix(m, "V") || strings.Contains(m, "WFC") || strings.Contains(m, "WFK") {
-		inst.Args = inst.Args[:len(inst.Args)-1]
-	}
 	for _, a := range inst.Args {
 		if a == nil {
 			break
 		}
 		args = append(args, plan9Arg(&inst, pc, symname, a))
+	}
+	if strings.HasPrefix(op, "V") || strings.Contains(op, "WFC") || strings.Contains(op, "WFK") {
+		args = args[:len(args)-1]
 	}
 
 	switch inst.Op {
