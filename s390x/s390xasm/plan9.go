@@ -30,6 +30,11 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	}
 
 	var args []string
+	opString := inst.Op.String()
+	op := strings.ToUpper(opString)
+	if strings.HasPrefix(m, "V") || strings.Contains(m, "WFC") || strings.Contains(m, "WFK") {
+		inst.Args= inst.Args[:len(inst.Args)-1]
+	}
 	for _, a := range inst.Args {
 		if a == nil {
 			break
@@ -37,8 +42,19 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args = append(args, plan9Arg(&inst, pc, symname, a))
 	}
 
-	op := strings.ToUpper(inst.Op.String())
 	switch inst.Op {
+	default:
+		switch len(args) {
+			case 0:
+				return op
+			case 1:
+				return fmt.Sprintf("%s %s", op, args[0])
+			case 2:
+				return fmt.Sprintf("%s %s,%s", op, args[0], args[1])
+			case 3:
+				return fmt.Sprintf("%s %s,%s,%s", op, args[0], args[1], args[2])
+		}
+		return op + " "+ strings.Join(args, ",")
 	case LCGR, LCGFR:
 		switch inst.Op {
 		case LCGR:
