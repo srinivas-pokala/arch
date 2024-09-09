@@ -33,7 +33,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	opString := inst.Op.String()
 	op := strings.ToUpper(opString)
 	if strings.HasPrefix(m, "V") || strings.Contains(m, "WFC") || strings.Contains(m, "WFK") {
-		inst.Args= inst.Args[:len(inst.Args)-1]
+		inst.Args = inst.Args[:len(inst.Args)-1]
 	}
 	for _, a := range inst.Args {
 		if a == nil {
@@ -45,16 +45,24 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	switch inst.Op {
 	default:
 		switch len(args) {
-			case 0:
-				return op
-			case 1:
-				return fmt.Sprintf("%s %s", op, args[0])
-			case 2:
-				return fmt.Sprintf("%s %s,%s", op, args[0], args[1])
-			case 3:
-				return fmt.Sprintf("%s %s,%s,%s", op, args[0], args[1], args[2])
+		case 0:
+			return op
+		case 1:
+			return fmt.Sprintf("%s %s", op, args[0])
+		case 2:
+			if reverseOperandOrder(inst.Op) {
+				args[0], args[1] = args[1], args[0]
+			}
+			op += " " + strings.Join(args, ", ")
+			return op
+		case 3:
+			if reverseOperandOrder(inst.Op) {
+				args[0], args[1], args[2] = args[2], args[1], args[0]
+			}
+			op += " " + strings.Join(args, ", ")
+			return op
 		}
-		return op + " "+ strings.Join(args, ",")
+		return op + " " + strings.Join(args, ",")
 	case LCGR, LCGFR:
 		switch inst.Op {
 		case LCGR:
@@ -118,10 +126,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args[2] = mem_operand(args[2:4]) //D(B)
 		args[0], args[1], args[2] = args[2], args[0], args[1]
 		args = args[:3]
-		return op + " " + strings.Join(args, ", ")
-
-	case LTEBR, LTDBR: // Load and test
-		args[0], args[1] = args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
 
 	case TCEB, TCDB: // Test Data class
@@ -482,9 +486,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1], args[2] = args[2], args[1], args[0]
 		}
 
-		return op + " " + strings.Join(args, ", ")
-	case LOCR:
-		args[0], args[1], args[2] = args[2], args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
 	case BRASL:
 		op = "CALL" // BL
@@ -1081,4 +1082,16 @@ func plan9gpr(r Reg) string {
 		return "ZR"
 	}
 	return fmt.Sprintf("R%d", regno)
+}
+
+func reverseOperandOrder(op Op) bool {
+	switch op {
+	case LOCR:
+		return true
+	case LTEBR, LTDBR:
+		return true
+	case VLEIB, VLEIH, VLEIF, VLEIG:
+		return true
+	}
+	return false
 }
