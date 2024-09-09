@@ -603,14 +603,14 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		default:
 		}
 		//Mnemonic V1, V2, V3, M4 or Mnemonic V1, I2, I3, M4 or Mnemonic V1, V3, I2, M4
-	case VA, VS, VACC, VAVG, VAVGL, VMX, VMXL, VMN, VMNL, VGFM, VGM, VREP, VERLLV, VESLV:
+	case VA, VS, VACC, VAVG, VAVGL, VMX, VMXL, VMN, VMNL, VGFM, VGM, VREP, VERLLV, VESLV, VSCBI:
 		mask, err := strconv.Atoi(args[3][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
 		val := mask & 0x7
 		switch inst.Op {
-		case VA, VS, VACC:
+		case VA, VS, VACC, VSCBI:
 			if val >= 0 && val < 5 {
 				op = op + vectorSize[val]
 				args[0], args[1], args[2] = args[1], args[2], args[0]
