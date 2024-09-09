@@ -11,7 +11,8 @@ package s390xasm
 // Different instruction types are as below:
 
 // Typ1 - Instructions having different base and extended mnemonic strings.
-//        These instructions have single M-field value and single offset.
+//
+//	These instructions have single M-field value and single offset.
 type typ1_ExtndMnics struct {
 	BaseOpStr string
 	Value     uint8
@@ -20,8 +21,9 @@ type typ1_ExtndMnics struct {
 }
 
 // Typ2 - Instructions having couple of extra strings added to the base mnemonic string,
-//        depending on the condition code evaluation.
-//        These instructions have single M-field value and single offset.
+//
+//	depending on the condition code evaluation.
+//	These instructions have single M-field value and single offset.
 type typ2_ExtndMnics struct {
 	Value     uint8
 	Offset    uint8
@@ -29,8 +31,9 @@ type typ2_ExtndMnics struct {
 }
 
 // Typ3 - Instructions having couple of extra strings added to the base mnemonic string,
-//        depending on the condition code evaluation.
-//        These instructions have two M-field values and two offsets.
+//
+//	depending on the condition code evaluation.
+//	These instructions have two M-field values and two offsets.
 type typ3_ExtndMnics struct {
 	Value1    uint8
 	Value2    uint8
@@ -40,7 +43,8 @@ type typ3_ExtndMnics struct {
 }
 
 // Typ4 - Instructions having different base and extended mnemonic strings.
-//        These instructions have two M-field values and two offsets.
+//
+//	These instructions have two M-field values and two offsets.
 type typ4_ExtndMnics struct {
 	BaseOpStr string
 	Value1    uint8
@@ -51,7 +55,8 @@ type typ4_ExtndMnics struct {
 }
 
 // Typ5 - Instructions having different base and extended mnemonic strings.
-//        These instructions have three M-field values and three offsets.
+//
+//	These instructions have three M-field values and three offsets.
 type typ5_ExtndMnics struct {
 	BaseOpStr string
 	Value1    uint8
@@ -64,14 +69,14 @@ type typ5_ExtndMnics struct {
 }
 
 // Typ6 - Instructions having couple of extra strings added to the base mnemonic string,
-//        depending on the condition code evaluation.
-//        These instructions have single M-field value and single offset.
+//
+//	depending on the condition code evaluation.
+//	These instructions have single M-field value and single offset.
 type typ6_ExtndMnics struct {
 	Value     uint16
 	Offset    uint8
 	ExtnOpStr string
 }
-
 
 // "func Handleextndmnemonic" - This is the function where the extended mnemonic logic
 // is implemented. This function defines various structures to keep a list of base
@@ -285,6 +290,7 @@ func HandleExtndMnemonic(inst *Inst) string {
 		typ5_ExtndMnics{BaseOpStr: "vfce", Value1: 2, Value2: 0, Value3: 0, Offset1: 3, Offset2: 4, Offset3: 5, ExtnOpStr: "vfcesb"},
 		typ5_ExtndMnics{BaseOpStr: "vfce", Value1: 2, Value2: 0, Value3: 1, Offset1: 3, Offset2: 4, Offset3: 5, ExtnOpStr: "vfcesbs"},
 		typ5_ExtndMnics{BaseOpStr: "vfce", Value1: 3, Value2: 0, Value3: 0, Offset1: 3, Offset2: 4, Offset3: 5, ExtnOpStr: "vfcedb"},
+		typ5_ExtndMnics{BaseOpStr: "vfce", Value1: 3, Value2: 0, Value3: 1, Offset1: 3, Offset2: 4, Offset3: 5, ExtnOpStr: "vfcedbs"},
 		typ5_ExtndMnics{BaseOpStr: "vfce", Value1: 2, Value2: 8, Value3: 0, Offset1: 3, Offset2: 4, Offset3: 5, ExtnOpStr: "wfcesb"},
 		typ5_ExtndMnics{BaseOpStr: "vfce", Value1: 2, Value2: 8, Value3: 1, Offset1: 3, Offset2: 4, Offset3: 5, ExtnOpStr: "wfcesbs"},
 		typ5_ExtndMnics{BaseOpStr: "vfce", Value1: 3, Value2: 8, Value3: 0, Offset1: 3, Offset2: 4, Offset3: 5, ExtnOpStr: "wfcedb"},
@@ -1020,4 +1026,3 @@ func removeArg(inst *Inst, index int8) {
 		}
 	}
 }
-
