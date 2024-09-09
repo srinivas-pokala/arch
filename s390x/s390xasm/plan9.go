@@ -739,6 +739,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		} else {
 			return fmt.Sprintf("Specefication exception is recognized for %q with m5: %v \n", op, m5)
 		}
+		args[0], args[1], args[2] = args[1], args[2], args[0]
+		args = args[:3]
 
 	case VFTCI:
 		m4, err := strconv.Atoi(args[3][1:])
