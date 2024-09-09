@@ -4830,13 +4830,13 @@ var instFormats = [...]instFormat{
 	{VLEB, 0xff00000000ff0000, 0xe700000000000000, 0x0, "VRX", // VECTOR LOAD ELEMENT (8) (VLEB V1,D2(X2,B2),M3)
 		[8]*argField{ap_VecReg_8_11, ap_DispUnsigned_20_31, ap_IndexReg_12_15, ap_BaseReg_16_19, ap_Mask_32_35, ap_ImmUnsigned_36_39}},
 	{VLEIH, 0xff00000000ff0000, 0xe700000000410000, 0xf000000000000, "VRI-a", // VECTOR LOAD ELEMENT IMMEDIATE (16) (VLEIH V1,I2,M3)
-		[8]*argField{ap_VecReg_8_11, ap_ImmUnsigned_16_31, ap_Mask_32_35, ap_ImmUnsigned_36_39}},
+		[8]*argField{ap_VecReg_8_11, ap_ImmSigned16_16_31, ap_Mask_32_35, ap_ImmUnsigned_36_39}},
 	{VLEIF, 0xff00000000ff0000, 0xe700000000430000, 0xf000000000000, "VRI-a", // VECTOR LOAD ELEMENT IMMEDIATE (32) (VLEIF V1,I2,M3)
-		[8]*argField{ap_VecReg_8_11, ap_ImmUnsigned_16_31, ap_Mask_32_35, ap_ImmUnsigned_36_39}},
+		[8]*argField{ap_VecReg_8_11, ap_ImmSigned16_16_31, ap_Mask_32_35, ap_ImmUnsigned_36_39}},
 	{VLEIG, 0xff00000000ff0000, 0xe700000000420000, 0xf000000000000, "VRI-a", // VECTOR LOAD ELEMENT IMMEDIATE (64) (VLEIG V1,I2,M3)
-		[8]*argField{ap_VecReg_8_11, ap_ImmUnsigned_16_31, ap_Mask_32_35, ap_ImmUnsigned_36_39}},
+		[8]*argField{ap_VecReg_8_11, ap_ImmSigned16_16_31, ap_Mask_32_35, ap_ImmUnsigned_36_39}},
 	{VLEIB, 0xff00000000ff0000, 0xe700000000400000, 0xf000000000000, "VRI-a", // VECTOR LOAD ELEMENT IMMEDIATE (8) (VLEIB V1,I2,M3)
-		[8]*argField{ap_VecReg_8_11, ap_ImmUnsigned_16_31, ap_Mask_32_35, ap_ImmUnsigned_36_39}},
+		[8]*argField{ap_VecReg_8_11, ap_ImmSigned16_16_31, ap_Mask_32_35, ap_ImmUnsigned_36_39}},
 	{VLER, 0xff00000000ff0000, 0xe600000000070000, 0x0, "VRX", // VECTOR LOAD ELEMENTS REVERSED (VLER V1,D2(X2,B2),M3)
 		[8]*argField{ap_VecReg_8_11, ap_DispUnsigned_20_31, ap_IndexReg_12_15, ap_BaseReg_16_19, ap_Mask_32_35, ap_ImmUnsigned_36_39}},
 	{VFI, 0xff00000000ff0000, 0xe700000000c70000, 0xff0000000000, "VRR-a", // VECTOR LOAD FP INTEGER (VFI V1,V2,M3,M4,M5)

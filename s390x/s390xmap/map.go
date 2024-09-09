@@ -286,7 +286,7 @@ func Imm_signed_8bit_check(op string) bool {
 }
 
 func Imm_signed_16bit_check(op string) bool {
-	imm_16 := []string{"AHI", "AGHI", "ALHSIK", "ALGHSIK", "AHIK", "AGHIK", "LHI", "LGHI", "MVGHI", "CIT", "CGIT", "CGHI", "CGHSI", "CHHSI", "CHI", "CHSI", "CRJ", "CGRJ"}
+	imm_16 := []string{"AHI", "AGHI", "ALHSIK", "ALGHSIK", "AHIK", "AGHIK", "LHI", "LGHI", "MVGHI", "CIT", "CGIT", "CGHI", "CGHSI", "CHHSI", "CHI", "CHSI", "CRJ", "CGRJ", "VLEIB", "VLEIH", "VLEIF", "VLEIG"}
 	var ret bool
 	ret = false
 	for _, str := range imm_16 {
