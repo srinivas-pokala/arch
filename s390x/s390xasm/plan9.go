@@ -826,9 +826,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		op = op + "Q"
 		args[0], args[1], args[2], args[3] = args[1], args[2], args[3], args[0]
 		args = args[:5]
-	case VN, VNC: // Mnemonic V1, V2, V3
-		args[0], args[1], args[2] = args[1], args[2], args[0]
-		args = args[:3]
 	case VL, VLREP, VLEBRH, VLEBRF, VLEBRG, VLBRREP:
 		//args[1] = mem_operandx(args[1:4]) // D(X,B)
 		switch inst.Op {
@@ -926,7 +923,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1] = args[1], args[0]
 			args = args[:2]
 		}
-	case VN, VNC, VNO, VO, VX:
+	case VN, VNC, VNO, VO, VX: //mnemonic V1, V2, V3
 		if args[1] == args[2] {
 			args = args[:2]
 			args[0], args[1] = args[1], args[0]
