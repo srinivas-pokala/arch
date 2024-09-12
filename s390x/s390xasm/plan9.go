@@ -32,11 +32,30 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	var args []string
 	opString := inst.Op.String()
 	op := strings.ToUpper(opString)
-	for _, a := range inst.Args {
+	//for i, a := range inst.Args {
+	for i:=0; i< len(inst.Args); i++ {
 		if a == nil {
 			break
 		}
-		args = append(args, plan9Arg(&inst, pc, symname, a))
+		switch inst.Args[i].(type) {
+			case Disp12, Disp20:
+				var temp []string
+				if _, ok  := inst.Args[i+1].(Index); ok {	//D(X,B)
+					for j :=0; j <3;j++ {
+						temp = append(temp, plan9Arg(&inst, pc, symname,inst.Args[i+j]))
+					}
+					args = append(args, mem_operandx(temp))
+					i = i+2
+				} else {	//D(B)
+					for j :=0; j <2;j++ {
+						temp = append(temp, plan9Arg(&inst, pc, symname,inst.Args[i+j]))
+					}
+					args = append(args, mem_operand(temp))
+					i = i+1
+				}
+			default:
+				args = append(args, plan9Arg(&inst, pc, symname, inst.Args[i]))
+		}
 	}
 	if strings.HasPrefix(op, "V") || strings.Contains(op, "WFC") || strings.Contains(op, "WFK") {
 		args = args[:len(args)-1]
@@ -79,8 +98,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 		return op + " " + strings.Join(args, ", ")
 	case LD, LE, LG, LGF, LLGF, LGH, LLGH, LGB, LLGC, LDY, LEY, LRVG, LRV, LRVH:
-		args[1] = mem_operandx(args[1:4]) //D(X,B)
-		args = args[:2]
+		//args[1] = mem_operandx(args[1:4]) //D(X,B)
+		//args = args[:2]
 		args[0], args[1] = args[1], args[0]
 		switch inst.Op {
 		case LG:
@@ -109,38 +128,38 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "MOVHBR"
 		}
 	case LA, LAY:
-		args[1] = mem_operandx(args[1:4]) //D(X,B)
+		//args[1] = mem_operandx(args[1:4]) //D(X,B)
 		args[0], args[1] = args[1], args[0]
-		args = args[:2]
+		//args = args[:2]
 		op = "MOVD"
 		return op + " " + strings.Join(args, ", ")
 
 	case LAA, LAAG, LAAL, LAALG, LAN, LANG, LAX, LAXG, LAO, LAOG:
-		args[2] = mem_operand(args[2:4]) //D(B)
+		//args[2] = mem_operand(args[2:4]) //D(B)
 		args[0], args[1] = args[1], args[0]
-		args = args[:3]
+		//args = args[:3]
 		return op + " " + strings.Join(args, ", ")
 	case LM, LMY, LMG: // Load Multiple
 		switch inst.Op {
 		case LM, LMY:
 			op = "LMY"
 		}
-		args[2] = mem_operand(args[2:4]) //D(B)
+		//args[2] = mem_operand(args[2:4]) //D(B)
 		args[0], args[1], args[2] = args[2], args[0], args[1]
-		args = args[:3]
+		//args = args[:3]
 		return op + " " + strings.Join(args, ", ")
 
 	case TCEB, TCDB: // Test Data class
-		args[1] = mem_operandx(args[1:4]) //D(X,B)
-		args = args[:2]
+		//args[1] = mem_operandx(args[1:4]) //D(X,B)
+		//args = args[:2]
 		return op + " " + strings.Join(args, ", ")
 	case STM, STMY, STMG: // Store Multiple
 		switch inst.Op {
 		case STM, STMY:
 			op = "STMY"
 		}
-		args[2] = mem_operand(args[2:4]) //D(B)
-		args = args[:3]
+		//args[2] = mem_operand(args[2:4]) //D(B)
+		//args = args[:3]
 		return op + " " + strings.Join(args, ", ")
 	case ST, STY, STG:
 		switch inst.Op {
@@ -149,8 +168,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case STG:
 			op = "MOVD"
 		}
-		args[1] = mem_operandx(args[1:4]) //D(X,B)
-		args = args[:2]
+		//args[1] = mem_operandx(args[1:4]) //D(X,B)
+		//args = args[:2]
 		return op + " " + strings.Join(args, ", ")
 	case LGR, LGFR, LGHR, LGBR, LLGFR, LLGHR, LLGCR, LRVGR, LRVR, LDR:
 		switch inst.Op {
@@ -189,8 +208,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case STE, STEY:
 			op = "FMOVS"
 		}
-		args[1] = mem_operandx(args[1:])
-		args = args[:2]
+		//args[1] = mem_operandx(args[1:])
+		//args = args[:2]
 		return op + " " + strings.Join(args, ", ")
 
 	case LGHI, LLILH, LLIHL, LLIHH, LGFI, LLILF, LLIHF:
@@ -332,8 +351,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case SRAG:
 			op = "SRAD"
 		}
-		args[2] = mem_operand(args[2:])
-		args = args[:3]
+		//args[2] = mem_operand(args[2:])
+		//args = args[:3]
 		args[0], args[1], args[2] = args[2], args[1], args[0]
 		return op + " " + strings.Join(args, ", ")
 	case TRAP2, SVC:
@@ -499,14 +518,14 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case XG:
 			op = "XOR"
 		}
-		args[1] = mem_operandx(args[1:])
-		args = args[:2]
-	case XC, NC, OC, MVC, MVCIN, CLC:
+		//args[1] = mem_operandx(args[1:])
+		//args = args[:2]
+	case XC, NC, OC, MVC, MVCIN, CLC:	//D(L,B)
 		args[0], args[1] = args[1], args[0]
-		args[1] = mem_operand(args[1:3])
-		args[2] = mem_operand(args[3:])
+		//args[1] = mem_operand(args[1:3])
+		//args[2] = mem_operand(args[3:])
 		args[1], args[2] = args[2], args[1]
-		args = args[:3]
+		//args = args[:3]
 		return op + " " + strings.Join(args, ", ")
 	case O, OY, OG:
 		switch inst.Op {
@@ -515,8 +534,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case OG:
 			op = "OR"
 		}
-		args[1] = mem_operandx(args[1:])
-		args = args[:2]
+		//args[1] = mem_operandx(args[1:])
+		//args = args[:2]
 	case N, NY, NG:
 		switch inst.Op {
 		case N, NY:
@@ -524,8 +543,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case NG:
 			op = "AND"
 		}
-		args[1] = mem_operandx(args[1:])
-		args = args[:2]
+		//args[1] = mem_operandx(args[1:])
+		//args = args[:2]
 	case S, SY, SLBG, SLG, SG:
 		switch inst.Op {
 		case S, SY:
@@ -537,8 +556,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case SG:
 			op = "SUB"
 		}
-		args[1] = mem_operandx(args[1:])
-		args = args[:2]
+		//args[1] = mem_operandx(args[1:])
+		//args = args[:2]
 	case MSG, MSY, MS:
 		switch inst.Op {
 		case MSG:
@@ -546,8 +565,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case MSY, MS:
 			op = "MULLW"
 		}
-		args[1] = mem_operandx(args[1:])
-		args = args[:2]
+		//args[1] = mem_operandx(args[1:])
+		//args = args[:2]
 	case A, AY, ALCG, ALG, AG:
 		switch inst.Op {
 		case A, AY:
@@ -559,8 +578,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case AG:
 			op = "ADD"
 		}
-		args[1] = mem_operandx(args[1:])
-		args = args[:2]
+		//args[1] = mem_operandx(args[1:])
+		//args = args[:2]
 	case RISBG, RISBGN, RISBHG, RISBLG, RNSBG, RXSBG, ROSBG:
 		switch inst.Op {
 		case RNSBG, RXSBG, ROSBG:
@@ -811,14 +830,14 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args[0], args[1], args[2] = args[1], args[2], args[0]
 		args = args[:3]
 	case VL, VLREP, VLEBRH, VLEBRF, VLEBRG, VLBRREP:
-		args[1] = mem_operandx(args[1:4]) // D(X,B)
+		//args[1] = mem_operandx(args[1:4]) // D(X,B)
 		switch inst.Op {
 		case VL:
 			args[0], args[1] = args[1], args[0]
 			args = args[:2]
 		case VLREP, VLBRREP:
 			args[0], args[1] = args[1], args[0]
-			mask, err := strconv.Atoi(args[4][1:])
+			mask, err := strconv.Atoi(args[2][1:])
 			if err != nil {
 				return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 			}
@@ -837,13 +856,13 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args = args[:3]
 		}
 	case VST, VSTEB, VSTEH, VSTEF, VSTEG, VLEB, VLEH, VLEF, VLEG: //Mnemonic V1, D2(X2,B2), M3
-		args[1] = mem_operandx(args[1:4]) // D(X,B)
-		m, err := strconv.Atoi(args[4][1:])
+		//args[1] = mem_operandx(args[1:4]) // D(X,B)
+		m, err := strconv.Atoi(args[2][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
-		args[2] = args[4]
-		args = args[:3]
+		//args[2] = args[4]
+		//args = args[:3]
 		switch inst.Op {
 		case VST:
 			if m == 0 || (m > 2 && m < 5) {
@@ -857,10 +876,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1], args[2] = args[2], args[0], args[1]
 		}
 	case VSTM, VSTL, VESL, VESRA, VLM, VERLL: //Mnemonic V1, V3, D2(B2)[,M4] or V1, R3,D2(B2)
-		args[2] = mem_operand(args[2:4]) // D(B)
+		//args[2] = mem_operand(args[2:4]) // D(B)
 		switch inst.Op {
 		case VSTM, VLM:
-			m, err := strconv.Atoi(args[4][1:])
+			m, err := strconv.Atoi(args[3][1:])
 			if err != nil {
 				return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 			}
@@ -872,7 +891,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			}
 			args = args[:3]
 		case VESL, VESRA, VERLL:
-			m, err := strconv.Atoi(args[4][1:])
+			m, err := strconv.Atoi(args[3][1:])
 			if err != nil {
 				return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 			}
