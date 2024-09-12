@@ -834,7 +834,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		switch inst.Op {
 		case VL:
 			args[0], args[1] = args[1], args[0]
-			args = args[:2]
+			//args = args[:2]
 		case VLREP, VLBRREP:
 			args[0], args[1] = args[1], args[0]
 			mask, err := strconv.Atoi(args[2][1:])
@@ -850,10 +850,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 					op = op + vectorSize[mask]
 				}
 			}
-			args = args[:2]
+			//args = args[:2]
 		case VLEBRH, VLEBRF, VLEBRG:
-			args[0], args[1], args[2] = args[1], args[4], args[0]
-			args = args[:3]
+			args[0], args[1], args[2] = args[1], args[2], args[0]
+			//args = args[:3]
 		}
 	case VST, VSTEB, VSTEH, VSTEF, VSTEG, VLEB, VLEH, VLEF, VLEG: //Mnemonic V1, D2(X2,B2), M3
 		//args[1] = mem_operandx(args[1:4]) // D(X,B)
@@ -926,6 +926,22 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1] = args[1], args[0]
 			args = args[:2]
 		}
+	case VN, VNC, VNO, VO, VX:
+		if args[1] == args[2] {
+			args = args[:2]
+			args[0], args[1] = args[1], args[0]
+		} else {
+			args[0], args[1], args[2] = args[1], args[2], args[0]
+		}
+	case VNO:
+		if args[1] == args[2] {
+			args = args[:2]
+			args[0], args[1] = args[1], args[0]
+			op = op + "T"
+		} else {
+			args[0], args[1], args[2] = args[1], args[2], args[0]
+		}
+
 	}
 	if args != nil {
 		op += " " + strings.Join(args, ", ")
