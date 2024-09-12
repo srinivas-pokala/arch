@@ -57,7 +57,9 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			return op
 		case 3:
 			if reverseOperandOrder(inst.Op) {
-				args[0], args[1], args[2] = args[2], args[1], args[0]
+				args[0], args[2] = args[2], args[0]
+			} else if reverseOperand3(inst.Op) {
+				args[0],args[1], args[2] = args[2], args[0], args[1]
 			}
 			op += " " + strings.Join(args, ", ")
 			return op
@@ -834,12 +836,14 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1], args[2] = args[1], args[4], args[0]
 			args = args[:3]
 		}
-	case VST, VSTEB, VSTEH, VSTEF, VSTEG: //Mnemonic V1, D2(X2,B2), M3
+	case VST, VSTEB, VSTEH, VSTEF, VSTEG, VLEB, VLEH, VLEF, VLEG: //Mnemonic V1, D2(X2,B2), M3
 		args[1] = mem_operandx(args[1:4]) // D(X,B)
 		m, err := strconv.Atoi(args[4][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
+		args[2] = args[4]
+		args = args[:3]
 		switch inst.Op {
 		case VST:
 			if m == 0 || (m > 2 && m < 5) {
@@ -847,10 +851,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			} else {
 				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, m)
 			}
+		case VLEB, VLEH, VLEF, VLEG:
+			args[0], args[2] = args[2], args[0]
 		default:
-			args[2] = args[4]
 			args[0], args[1], args[2] = args[2], args[0], args[1]
-			args = args[:3]
 		}
 	case VSTM, VSTL, VESL, VESRA, VLM, VERLL: //Mnemonic V1, V3, D2(B2)[,M4] or V1, R3,D2(B2)
 		args[2] = mem_operand(args[2:4]) // D(B)
@@ -1095,3 +1099,11 @@ func reverseOperandOrder(op Op) bool {
 	}
 	return false
 }
+func reverseOperandOrder3(op Op) bool {
+	switch op {
+	case VLVGP:
+		return true
+	}
+return false
+}
+
