@@ -33,28 +33,28 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	opString := inst.Op.String()
 	op := strings.ToUpper(opString)
 	//for i, a := range inst.Args {
-	for i:=0; i< len(inst.Args); i++ {
+	for i := 0; i < len(inst.Args); i++ {
 		if inst.Args[i] == nil {
 			break
 		}
 		switch inst.Args[i].(type) {
-			case Disp12, Disp20:
-				var temp []string
-				if _, ok  := inst.Args[i+1].(Index); ok {	//D(X,B)
-					for j :=0; j <3;j++ {
-						temp = append(temp, plan9Arg(&inst, pc, symname,inst.Args[i+j]))
-					}
-					args = append(args, mem_operandx(temp))
-					i = i+2
-				} else {	//D(B)
-					for j :=0; j <2;j++ {
-						temp = append(temp, plan9Arg(&inst, pc, symname,inst.Args[i+j]))
-					}
-					args = append(args, mem_operand(temp))
-					i = i+1
+		case Disp12, Disp20:
+			var temp []string
+			if _, ok := inst.Args[i+1].(Index); ok { //D(X,B)
+				for j := 0; j < 3; j++ {
+					temp = append(temp, plan9Arg(&inst, pc, symname, inst.Args[i+j]))
 				}
-			default:
-				args = append(args, plan9Arg(&inst, pc, symname, inst.Args[i]))
+				args = append(args, mem_operandx(temp))
+				i = i + 2
+			} else { //D(B)
+				for j := 0; j < 2; j++ {
+					temp = append(temp, plan9Arg(&inst, pc, symname, inst.Args[i+j]))
+				}
+				args = append(args, mem_operand(temp))
+				i = i + 1
+			}
+		default:
+			args = append(args, plan9Arg(&inst, pc, symname, inst.Args[i]))
 		}
 	}
 	if strings.HasPrefix(op, "V") || strings.Contains(op, "WFC") || strings.Contains(op, "WFK") {
@@ -78,7 +78,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			if reverseOperandOrder(inst.Op) {
 				args[0], args[2] = args[2], args[0]
 			} else if reverseOperand3(inst.Op) {
-				args[0],args[1], args[2] = args[2], args[0], args[1]
+				args[0], args[1], args[2] = args[2], args[0], args[1]
 			}
 			op += " " + strings.Join(args, ", ")
 			return op
@@ -520,7 +520,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 		//args[1] = mem_operandx(args[1:])
 		//args = args[:2]
-	case XC, NC, OC, MVC, MVCIN, CLC:	//D(L,B)
+	case XC, NC, OC, MVC, MVCIN, CLC: //D(L,B)
 		args[0], args[1] = args[1], args[0]
 		//args[1] = mem_operand(args[1:3])
 		//args[2] = mem_operand(args[3:])
@@ -600,9 +600,9 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			}
 		}
 		if len(args) == 5 {
-			args[0], args[1], args[2], args[3], args[4] = args[4], args[3], args[2], args[1], args[0]
+			args[0], args[1], args[2], args[3], args[4] = args[2], args[3], args[4], args[1], args[0]
 		} else {
-			args[0], args[1], args[2], args[3] = args[3], args[2], args[1], args[0]
+			args[0], args[1], args[2], args[3] = args[2], args[3], args[1], args[0]
 		}
 		return op + " " + strings.Join(args, ", ")
 
@@ -1123,6 +1123,5 @@ func reverseOperand3(op Op) bool {
 	case VLVGP:
 		return true
 	}
-return false
+	return false
 }
-
