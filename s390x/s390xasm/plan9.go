@@ -34,7 +34,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	op := strings.ToUpper(opString)
 	//for i, a := range inst.Args {
 	for i:=0; i< len(inst.Args); i++ {
-		if a == nil {
+		if inst.Args[i] == nil {
 			break
 		}
 		switch inst.Args[i].(type) {
@@ -1118,7 +1118,7 @@ func reverseOperandOrder(op Op) bool {
 	}
 	return false
 }
-func reverseOperandOrder3(op Op) bool {
+func reverseOperand3(op Op) bool {
 	switch op {
 	case VLVGP:
 		return true
