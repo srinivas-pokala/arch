@@ -82,6 +82,12 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			}
 			op += " " + strings.Join(args, ", ")
 			return op
+		case 4:
+			if reverseOperandOrder(inst.Op) {
+				args[0], args[1], args[2], args[3] = args[1], args[2], args[3], args[0]
+			} else if reverseEndOperand(inst.Op) {
+				args[0], args[3] = args[3], args[0]
+			}
 		}
 		return op + " " + strings.Join(args, ",")
 	case LCGR, LCGFR:
@@ -744,6 +750,24 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		} else {
 			return fmt.Sprintf("Specefication exception is recognized for %q with mask(m5) value: %v \n", op, m5)
 		}
+	case VFMA, VFMS: //Mnemonic V1, V2, V3, V4, M5, M6
+		m5, err := strconv.Atoi(args[4][1:])
+		if err != nil {
+			return fmt.Sprintf("GoSyntax: %q error in converting Atoi:%s", op, err)
+		}
+		m6, err := strconv.Atoi(args[5][1:])
+		if err != nil {
+			return fmt.Sprintf("GoSyntax: %q error in converting Atoi:%s", op, err)
+		}
+		if m5 == 0 && m6 == 3 {
+			op = op + "DB"
+		} else if m5 == 8 && M6 == 3 {
+			op = "W" + op[1:] + "DB"
+		} else {
+			return fmt.Sprintf("Specefication exception is recognized for %q with m5: %v m6: %v \n", op, m5, m6)
+		}
+		args[0], args[1], args[2], args[3] = args[1], args[2], args[3], args[0]
+
 	case VFCE, VFCH, VFCHE: //Mnemonic V1,V2,V3,M4,M5,M6
 		m4, err := strconv.Atoi(args[3][1:])
 		if err != nil {
@@ -1051,7 +1075,7 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 		if s != "" {
 			return strings.ToUpper(s[1 : len(s)-1])
 		}
-		return ""
+		return "R0"
 	case Index:
 		if arg == R13 {
 			return "g"
@@ -1111,7 +1135,7 @@ func reverseOperandOrder(op Op) bool {
 		return true
 	case LTEBR, LTDBR:
 		return true
-	case VLEIB, VLEIH, VLEIF, VLEIG:
+	case VLEIB, VLEIH, VLEIF, VLEIG, VSEL, VPERM:
 		return true
 	}
 	return false
@@ -1119,6 +1143,14 @@ func reverseOperandOrder(op Op) bool {
 func reverseOperand3(op Op) bool {
 	switch op {
 	case VLVGP:
+		return true
+	}
+	return false
+}
+
+func reverseEndOperand(op Op) bool {
+	switch op {
+	case VPDI:
 		return true
 	}
 	return false
