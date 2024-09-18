@@ -913,20 +913,15 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1] = args[1], args[0]
 			args = args[:2]
 		}
-	case VN, VNC, VO, VX: //mnemonic V1, V2, V3
-		if args[1] == args[2] {
+	case VN, VNC, VO, VX, VNO: //mnemonic V1, V2, V3
+		if args[0] == args[2] {
 			args = args[:2]
 			args[0], args[1] = args[1], args[0]
 		} else {
 			args[0], args[1], args[2] = args[1], args[2], args[0]
 		}
-	case VNO:
-		if args[1] == args[2] {
-			args = args[:2]
-			args[0], args[1] = args[1], args[0]
+		if op == "VNO" {
 			op = op + "T"
-		} else {
-			args[0], args[1], args[2] = args[1], args[2], args[0]
 		}
 
 	}
