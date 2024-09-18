@@ -579,16 +579,18 @@ func HandleExtndMnemonic(inst *Inst) string {
 					break
 				}
 			}
-		case "vsum", "vsumg":
-			for i := 1; i < len(vecInstrExtndMnics)-4; i++ {
-				if uint8(inst.Args[vecInstrExtndMnics[i].Offset].(Mask)) == vecInstrExtndMnics[i].Value {
-					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
-					removeArg(inst, int8(vecInstrExtndMnics[i].Offset))
-					break
-				}
+		case "vsum", "vsumg", "vsumq":
+			var off uint8
+			switch opString {
+				case "vsum":
+					off = 0
+				case "vsumg":
+					off = 1
+				case "vsumq":
+					off = 2
+
 			}
-		case "vsumq":
-			for i := 2; i < len(vecInstrExtndMnics)-2; i++ {
+			for i := off; i < len(vecInstrExtndMnics)-4 + off; i++ {
 				if uint8(inst.Args[vecInstrExtndMnics[i].Offset].(Mask)) == vecInstrExtndMnics[i].Value {
 					newOpStr = opString + vecInstrExtndMnics[i].ExtnOpStr
 					removeArg(inst, int8(vecInstrExtndMnics[i].Offset))
