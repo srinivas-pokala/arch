@@ -580,7 +580,7 @@ func HandleExtndMnemonic(inst *Inst) string {
 				}
 			}
 		case "vsum", "vsumg", "vsumq":
-			var off uint8
+			var off int
 			switch opString {
 				case "vsum":
 					off = 0
