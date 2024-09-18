@@ -630,7 +630,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		default:
 		}
 		//Mnemonic V1, V2, V3, M4 or Mnemonic V1, I2, I3, M4 or Mnemonic V1, V3, I2, M4
-	case VA, VS, VACC, VAVG, VAVGL, VMX, VMXL, VMN, VMNL, VGFM, VGM, VREP, VERLLV, VESLV, VSCBI:
+	case VA, VS, VACC, VAVG, VAVGL, VMX, VMXL, VMN, VMNL, VGFM, VGM, VREP, VERLLV, VESLV, VSCBI, VSUM, VSUMG, VSUMQ:
 		mask, err := strconv.Atoi(args[3][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
@@ -658,6 +658,24 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				op = op + vectorSize[val]
 				args[0], args[1], args[2] = args[2], args[1], args[0]
 				args = args[:3]
+			} else {
+				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
+			}
+		case VSUM, VSUMG, VSUMQ:
+			if val >= 0 && val < 2 {
+				op = op + vectorSize[val]
+			} else {
+				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
+			}
+		case VSUMG:
+			if val > 0 && val < 3 {
+				op = op + vectorSize[val]
+			} else {
+				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
+			}
+		case VSUMQ:
+			if val > 1 && val < 4 {
+				op = op + vectorSize[val]
 			} else {
 				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
 			}
@@ -750,7 +768,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		} else {
 			return fmt.Sprintf("Specefication exception is recognized for %q with mask(m5) value: %v \n", op, m5)
 		}
-	case VFMA, VFMS: //Mnemonic V1, V2, V3, V4, M5, M6
+	case VFMA, VFMS, VMSL: //Mnemonic V1, V2, V3, V4, M5, M6
 		m5, err := strconv.Atoi(args[4][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: %q error in converting Atoi:%s", op, err)
@@ -759,14 +777,28 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: %q error in converting Atoi:%s", op, err)
 		}
-		if m5 == 0 && m6 == 3 {
-			op = op + "DB"
-		} else if m5 == 8 && m6 == 3 {
-			op = "W" + op[1:] + "DB"
-		} else {
-			return fmt.Sprintf("Specefication exception is recognized for %q with m5: %v m6: %v \n", op, m5, m6)
+		switch inst.Op {
+		case VMSL:
+			if m5 == 3 && m6 == 8 {
+				op = op + "EG"
+			} else if m5 == 3 && m6 == 4 {
+				op = op + "OG"
+			} else if m5 == 3 && m6 == 12 {
+				op = op + "EOG"
+			} else if m5 == 3 {
+				op = op + "G"
+			}
+		default:
+			if m5 == 0 && m6 == 3 {
+				op = op + "DB"
+			} else if m5 == 8 && m6 == 3 {
+				op = "W" + op[1:] + "DB"
+			} else {
+				return fmt.Sprintf("Specefication exception is recognized for %q with m5: %v m6: %v \n", op, m5, m6)
+			}
 		}
 		args[0], args[1], args[2], args[3] = args[1], args[2], args[3], args[0]
+		args = args[:4]
 
 	case VFCE, VFCH, VFCHE: //Mnemonic V1,V2,V3,M4,M5,M6
 		m4, err := strconv.Atoi(args[3][1:])
