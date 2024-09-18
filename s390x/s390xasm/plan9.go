@@ -661,7 +661,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			} else {
 				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
 			}
-		case VSUM, VSUMG, VSUMQ:
+		case VSUM:
 			if val >= 0 && val < 2 {
 				op = op + vectorSize[val]
 			} else {
