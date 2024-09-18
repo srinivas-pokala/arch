@@ -761,7 +761,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 		if m5 == 0 && m6 == 3 {
 			op = op + "DB"
-		} else if m5 == 8 && M6 == 3 {
+		} else if m5 == 8 && m6 == 3 {
 			op = "W" + op[1:] + "DB"
 		} else {
 			return fmt.Sprintf("Specefication exception is recognized for %q with m5: %v m6: %v \n", op, m5, m6)
