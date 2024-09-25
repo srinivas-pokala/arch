@@ -52,11 +52,18 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				}
 				args = append(args, mem_operand(temp))
 				i = i + 1
-			} else {	//D(V,B)
+			} else if _, ok := inst.Args[i+1].(VReg); ok { //D(V,B)
 				for j := 0; j < 3; j++ {
 					temp = append(temp, plan9Arg(&inst, pc, symname, inst.Args[i+j]))
 				}
 				args = append(args, mem_operandv(temp))
+				i = i + 2
+			} else { //D(L,B)
+				for j := 0; j < 3; j++ {
+					temp = append(temp, plan9Arg(&inst, pc, symname, inst.Args[i+j]))
+				}
+				ar1, ar2 := mem_operandl(temp)
+				args = append(args, ar1, ar2)
 				i = i + 2
 			}
 		default:
@@ -536,7 +543,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args[0], args[1] = args[1], args[0]
 		//args[1] = mem_operand(args[1:3])
 		//args[2] = mem_operand(args[3:])
-		args[1], args[2] = args[2], args[1]
+		//args[1], args[2] = args[2], args[1]
 		//args = args[:3]
 		return op + " " + strings.Join(args, ", ")
 	case O, OY, OG:
@@ -985,7 +992,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		if op == "VNO" {
 			op = op + "T"
 		}
-	case VGEG, VGEF, VSCEG, VSCEF:	//Mnemonic V1, D2(V2, B2), M3
+	case VGEG, VGEF, VSCEG, VSCEF: //Mnemonic V1, D2(V2, B2), M3
 		args[0], args[2] = args[2], args[0]
 
 	}
@@ -1117,6 +1124,18 @@ func mem_operandv(args []string) string { //D(V,B)
 	}
 	return args[0]
 }
+
+func mem_operandl(args []string) (string, string) { //D(L,B)
+	if args[0] != "" && args[2] != "" {
+		args[0] = fmt.Sprintf("%s(%s)", args[0], args[2])
+	} else if args[2] != "" {
+		args[0] = fmt.Sprintf("(%s)", args[2])
+	} else {
+		args[0] = fmt.Sprintf("%s", args[0])
+	}
+	return args[0], args[1]
+}
+
 // plan9Arg formats arg (which is the argIndex's arg in inst) according to Plan 9 rules.
 //
 // NOTE: because Plan9Syntax is the only caller of this func, and it receives a copy
