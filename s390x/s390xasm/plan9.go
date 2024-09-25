@@ -52,7 +52,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				}
 				args = append(args, mem_operand(temp))
 				i = i + 1
-			} else {
+			} else {	//D(V,B)
 				for j := 0; j < 3; j++ {
 					temp = append(temp, plan9Arg(&inst, pc, symname, inst.Args[i+j]))
 				}
@@ -986,7 +986,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = op + "T"
 		}
 	case VGEG, VGEF, VSCEG, VSCEF:	//Mnemonic V1, D2(V2, B2), M3
-		fmt.printf("Srinivas: %v \n", args)
+		args[0], args[2] = args[2], args[0]
 
 	}
 	if args != nil {
