@@ -46,12 +46,18 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				}
 				args = append(args, mem_operandx(temp))
 				i = i + 2
-			} else { //D(B)
+			} else if _, ok := inst.Args[i+1].(Base); ok { //D(B)
 				for j := 0; j < 2; j++ {
 					temp = append(temp, plan9Arg(&inst, pc, symname, inst.Args[i+j]))
 				}
 				args = append(args, mem_operand(temp))
 				i = i + 1
+			} else {
+				for j := 0; j < 3; j++ {
+					temp = append(temp, plan9Arg(&inst, pc, symname, inst.Args[i+j]))
+				}
+				args = append(args, mem_operandv(temp))
+				i = i + 2
 			}
 		default:
 			args = append(args, plan9Arg(&inst, pc, symname, inst.Args[i]))
@@ -979,6 +985,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		if op == "VNO" {
 			op = op + "T"
 		}
+	case VGEG, VGEF, VSCEG, VSCEF:	//Mnemonic V1, D2(V2, B2), M3
+		fmt.printf("Srinivas: %v \n", args)
 
 	}
 	if args != nil {
@@ -1088,6 +1096,27 @@ func mem_operandx(args []string) string { //D(X,B)
 	return args[0]
 }
 
+func mem_operandv(args []string) string { //D(V,B)
+	if args[1] != "" && args[2] != "" {
+		args[1] = fmt.Sprintf("(%s)(%s*1)", args[2], args[1])
+	} else if args[1] != "" {
+		args[1] = fmt.Sprintf("(%s*1)", args[1])
+	} else if args[2] != "" {
+		args[1] = fmt.Sprintf("(%s)", args[2])
+	} else if args[0] != "" {
+		args[1] = ""
+	}
+	if args[0] != "" && args[1] != "" {
+		args[0] = fmt.Sprintf("%s%s", args[0], args[1])
+	} else if args[0] != "" {
+		args[0] = fmt.Sprintf("$%s", args[0])
+	} else if args[1] != "" {
+		args[0] = fmt.Sprintf("%s", args[1])
+	} else {
+		args[0] = ""
+	}
+	return args[0]
+}
 // plan9Arg formats arg (which is the argIndex's arg in inst) according to Plan 9 rules.
 //
 // NOTE: because Plan9Syntax is the only caller of this func, and it receives a copy
