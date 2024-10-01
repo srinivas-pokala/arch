@@ -606,24 +606,22 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			} else {
 				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
 			}
-		case VSUM:
-			if val >= 0 && val < 2 {
+		case VSUM, VSUMG, VSUMQ:
+			var off int
+			switch inst.Op {
+			case VSUM:
+				off = 0
+			case VSUMG:
+				off = 1
+			case VSUMQ:
+				off = 2
+			}
+			if (val > (-1 + off)) && (val < (2 + off)) {
 				op = op + vectorSize[val]
 			} else {
 				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
 			}
-		case VSUMG:
-			if val > 0 && val < 3 {
-				op = op + vectorSize[val]
-			} else {
-				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
-			}
-		case VSUMQ:
-			if val > 1 && val < 4 {
-				op = op + vectorSize[val]
-			} else {
-				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
-			}
+			args = args[:3]
 		}
 
 	case VGFMA, VERIM: // Mnemonic V1, V2, V3, V4/I4, M5
