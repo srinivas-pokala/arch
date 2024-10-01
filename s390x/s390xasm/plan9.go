@@ -1148,6 +1148,8 @@ func reverseOperandOrder(op Op) bool {
 		return true
 	case VLEIB, VLEIH, VLEIF, VLEIG, VPDI:
 		return true
+	case VSLDB:
+		return true
 	}
 	return false
 }
