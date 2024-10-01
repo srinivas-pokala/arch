@@ -885,6 +885,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			}
 			switch inst.Op {
 			case VLVG:
+				args[0], args[2] = args[2], args[0]
+				args = args[:3]
 			default:
 				if args[0] == args[1] {
 					args[0], args[1] = args[2], args[1]
