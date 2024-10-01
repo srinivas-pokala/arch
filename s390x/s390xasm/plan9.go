@@ -443,38 +443,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0] = args[1]
 			args = args[:1]
 		}
-	case LOCGR:
-		mask, err := strconv.Atoi(args[2][1:])
-		if err != nil {
-			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
-		}
-		var check bool
-		switch mask & 0xf {
-		case 2: //Greaterthan (M=2)
-			op = "MOVDGT"
-			check = true
-		case 4: //Lessthan (M=4)
-			op = "MOVDLT"
-			check = true
-		case 7: // Not Equal (M=7)
-			op = "MOVDNE"
-			check = true
-		case 8: // Equal (M=8)
-			op = "MODEQ"
-			check = true
-		case 10: // Greaterthan or Equal (M=10)
-			op = "MOVDGE"
-			check = true
-		case 12: // Lessthan or Equal (M=12)
-			op = "MOVDLE"
-			check = true
-		}
-		if check {
-			args[0], args[1] = args[1], args[0]
-			args = args[:2]
-		} else {
-			args[0], args[1], args[2] = args[2], args[1], args[0]
-		}
 
 	case BRASL:
 		op = "CALL" // BL
@@ -860,7 +828,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		default:
 			args[0], args[1], args[2] = args[2], args[0], args[1]
 		}
-	case VSTM, VSTL, VESL, VESRA, VLM, VERLL: //Mnemonic V1, V3, D2(B2)[,M4] or V1, R3,D2(B2)
+	case VSTM, VSTL, VESL, VESRA, VLM, VERLL, VLVG: //Mnemonic V1, V3, D2(B2)[,M4] or V1, R3,D2(B2)
 		switch inst.Op {
 		case VSTM, VLM:
 			m, err := strconv.Atoi(args[3][1:])
@@ -874,7 +842,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				args[0], args[1], args[2] = args[2], args[0], args[1]
 			}
 			args = args[:3]
-		case VESL, VESRA, VERLL:
+		case VESL, VESRA, VERLL, VLVG:
 			m, err := strconv.Atoi(args[3][1:])
 			if err != nil {
 				return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
@@ -884,13 +852,17 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			} else {
 				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, m)
 			}
-			if args[0] == args[1] {
-				args[0], args[1] = args[2], args[1]
-				args = args[:2]
-				break
+			switch inst.Op {
+			case VLVG:
+			default:
+				if args[0] == args[1] {
+					args[0], args[1] = args[2], args[1]
+					args = args[:2]
+					break
+				}
+				args[0], args[2] = args[2], args[0]
+				args = args[:3]
 			}
-			args[0], args[1], args[2] = args[2], args[1], args[0]
-			args = args[:3]
 		case VSTL:
 			args[0], args[1] = args[1], args[0]
 			args = args[:3]
@@ -1139,7 +1111,7 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 // It checks any 2 args of given instructions to swap or not
 func reverseOperandOrder(op Op) bool {
 	switch op {
-	case LOCR:
+	case LOCR, LOCGR:
 		return true
 	case LTEBR, LTDBR:
 		return true
