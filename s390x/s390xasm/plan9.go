@@ -1142,7 +1142,7 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 // It checks any 2 args of given instructions to swap or not
 func reverseOperandOrder(op Op) bool {
 	switch op {
-	case LOCR, LOCGR:
+	case LOCR:
 		return true
 	case LTEBR, LTDBR:
 		return true
