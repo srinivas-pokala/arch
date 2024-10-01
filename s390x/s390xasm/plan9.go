@@ -1,4 +1,4 @@
-// Copyright 2017 The Go Authors. All rights reserved.
+// Copyright 2024 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,14 +12,13 @@ import (
 
 // GoSyntax returns the Go assembler syntax for the instruction.
 // The syntax was originally defined by Plan 9.
+// The inst relates to single instruction.
 // The pc is the program counter of the instruction, used for
 // expanding PC-relative addresses into absolute ones.
 // The symname function queries the symbol table for the program
 // being disassembled. Given a target address it returns the name
 // and base address of the symbol containing the target, if any;
 // otherwise it returns "", 0.
-// The reader text should read from the text segment using text addresses
-// as offsets; it is used to display pc-relative loads as constant loads.
 
 var vectorSize = map[int]string{0: "B", 1: "H", 2: "F", 3: "G", 4: "Q"}
 var vectorCS = map[int]string{0: "BS", 1: "HS", 2: "FS", 3: "GS"}
@@ -85,24 +84,19 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			if reverseOperandOrder(inst.Op) {
 				args[0], args[1] = args[1], args[0]
 			}
-			op += " " + strings.Join(args, ", ")
-			return op
 		case 3:
 			if reverseOperandOrder(inst.Op) {
 				args[0], args[2] = args[2], args[0]
-			} else if reverseOperand3(inst.Op) {
+			} else if reverseAllOperands(inst.Op) {
 				args[0], args[1], args[2] = args[2], args[0], args[1]
 			}
-			op += " " + strings.Join(args, ", ")
-			return op
 		case 4:
 			if reverseOperandOrder(inst.Op) {
-				args[0], args[1], args[2], args[3] = args[1], args[2], args[3], args[0]
-			} else if reverseEndOperand(inst.Op) {
 				args[0], args[3] = args[3], args[0]
+			} else if reverseAllOperands(inst.Op) {
+				args[0], args[1], args[2], args[3] = args[1], args[2], args[3], args[0]
 			}
 		}
-		return op + " " + strings.Join(args, ",")
 	case LCGR, LCGFR:
 		switch inst.Op {
 		case LCGR:
@@ -115,7 +109,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		} else {
 			args[0], args[1] = args[1], args[0]
 		}
-		return op + " " + strings.Join(args, ", ")
 	case LD, LE, LG, LGF, LLGF, LGH, LLGH, LGB, LLGC, LDY, LEY, LRVG, LRV, LRVH:
 		//args[1] = mem_operandx(args[1:4]) //D(X,B)
 		//args = args[:2]
@@ -147,39 +140,23 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "MOVHBR"
 		}
 	case LA, LAY:
-		//args[1] = mem_operandx(args[1:4]) //D(X,B)
 		args[0], args[1] = args[1], args[0]
-		//args = args[:2]
 		op = "MOVD"
-		return op + " " + strings.Join(args, ", ")
 
 	case LAA, LAAG, LAAL, LAALG, LAN, LANG, LAX, LAXG, LAO, LAOG:
-		//args[2] = mem_operand(args[2:4]) //D(B)
 		args[0], args[1] = args[1], args[0]
-		//args = args[:3]
-		return op + " " + strings.Join(args, ", ")
 	case LM, LMY, LMG: // Load Multiple
 		switch inst.Op {
 		case LM, LMY:
 			op = "LMY"
 		}
-		//args[2] = mem_operand(args[2:4]) //D(B)
 		args[0], args[1], args[2] = args[2], args[0], args[1]
-		//args = args[:3]
-		return op + " " + strings.Join(args, ", ")
 
-	case TCEB, TCDB: // Test Data class
-		//args[1] = mem_operandx(args[1:4]) //D(X,B)
-		//args = args[:2]
-		return op + " " + strings.Join(args, ", ")
 	case STM, STMY, STMG: // Store Multiple
 		switch inst.Op {
 		case STM, STMY:
 			op = "STMY"
 		}
-		//args[2] = mem_operand(args[2:4]) //D(B)
-		//args = args[:3]
-		return op + " " + strings.Join(args, ", ")
 	case ST, STY, STG:
 		switch inst.Op {
 		case ST, STY:
@@ -187,9 +164,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case STG:
 			op = "MOVD"
 		}
-		//args[1] = mem_operandx(args[1:4]) //D(X,B)
-		//args = args[:2]
-		return op + " " + strings.Join(args, ", ")
 	case LGR, LGFR, LGHR, LGBR, LLGFR, LLGHR, LLGCR, LRVGR, LRVR, LDR:
 		switch inst.Op {
 		case LGR:
@@ -227,9 +201,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case STE, STEY:
 			op = "FMOVS"
 		}
-		//args[1] = mem_operandx(args[1:])
-		//args = args[:2]
-		return op + " " + strings.Join(args, ", ")
 
 	case LGHI, LLILH, LLIHL, LLIHH, LGFI, LLILF, LLIHF:
 		op = "MOVD"
@@ -249,7 +220,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		} else {
 			args[0], args[1], args[2] = args[2], args[1], args[0]
 		}
-		return op + " " + strings.Join(args, ", ")
 	case AGHIK, AHIK, ALGHSIK:
 		switch inst.Op {
 		case AGHIK:
@@ -260,7 +230,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "ADDC"
 		}
 		args[0], args[1], args[2] = args[2], args[1], args[0]
-		return op + " " + strings.Join(args, ", ")
 	case AGHI, AHI, AGFI, AFI, AR, ALCGR:
 		switch inst.Op {
 		case AGHI, AGFI:
@@ -271,7 +240,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "ADDE"
 		}
 		args[0], args[1] = args[1], args[0]
-		return op + " " + strings.Join(args, ", ")
 	case AEBR, ADBR, DDBR, DEBR, MDBR, MEEBR, SDBR, SEBR, LPDBR, LNDBR, LPDFR, LNDFR, LCDFR, LCEBR, LEDBR, LDEBR, SQDBR, SQEBR:
 		switch inst.Op {
 		case AEBR:
@@ -304,7 +272,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "FSQRTS"
 		}
 		args[0], args[1] = args[1], args[0]
-		return op + " " + strings.Join(args, ", ")
 	case SR, SGR, SLGR, SLFI:
 		switch inst.Op {
 		case SR, SLFI:
@@ -315,7 +282,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "SUBC"
 		}
 		args[0], args[1] = args[1], args[0]
-		return op + " " + strings.Join(args, ", ")
 	case SGRK, SLGRK, SRK:
 		switch inst.Op {
 		case SGRK:
@@ -331,11 +297,9 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		} else {
 			args[0], args[1], args[2] = args[2], args[1], args[0]
 		}
-		return op + " " + strings.Join(args, ", ")
 	case SLBGR:
 		op = "SUBE"
 		args[0], args[1] = args[1], args[0]
-		return op + " " + strings.Join(args, ", ")
 	case MSGFR, MHI, MSFI, MSGFI:
 		switch inst.Op {
 		case MSGFR, MHI, MSFI:
@@ -344,17 +308,14 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "MULLD"
 		}
 		args[0], args[1] = args[1], args[0]
-		return op + " " + strings.Join(args, ", ")
 
 	case NGR, NR, NILL, NILF, NILH, OGR, OR, OILL, OILF, OILH, XGR, XR, XILF:
 		op = bitwise_op(inst.Op)
 		args[0], args[1] = args[1], args[0]
-		return op + " " + strings.Join(args, ", ")
 
 	case NGRK, NRK, OGRK, ORK, XGRK, XRK: // opcode R1, R2, R3
 		op = bitwise_op(inst.Op)
 		args[0], args[1], args[2] = args[1], args[2], args[0]
-		return op + " " + strings.Join(args, ", ")
 	case SLLG, SRLG, SLLK, SRLK, RLL, RLLG, SRAK, SRAG:
 		switch inst.Op {
 		case SLLG:
@@ -370,10 +331,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case SRAG:
 			op = "SRAD"
 		}
-		//args[2] = mem_operand(args[2:])
-		//args = args[:3]
 		args[0], args[1], args[2] = args[2], args[1], args[0]
-		return op + " " + strings.Join(args, ", ")
 	case TRAP2, SVC:
 		op = "SYSALL"
 	case CR, CLR, CGR, CLGR, KDBR, CDBR, CEBR, CGHI, CHI, CGFI, CLGFI, CFI, CLFI:
@@ -391,11 +349,9 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case KDBR:
 			op = "FCMPO"
 		}
-		return op + " " + strings.Join(args, ", ")
-	case CEFBRA, CDFBRA, CEGBRA, CDGBRA, CELFBR, CDLFBR, CELGBR, CDLGBR:
-		return op + " " + args[2] + ", " + args[0]
-	case CFEBRA, CFDBRA, CGEBRA, CGDBRA, CLFEBR, CLFDBR, CLGEBR, CLGDBR:
-		return op + " " + args[2] + ", " + args[0]
+	case CEFBRA, CDFBRA, CEGBRA, CDGBRA, CELFBR, CDLFBR, CELGBR, CDLGBR, CFEBRA, CFDBRA, CGEBRA, CGDBRA, CLFEBR, CLFDBR, CLGEBR, CLGDBR:
+		args[0], args[1] = args[2], args[0]
+		args = args[:2]
 	case CGRJ, CGIJ:
 		mask, err := strconv.Atoi(args[2][1:])
 		if err != nil {
@@ -426,7 +382,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[2] = args[3]
 			args = args[:3]
 		}
-		return op + " " + strings.Join(args, ", ")
 	case CLGRJ, CLGIJ:
 		mask, err := strconv.Atoi(args[2][1:])
 		if err != nil {
@@ -457,10 +412,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[2] = args[3]
 			args = args[:3]
 		}
-		return op + " " + strings.Join(args, ", ")
 	case CLRJ, CRJ, CIJ, CLIJ:
 		args[0], args[1], args[2], args[3] = args[2], args[0], args[1], args[3]
-		return op + " " + strings.Join(args, ", ")
 	case BRC, BRCL:
 		mask, err := strconv.Atoi(args[0][1:])
 		if err != nil {
@@ -471,9 +424,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = opStr
 		}
 		if check {
-			return op + " " + args[1]
-		} else {
-			return op + " " + strings.Join(args, ", ")
+			args[0] = args[1]
+			args = args[:1]
 		}
 	case BCR:
 		mask, err := strconv.Atoi(args[0][1:])
@@ -486,12 +438,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 		if op == "SYNC" || op == "NOPH" {
 			args = args[:0]
-			return op
 		}
 		if check {
-			return op + " " + args[1]
-		} else {
-			return op + " " + strings.Join(args, ", ")
+			args[0] = args[1]
+			args = args[:1]
 		}
 	case LOCGR:
 		mask, err := strconv.Atoi(args[2][1:])
@@ -526,10 +476,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1], args[2] = args[2], args[1], args[0]
 		}
 
-		return op + " " + strings.Join(args, ", ")
 	case BRASL:
 		op = "CALL" // BL
-		return op + " " + args[1]
+		args[0] = args[1]
+		args = args[:1]
 	case X, XY, XG:
 		switch inst.Op {
 		case X, XY:
@@ -537,14 +487,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case XG:
 			op = "XOR"
 		}
-		//args[1] = mem_operandx(args[1:])
-		//args = args[:2]
 	case XC, NC, OC, MVC, MVCIN, CLC: //D(L,B)
 		args[0], args[1] = args[1], args[0]
-		//args[1] = mem_operand(args[1:3])
-		//args[2] = mem_operand(args[3:])
-		//args[1], args[2] = args[2], args[1]
-		//args = args[:3]
 		return op + " " + strings.Join(args, ", ")
 	case O, OY, OG:
 		switch inst.Op {
@@ -553,8 +497,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case OG:
 			op = "OR"
 		}
-		//args[1] = mem_operandx(args[1:])
-		//args = args[:2]
 	case N, NY, NG:
 		switch inst.Op {
 		case N, NY:
@@ -562,8 +504,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case NG:
 			op = "AND"
 		}
-		//args[1] = mem_operandx(args[1:])
-		//args = args[:2]
 	case S, SY, SLBG, SLG, SG:
 		switch inst.Op {
 		case S, SY:
@@ -575,8 +515,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case SG:
 			op = "SUB"
 		}
-		//args[1] = mem_operandx(args[1:])
-		//args = args[:2]
 	case MSG, MSY, MS:
 		switch inst.Op {
 		case MSG:
@@ -584,8 +522,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case MSY, MS:
 			op = "MULLW"
 		}
-		//args[1] = mem_operandx(args[1:])
-		//args = args[:2]
 	case A, AY, ALCG, ALG, AG:
 		switch inst.Op {
 		case A, AY:
@@ -597,8 +533,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case AG:
 			op = "ADD"
 		}
-		//args[1] = mem_operandx(args[1:])
-		//args = args[:2]
 	case RISBG, RISBGN, RISBHG, RISBLG, RNSBG, RXSBG, ROSBG:
 		switch inst.Op {
 		case RNSBG, RXSBG, ROSBG:
@@ -623,7 +557,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		} else {
 			args[0], args[1], args[2], args[3] = args[2], args[3], args[1], args[0]
 		}
-		return op + " " + strings.Join(args, ", ")
 
 	case VEC, VECL, VCLZ, VCTZ, VREPI, VPOPCT: //mnemonic V1, V2, M3
 		mask, err := strconv.Atoi(args[2][1:])
@@ -896,7 +829,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		args[0], args[1], args[2], args[3] = args[1], args[2], args[3], args[0]
 		args = args[:5]
 	case VL, VLREP:
-		//args[1] = mem_operandx(args[1:4]) // D(X,B)
 		switch inst.Op {
 		case VL:
 			args[0], args[1] = args[1], args[0]
@@ -912,13 +844,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			}
 		}
 	case VST, VSTEB, VSTEH, VSTEF, VSTEG, VLEB, VLEH, VLEF, VLEG: //Mnemonic V1, D2(X2,B2), M3
-		//args[1] = mem_operandx(args[1:4]) // D(X,B)
 		m, err := strconv.Atoi(args[2][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
-		//args[2] = args[4]
-		//args = args[:3]
 		switch inst.Op {
 		case VST:
 			if m == 0 || (m > 2 && m < 5) {
@@ -932,7 +861,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1], args[2] = args[2], args[0], args[1]
 		}
 	case VSTM, VSTL, VESL, VESRA, VLM, VERLL: //Mnemonic V1, V3, D2(B2)[,M4] or V1, R3,D2(B2)
-		//args[2] = mem_operand(args[2:4]) // D(B)
 		switch inst.Op {
 		case VSTM, VLM:
 			m, err := strconv.Atoi(args[3][1:])
@@ -1003,6 +931,8 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	return op
 }
 
+// This function returns corresponding extended mnemonic for the given
+// branch on relative mnemonic.
 func branch_relative_op(mask int, opconst Op) (op string, check bool) {
 	switch mask & 0xf {
 	case 2:
@@ -1036,6 +966,8 @@ func branch_relative_op(mask int, opconst Op) (op string, check bool) {
 	return op, check
 }
 
+// This function returns corresponding extended mnemonic for the given
+// brach on condition mnemonic.
 func branchOnConditionOp(mask int, opconst Op) (op string, check bool) {
 	switch mask & 0xf {
 	case 0:
@@ -1049,6 +981,7 @@ func branchOnConditionOp(mask int, opconst Op) (op string, check bool) {
 	return op, check
 }
 
+// This function returns corresponding plan9 mnemonic for the native bitwise mnemonic.
 func bitwise_op(op Op) string {
 	var ret string
 	switch op {
@@ -1068,7 +1001,8 @@ func bitwise_op(op Op) string {
 	return ret
 }
 
-func mem_operand(args []string) string { //D(B)
+// This function parses memory operand of type D(B)
+func mem_operand(args []string) string {
 	if args[0] != "" && args[1] != "" {
 		args[0] = fmt.Sprintf("%s(%s)", args[0], args[1])
 	} else if args[0] != "" {
@@ -1081,7 +1015,8 @@ func mem_operand(args []string) string { //D(B)
 	return args[0]
 }
 
-func mem_operandx(args []string) string { //D(X,B)
+// This function parses memory operand of type D(X,B)
+func mem_operandx(args []string) string {
 	if args[1] != "" && args[2] != "" {
 		args[1] = fmt.Sprintf("(%s, %s)", args[1], args[2])
 	} else if args[1] != "" {
@@ -1103,7 +1038,8 @@ func mem_operandx(args []string) string { //D(X,B)
 	return args[0]
 }
 
-func mem_operandv(args []string) string { //D(V,B)
+// This function parses memory operand of type D(V,B)
+func mem_operandv(args []string) string {
 	if args[1] != "" && args[2] != "" {
 		args[1] = fmt.Sprintf("(%s)(%s*1)", args[2], args[1])
 	} else if args[1] != "" {
@@ -1125,7 +1061,8 @@ func mem_operandv(args []string) string { //D(V,B)
 	return args[0]
 }
 
-func mem_operandl(args []string) (string, string) { //D(L,B)
+// This function parses memory operand of type D(L,B)
+func mem_operandl(args []string) (string, string) {
 	if args[0] != "" && args[2] != "" {
 		args[0] = fmt.Sprintf("%s(%s)", args[0], args[2])
 	} else if args[2] != "" {
@@ -1137,7 +1074,6 @@ func mem_operandl(args []string) (string, string) { //D(L,B)
 }
 
 // plan9Arg formats arg (which is the argIndex's arg in inst) according to Plan 9 rules.
-//
 // NOTE: because Plan9Syntax is the only caller of this func, and it receives a copy
 // of inst, it's ok to modify inst.Args here.
 func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg Arg) string {
@@ -1200,37 +1136,25 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 	return fmt.Sprintf("???(%v)", arg)
 }
 
-// Convert a general-purpose register to plan9 assembly format.
-func plan9gpr(r Reg) string {
-	regno := uint16(r) & 31
-	if regno == 31 {
-		return "ZR"
-	}
-	return fmt.Sprintf("R%d", regno)
-}
-
+// It checks any 2 args of given instructions to swap or not
 func reverseOperandOrder(op Op) bool {
 	switch op {
 	case LOCR:
 		return true
 	case LTEBR, LTDBR:
 		return true
-	case VLEIB, VLEIH, VLEIF, VLEIG, VSEL, VPERM:
-		return true
-	}
-	return false
-}
-func reverseOperand3(op Op) bool {
-	switch op {
-	case VLVGP:
+	case VLEIB, VLEIH, VLEIF, VLEIG, VPDI:
 		return true
 	}
 	return false
 }
 
-func reverseEndOperand(op Op) bool {
+// It checks whether to reverse all the args of given mnemonic or not
+func reverseAllOperands(op Op) bool {
 	switch op {
-	case VPDI:
+	case VLVGP: //3-operand list
+		return true
+	case VSEL, VPERM: //4-Operand list
 		return true
 	}
 	return false
