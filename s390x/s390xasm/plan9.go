@@ -57,12 +57,18 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				}
 				args = append(args, mem_operandv(temp))
 				i = i + 2
-			} else { //D(L,B)
+			} else if _, ok := inst.Args[i+1].(Len); ok { //D(L,B)
 				for j := 0; j < 3; j++ {
 					temp = append(temp, plan9Arg(&inst, pc, symname, inst.Args[i+j]))
 				}
 				ar1, ar2 := mem_operandl(temp)
 				args = append(args, ar1, ar2)
+				i = i + 2
+			} else { //D(R,B)
+				for j := 0; j < 3; j++ {
+					temp = append(temp, plan9Arg(&inst, pc, symname, inst.Args[i+j]))
+				}
+				args = append(args, mem_operandx(temp))
 				i = i + 2
 			}
 		default:
