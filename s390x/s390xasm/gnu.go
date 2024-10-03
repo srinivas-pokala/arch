@@ -681,7 +681,7 @@ func HandleExtndMnemonic(inst *Inst) string {
 	case "vac", "vaccc":
 		if uint8(inst.Args[4].(Mask)) == uint8(4) {
 			newOpStr = opString + vecInstrExtndMnics[4].ExtnOpStr
-			removeArg(inst, int8(3))
+			removeArg(inst, int8(4))
 		}
 
 	case "vceq", "vch", "vchl":
