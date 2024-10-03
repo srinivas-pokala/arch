@@ -643,20 +643,26 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			}
 		}
 
-	case VGFMA, VERIM: // Mnemonic V1, V2, V3, V4/I4, M5
+	case VGFMA, VERIM, VMAH, VMALH: // Mnemonic V1, V2, V3, V4/I4, M5
 		mask, err := strconv.Atoi(args[4][1:])
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
 		val := mask & 0x7
 		args = args[:4]
-		if val >= 0 && val < 4 {
+		var off int
+		switch inst.Op {
+		case VMAH, VMALH:
+			off = -1
+		}
+
+		if val >= 0 && val < (4+off) {
 			op = op + vectorSize[val]
 		} else {
 			return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
 		}
 		switch inst.Op {
-		case VGFMA:
+		case VGFMA, VMAH, VMALH:
 			args[0], args[1], args[2], args[3] = args[1], args[2], args[3], args[0]
 		default:
 			args[0], args[3] = args[3], args[0]
@@ -843,7 +849,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 		op = op + "Q"
 		args[0], args[1], args[2], args[3] = args[1], args[2], args[3], args[0]
-		args = args[:5]
+		args = args[:4]
 	case VL, VLREP:
 		switch inst.Op {
 		case VL:
