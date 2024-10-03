@@ -584,9 +584,14 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		switch inst.Op {
 		case VA, VS, VACC, VSCBI:
 			if val >= 0 && val < 5 {
+				if args[0] == args[2] {
+					args[0], args[1] = args[1], args[0]
+					args = args[:2]
+				} else {
+					args[0], args[1], args[2] = args[1], args[2], args[0]
+					args = args[:3]
+				}
 				op = op + vectorSize[val]
-				args[0], args[1], args[2] = args[1], args[2], args[0]
-				args = args[:3]
 			} else {
 				return fmt.Sprintf("Specefication exception is recognized for %q with mask value: %v \n", op, mask)
 			}
