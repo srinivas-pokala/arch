@@ -28,7 +28,7 @@ func (i Inst) String(pc uint64) string {
 	mnemonic := HandleExtndMnemonic(&i)
 	buf.WriteString(fmt.Sprintf("%s", mnemonic))
 	//for j, arg := range i.Args {
-	for j := 0; j< len(i.Args); j++ {
+	for j := 0; j < len(i.Args); j++ {
 		if i.Args[j] == nil {
 			break
 		}
@@ -46,18 +46,28 @@ func (i Inst) String(pc uint64) string {
 					buf.WriteString(",")
 				}
 			case Reg:
-				buf.WriteString(",")
+				if _, ok := i.Args[j-1].(Disp12); ok {
+					if str != "" {
+						buf.WriteString("(")
+					}
+				} else if _, ok := i.Args[j-1].(Disp20); ok {
+					if str != "" {
+						buf.WriteString("(")
+					}
+				} else {
+					buf.WriteString(",")
+				}
 			case Base:
 				if _, ok := i.Args[j-1].(VReg); ok {
 					buf.WriteString(",")
 				} else if _, ok := i.Args[j-1].(Reg); ok {
 					buf.WriteString(",")
 				} else if _, ok := i.Args[j-1].(Disp12); ok {
-					if str  != "" {
+					if str != "" {
 						buf.WriteString("(")
 					}
 				} else if _, ok := i.Args[j-1].(Disp20); ok {
-					if str  != "" {
+					if str != "" {
 						buf.WriteString("(")
 					}
 				} else if _, ok := i.Args[j-1].(Len); ok {
