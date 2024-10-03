@@ -1147,13 +1147,11 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 		if err != nil {
 			return fmt.Sprintf("plan9Arg: error in converting ParseUint:%s", err)
 		}
-		//off := int32(addr - pc)
 		off := int(addr - pc)
 		s, base := symname(addr)
 		if s != "" && addr == base {
 			return fmt.Sprintf("%s(SB)", s)
 		}
-		//off = off / 4
 		off = off / inst.Len
 		return fmt.Sprintf("%v(PC)", off)
 	case Imm, Sign8, Sign16, Sign32:
