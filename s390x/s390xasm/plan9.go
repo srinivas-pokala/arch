@@ -365,7 +365,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case 4:
 			op = "CMPBLT"
 			check = true
-		case 7:
+		case 6:
 			op = "CMPBNE"
 			check = true
 		case 8:
@@ -854,7 +854,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		switch inst.Op {
 		case VL:
 			args[0], args[1] = args[1], args[0]
-			args = args[:2]
 		case VLREP:
 			args[0], args[1] = args[1], args[0]
 			mask, err := strconv.Atoi(args[2][1:])
@@ -865,6 +864,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				op = op + vectorSize[mask]
 			}
 		}
+		args = args[:2]
 	case VST, VSTEB, VSTEH, VSTEF, VSTEG, VLEB, VLEH, VLEF, VLEG: //Mnemonic V1, D2(X2,B2), M3
 		m, err := strconv.Atoi(args[2][1:])
 		if err != nil {
@@ -1152,7 +1152,8 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 		if s != "" && addr == base {
 			return fmt.Sprintf("%s(SB)", s)
 		}
-		off = off / 4
+		//off = off / 4
+		off = off / inst.Len
 		return fmt.Sprintf("%v(PC)", off)
 	case Imm, Sign8, Sign16, Sign32:
 		numImm := arg.String(pc)
