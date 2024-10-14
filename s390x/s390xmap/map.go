@@ -273,7 +273,7 @@ func computeMaskValueReserved(args Args, text string) (mask, value, reserved uin
 }
 
 func Imm_signed_8bit_check(op string) bool {
-	imm_8 := []string{"ASI", "AGSI", "ALSI", "ALGSI", "CIB", "CGIB", "CIJ", "CGIJ"}
+	imm_8 := []string{"ASI", "AGSI", "ALSI", "ALGSI", "CIB", "CGIB", "CIJ", "CGIJ", "NI", "NIY"}
 	var ret bool
 	ret = false
 	for _, str := range imm_8 {
@@ -286,7 +286,7 @@ func Imm_signed_8bit_check(op string) bool {
 }
 
 func Imm_signed_16bit_check(op string) bool {
-	imm_16 := []string{"AHI", "AGHI", "ALHSIK", "ALGHSIK", "AHIK", "AGHIK", "LHI", "LGHI", "MVGHI", "CIT", "CGIT", "CGHI", "CGHSI", "CHHSI", "CHI", "CHSI", "CRJ", "CGRJ", "VLEIB", "VLEIH", "VLEIF", "VLEIG"}
+	imm_16 := []string{"AHI", "AGHI", "ALHSIK", "ALGHSIK", "AHIK", "AGHIK", "LHI", "LGHI", "MVGHI", "CIT", "CGIT", "CGHI", "CGHSI", "CHHSI", "CHI", "CHSI", "CRJ", "CGRJ", "NIHH", "NIHL", "NILH", "NILL", "VLEIB", "VLEIH", "VLEIF", "VLEIG"}
 	var ret bool
 	ret = false
 	for _, str := range imm_16 {
@@ -299,7 +299,7 @@ func Imm_signed_16bit_check(op string) bool {
 }
 
 func Imm_signed_32bit_check(op string) bool {
-	imm_32 := []string{"AFI", "AGFI", "AIH", "CIH", "CFI", "CGFI", "CRL", "STRL", "STGRL"}
+	imm_32 := []string{"AFI", "AGFI", "AIH", "CIH", "CFI", "CGFI", "CRL", "STRL", "STGRL", "LGFI", "LLIHF", "MSFI", "MSGFI", "MGHI", "MHI", "NIHF", "NILF"}
 	var ret bool
 	ret = false
 	for _, str := range imm_32 {

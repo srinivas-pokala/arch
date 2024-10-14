@@ -163,12 +163,20 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case STM, STMY:
 			op = "STMY"
 		}
-	case ST, STY, STG:
+	case ST, STY, STG, STHY, STCY, STRVG, STRV:
 		switch inst.Op {
 		case ST, STY:
 			op = "MOVW"
+		case STHY:
+			op = "MOVH"
+		case STCY:
+			op = "MOVB"
 		case STG:
 			op = "MOVD"
+		case STRVG:
+			op = "MOVDBR"
+		case STRV:
+			op = "MOVWBR"
 		}
 	case LGR, LGFR, LGHR, LGBR, LLGFR, LLGHR, LLGCR, LRVGR, LRVR, LDR:
 		switch inst.Op {
@@ -209,7 +217,22 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 
 	case LGHI, LLILH, LLIHL, LLIHH, LGFI, LLILF, LLIHF:
-		op = "MOVD"
+		switch inst.Op {
+		case LGFI:
+			op = "MOVW"
+		case LGHI:
+			num, err := strconv.ParseInt(args[1][1:], 10, 16)
+			if err != nil {
+				return fmt.Sprintf("plan9Arg: error in converting ParseInt:%s", err)
+			}
+			if num == int64(int8(num)) {
+				op = "MOVB"
+			} else {
+				op = "MOVH"
+			}
+		default:
+			op = "MOVD"
+		}
 		args[0], args[1] = args[1], args[0]
 	case ARK, AGRK, ALGRK:
 		switch inst.Op {
@@ -227,19 +250,42 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			args[0], args[1], args[2] = args[2], args[1], args[0]
 		}
 	case AGHIK, AHIK, ALGHSIK:
+		num, err := strconv.ParseInt(args[2][1:], 10, 32)
+		if err != nil {
+			return fmt.Sprintf("plan9Arg: error in converting ParseInt:%s", err)
+		}
 		switch inst.Op {
 		case AGHIK:
-			op = "ADD"
+			if num < 0 {
+				op = "SUB"
+				args[2] = args[2][:1] + args[2][2:]
+			} else {
+				op = "ADD"
+			}
 		case AHIK:
 			op = "ADDW"
 		case ALGHSIK:
-			op = "ADDC"
+			if num < 0 {
+				op = "SUBC"
+				args[2] = args[2][:1] + args[2][2:]
+			} else {
+				op = "ADDC"
+			}
 		}
 		args[0], args[1], args[2] = args[2], args[1], args[0]
 	case AGHI, AHI, AGFI, AFI, AR, ALCGR:
+		num, err := strconv.ParseInt(args[1][1:], 10, 32)
+		if err != nil {
+			return fmt.Sprintf("plan9Arg: error in converting ParseInt:%s", err)
+		}
 		switch inst.Op {
 		case AGHI, AGFI:
-			op = "ADD"
+			if num < 0 {
+				op = "SUB"
+				args[1] = args[1][:1] + args[1][2:]
+			} else {
+				op = "ADD"
+			}
 		case AHI, AFI, AR:
 			op = "ADDW"
 		case ALCGR:
@@ -318,6 +364,12 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 	case NGR, NR, NILL, NILF, NILH, OGR, OR, OILL, OILF, OILH, XGR, XR, XILF:
 		op = bitwise_op(inst.Op)
 		args[0], args[1] = args[1], args[0]
+		switch inst.Op {
+		case NILF:
+			if int(inst.Args[1].(Sign32)) < 0 {
+				op = "AND"
+			}
+		}
 
 	case NGRK, NRK, OGRK, ORK, XGRK, XRK: // opcode R1, R2, R3
 		op = bitwise_op(inst.Op)
@@ -466,7 +518,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = "MOVDNE"
 			check = true
 		case 8: // Equal (M=8)
-			op = "MODEQ"
+			op = "MOVDEQ"
 			check = true
 		case 10: // Greaterthan or Equal (M=10)
 			op = "MOVDGE"
@@ -538,6 +590,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case AG:
 			op = "ADD"
 		}
+		args[0], args[1] = args[1], args[0]
 	case RISBG, RISBGN, RISBHG, RISBLG, RNSBG, RXSBG, ROSBG:
 		switch inst.Op {
 		case RNSBG, RXSBG, ROSBG:
@@ -1019,9 +1072,9 @@ func branchOnConditionOp(mask int, opconst Op) (op string, check bool) {
 func bitwise_op(op Op) string {
 	var ret string
 	switch op {
-	case NGR, NGRK, NILL, NILF:
+	case NGR, NGRK:
 		ret = "AND"
-	case NR, NRK, NILH:
+	case NR, NRK, NILH, NILF, NILL:
 		ret = "ANDW"
 	case OGR, OGRK, OILL, OILF:
 		ret = "OR"
@@ -1162,6 +1215,26 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 		return fmt.Sprintf("%v(PC)", off)
 	case Imm, Sign8, Sign16, Sign32:
 		numImm := arg.String(pc)
+		switch arg.(type) {
+		case Sign32, Sign16:
+			//fmt.Printf("Sree-start:%s \n", numImm)
+			num, err := strconv.ParseInt(numImm, 10, 64)
+			if err != nil {
+				return fmt.Sprintf("plan9Arg: error in converting ParseInt:%s", err)
+			}
+			switch inst.Op {
+			case LLIHF:
+				num = num << 32
+			case LLILH:
+				num = num << 16
+			case NILH, OILH:
+				fmt.Printf("before:%v: %v \n", inst.Op, num)
+				num = (num << 16) | int64(0xFFFF)
+				fmt.Printf("After:%v: %v \n", inst.Op, num)
+			}
+			numImm = fmt.Sprintf("%d", num)
+			//fmt.Printf("Sree-end:%s \n", numImm)
+		}
 		return fmt.Sprintf("$%s", numImm)
 	case Mask, Len:
 		num := arg.String(pc)
@@ -1173,7 +1246,7 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 // It checks any 2 args of given instructions to swap or not
 func reverseOperandOrder(op Op) bool {
 	switch op {
-	case LOCR:
+	case LOCR, MLGR:
 		return true
 	case LTEBR, LTDBR:
 		return true
