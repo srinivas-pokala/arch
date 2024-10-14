@@ -365,6 +365,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		op = bitwise_op(inst.Op)
 		args[0], args[1] = args[1], args[0]
 		switch inst.Op {
+		/*	case NILL:
+			if int32(inst.Args[0].(Sign16)&0xffff0000) == 0xffff0000 {
+				op = "ANDW"
+			}*/
 		case NILF:
 			if int(inst.Args[1].(Sign32)) < 0 {
 				op = "AND"
@@ -1228,9 +1232,7 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 			case LLILH:
 				num = num << 16
 			case NILH, OILH:
-				fmt.Printf("before:%v: %v \n", inst.Op, num)
 				num = (num << 16) | int64(0xFFFF)
-				fmt.Printf("After:%v: %v \n", inst.Op, num)
 			}
 			numImm = fmt.Sprintf("%d", num)
 			//fmt.Printf("Sree-end:%s \n", numImm)

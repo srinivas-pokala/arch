@@ -81,7 +81,7 @@ c21080000000|	plan9	MULLD $-2147483648, R1
 
     b9800021|	plan9	AND R1, R2
     b9e42031|	plan9	AND R1, R2, R3
-    a517fffe|	plan9	AND $-2, R1
+    a517ffff|	plan9	ANDW $-1, R1
 c01bffff0000|	plan9	AND $-65536, R1
         1421|	plan9	ANDW R1, R2
     b9f42031|	plan9	ANDW R1, R2, R3
