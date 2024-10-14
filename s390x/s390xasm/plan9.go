@@ -365,10 +365,11 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		op = bitwise_op(inst.Op)
 		args[0], args[1] = args[1], args[0]
 		switch inst.Op {
-		/*	case NILL:
-			if int32(inst.Args[0].(Sign16)&0xffff0000) == 0xffff0000 {
+		case NILL:
+			if int(inst.Args[1].(Sign16)) < 0 {
 				op = "ANDW"
-			}*/
+			}
+
 		case NILF:
 			if int(inst.Args[1].(Sign32)) < 0 {
 				op = "AND"
@@ -1076,13 +1077,13 @@ func branchOnConditionOp(mask int, opconst Op) (op string, check bool) {
 func bitwise_op(op Op) string {
 	var ret string
 	switch op {
-	case NGR, NGRK:
+	case NGR, NGRK, NILL:
 		ret = "AND"
-	case NR, NRK, NILH, NILF, NILL:
+	case NR, NRK, NILH, NILF:
 		ret = "ANDW"
-	case OGR, OGRK, OILL, OILF:
+	case OGR, OGRK:
 		ret = "OR"
-	case OR, ORK, OILH:
+	case OR, ORK, OILH, OILF, OILL:
 		ret = "ORW"
 	case XGR, XGRK, XILF:
 		ret = "XOR"
@@ -1220,8 +1221,7 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 	case Imm, Sign8, Sign16, Sign32:
 		numImm := arg.String(pc)
 		switch arg.(type) {
-		case Sign32, Sign16:
-			//fmt.Printf("Sree-start:%s \n", numImm)
+		case Sign32, Sign16, Imm:
 			num, err := strconv.ParseInt(numImm, 10, 64)
 			if err != nil {
 				return fmt.Sprintf("plan9Arg: error in converting ParseInt:%s", err)
@@ -1231,11 +1231,12 @@ func plan9Arg(inst *Inst, pc uint64, symname func(uint64) (string, uint64), arg 
 				num = num << 32
 			case LLILH:
 				num = num << 16
-			case NILH, OILH:
+			case NILH:
 				num = (num << 16) | int64(0xFFFF)
+			case OILH:
+				num = num << 16
 			}
 			numImm = fmt.Sprintf("%d", num)
-			//fmt.Printf("Sree-end:%s \n", numImm)
 		}
 		return fmt.Sprintf("$%s", numImm)
 	case Mask, Len:
