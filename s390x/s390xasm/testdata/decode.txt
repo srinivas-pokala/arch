@@ -18,7 +18,6 @@ e3201000000a|	plan9	ADDC (R1), R2
     5a807fff|	plan9	ADDW 4095(R7), R8
     b9f23012|	plan9	LOCR $3, R2, R1
     b9e27065|	plan9	MOVDNE R5, R6
-
 e310f0000004|	plan9	MOVD (R15), R1
 e320f0000014|	plan9	MOVW (R15), R2
 e330f0000015|	plan9	MOVH (R15), R3
@@ -28,15 +27,12 @@ e360f0000091|	plan9	MOVHZ (R15), R6
 e370f0000090|	plan9	MOVBZ (R15), R7
 e380f000000f|	plan9	MOVDBR (R15), R8
 e390f000001e|	plan9	MOVWBR (R15), R9
-
 e310fff8ff24|	plan9	MOVD R1, -8(R15)
 e320fff8ff50|	plan9	MOVW R2, -8(R15)
 e330fff8ff70|	plan9	MOVH R3, -8(R15)
 e340fff8ff72|	plan9	MOVB R4, -8(R15)
 e350fff8ff2f|	plan9	MOVDBR R5, -8(R15)
 e360fff8ff3e|	plan9	MOVWBR R6, -8(R15)
-
-
 c01efffffffe|	plan9	MOVD $-8589934592, R1
 c021fffe0000|	plan9	MOVW $-131072, R2	
     a739fe00|	plan9	MOVH $-512, R3
@@ -89,6 +85,24 @@ c01b00000001|	plan9	ANDW $1, R1
     a5160001|	plan9	ANDW $131071, R1
 c01b00010000|	plan9	ANDW $65536, R1
     a517fffe|	plan9	ANDW $-2, R1
-    a517000f|	plan9	ANDW $15, R1
-
-
+    a517000f|	plan9	AND $15, R1
+    b9810021|	plan9	OR R1, R2
+    b9e62031|	plan9	OR R1, R2, R3
+    a51a0001|	plan9	ORW $65536, R1
+    a51bffff|	plan9	ORW $65535, R1
+    a51b0001|	plan9	ORW $1, R1
+        1621|	plan9	ORW R1, R2
+c01d0001ffff|	plan9	OR $131071, R1
+c01dffffffff|	plan9	ORW $-1, R1
+    b9f62031|	plan9	ORW R1, R2, R3
+    b9820021|	plan9	XOR R1, R2
+    b9e72031|	plan9	XOR R1, R2, R3
+c01700000001|	plan9	XOR $1, R1
+c0170001ffff|	plan9	XOR $131071, R1
+c01700010000|	plan9	XOR $65536, R1
+        1721|	plan9	XORW R1, R2
+    b9f72031|	plan9	XORW R1, R2, R3
+c017fffffffe|	plan9	XORW $-2, R1
+e32010000080|	plan9	AND (R1), R2
+    54201000|	plan9	ANDW (R1), R2
+e32010000154|	plan9	ANDW 4096(R1), R2

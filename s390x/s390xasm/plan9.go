@@ -378,6 +378,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			if int(inst.Args[1].(Sign32)) < 0 {
 				op = "ORW"
 			}
+		case XILF:
+			if int(inst.Args[1].(Sign32)) < 0 {
+				op = "XORW"
+			}
 		}
 
 	case NGRK, NRK, OGRK, ORK, XGRK, XRK: // opcode R1, R2, R3
@@ -555,7 +559,6 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		}
 	case XC, NC, OC, MVC, MVCIN, CLC: //D(L,B)
 		args[0], args[1] = args[1], args[0]
-		return op + " " + strings.Join(args, ", ")
 	case O, OY, OG:
 		switch inst.Op {
 		case O, OY:
@@ -570,6 +573,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case NG:
 			op = "AND"
 		}
+		args[0], args[1] = args[1], args[0]
 	case S, SY, SLBG, SLG, SG:
 		switch inst.Op {
 		case S, SY:

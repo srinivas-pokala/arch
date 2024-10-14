@@ -299,7 +299,7 @@ func Imm_signed_16bit_check(op string) bool {
 }
 
 func Imm_signed_32bit_check(op string) bool {
-	imm_32 := []string{"AFI", "AGFI", "AIH", "CIH", "CFI", "CGFI", "CRL", "STRL", "STGRL", "LGFI", "LLIHF", "MSFI", "MSGFI", "MGHI", "MHI", "NIHF", "NILF", "OILF"}
+	imm_32 := []string{"AFI", "AGFI", "AIH", "CIH", "CFI", "CGFI", "CRL", "STRL", "STGRL", "LGFI", "LLIHF", "MSFI", "MSGFI", "MGHI", "MHI", "NIHF", "NILF", "OILF", "XILF"}
 	var ret bool
 	ret = false
 	for _, str := range imm_32 {

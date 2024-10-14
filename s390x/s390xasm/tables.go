@@ -3345,7 +3345,7 @@ var instFormats = [...]instFormat{
 	{XIHF, 0xff0f000000000000, 0xc006000000000000, 0x0, "RIL-a", // EXCLUSIVE OR IMMEDIATE (high) (XIHF R1,I2)
 		[8]*argField{ap_Reg_8_11, ap_ImmUnsigned_16_47}},
 	{XILF, 0xff0f000000000000, 0xc007000000000000, 0x0, "RIL-a", // EXCLUSIVE OR IMMEDIATE (low) (XILF R1,I2)
-		[8]*argField{ap_Reg_8_11, ap_ImmUnsigned_16_47}},
+		[8]*argField{ap_Reg_8_11, ap_ImmSigned32_16_47}},
 	{EX, 0xff00000000000000, 0x4400000000000000, 0x0, "RX-a", // EXECUTE (EX R1,D2(X2,B2))
 		[8]*argField{ap_Reg_8_11, ap_DispUnsigned_20_31, ap_IndexReg_12_15, ap_BaseReg_16_19}},
 	{EXRL, 0xff0f000000000000, 0xc600000000000000, 0x0, "RIL-b", // EXECUTE RELATIVE LONG (EXRL R1,RI2)
