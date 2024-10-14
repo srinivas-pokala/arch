@@ -13,9 +13,6 @@
     b9e2c076|	plan9	MOVDLE R6, R7
     b9e24098|	plan9	MOVDLT R8, R9
     b9e270ba|	plan9	MOVDNE R10, R11
-e3201000000a|	plan9	ADDC (R1), R2
-    5a605000|	plan9	ADDW (R5), R6
-    5a807fff|	plan9	ADDW 4095(R7), R8
     b9f23012|	plan9	LOCR $3, R2, R1
     b9e27065|	plan9	MOVDNE R5, R6
 e310f0000004|	plan9	MOVD (R15), R1
@@ -53,6 +50,12 @@ ec21ffff00db|	plan9	SUBC $1, R1, R2
     a71a2000|	plan9	ADDW $8192, R1
 ec21200000d8|	plan9	ADDW $8192, R1, R2
     b9880021|	plan9	ADDE R1, R2
+e3201000000a|	plan9	ADDC (R1), R2
+    5a605000|	plan9	ADDW (R5), R6
+    5a807fff|	plan9	ADDW 4095(R7), R8
+e3201fffff5a|	plan9	ADDW -1(R1), R2
+e34030000188|	plan9	ADDE 4096(R3), R4
+e34230000188|	plan9	ADDE 4096(R3)(R2*1), R4
     b9090043|	plan9	SUB R3, R4
     b9e93054|	plan9	SUB R3, R4, R5
     a73be000|	plan9	SUB $8192, R3
@@ -63,6 +66,10 @@ ec43ffff00db|	plan9	SUBC $1, R3, R4
         1b43|	plan9	SUBW R3, R4
     b9f93054|	plan9	SUBW R3, R4, R5
 c21500002000|	plan9	SUBW $8192, R1
+e320400f0089|	plan9	SUBE 15(R4), R2
+e32040080009|	plan9	SUB 8(R4), R2
+    5b204000|	plan9	SUBW (R4), R2
+e3204fffff5b|	plan9	SUBW -1(R4), R2
     b91c0076|	plan9	MULLW R6, R7
     a76c2000|	plan9	MULLW $8192, R6
 c2810000000f|	plan9	MULLW $15, R8
@@ -86,6 +93,9 @@ c01b00000001|	plan9	ANDW $1, R1
 c01b00010000|	plan9	ANDW $65536, R1
     a517fffe|	plan9	ANDW $-2, R1
     a517000f|	plan9	AND $15, R1
+e32010000080|	plan9	AND (R1), R2
+    54201000|	plan9	ANDW (R1), R2
+e32010000154|	plan9	ANDW 4096(R1), R2
     b9810021|	plan9	OR R1, R2
     b9e62031|	plan9	OR R1, R2, R3
     a51a0001|	plan9	ORW $65536, R1
@@ -95,6 +105,9 @@ c01b00010000|	plan9	ANDW $65536, R1
 c01d0001ffff|	plan9	OR $131071, R1
 c01dffffffff|	plan9	ORW $-1, R1
     b9f62031|	plan9	ORW R1, R2, R3
+e32010000081|	plan9	OR (R1), R2
+    56201000|	plan9	ORW (R1), R2
+e3201fffff56|	plan9	ORW -1(R1), R2
     b9820021|	plan9	XOR R1, R2
     b9e72031|	plan9	XOR R1, R2, R3
 c01700000001|	plan9	XOR $1, R1
@@ -103,6 +116,13 @@ c01700010000|	plan9	XOR $65536, R1
         1721|	plan9	XORW R1, R2
     b9f72031|	plan9	XORW R1, R2, R3
 c017fffffffe|	plan9	XORW $-2, R1
-e32010000080|	plan9	AND (R1), R2
-    54201000|	plan9	ANDW (R1), R2
-e32010000154|	plan9	ANDW 4096(R1), R2
+
+
+
+
+e7824000608a|	plan9	VSTRCB V2, V4, V6, V8
+e7824100608a|	plan9	VSTRCH V2, V4, V6, V8
+e7824200608a|	plan9	VSTRCF V2, V4, V6, V8
+e7824010608a|	plan9	VSTRCBS V2, V4, V6, V8
+e7824110608a|	plan9	VSTRCHS V2, V4, V6, V8
+e7824210608a|	plan9	VSTRCFS V2, V4, V6, V8

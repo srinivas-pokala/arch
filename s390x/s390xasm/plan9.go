@@ -557,21 +557,16 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case XG:
 			op = "XOR"
 		}
-	case XC, NC, OC, MVC, MVCIN, CLC: //D(L,B)
-		args[0], args[1] = args[1], args[0]
-	case O, OY, OG:
-		switch inst.Op {
-		case O, OY:
-			op = "ORW"
-		case OG:
-			op = "OR"
-		}
-	case N, NY, NG:
+	case N, NY, NG, O, OY, OG, XC, NC, OC, MVC, MVCIN, CLC:
 		switch inst.Op {
 		case N, NY:
 			op = "ANDW"
 		case NG:
 			op = "AND"
+		case O, OY:
+			op = "ORW"
+		case OG:
+			op = "OR"
 		}
 		args[0], args[1] = args[1], args[0]
 	case S, SY, SLBG, SLG, SG:
@@ -585,6 +580,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		case SG:
 			op = "SUB"
 		}
+		args[0], args[1] = args[1], args[0]
 	case MSG, MSY, MS:
 		switch inst.Op {
 		case MSG:
@@ -1118,7 +1114,7 @@ func mem_operand(args []string) string {
 // This function parses memory operand of type D(X,B)
 func mem_operandx(args []string) string {
 	if args[1] != "" && args[2] != "" {
-		args[1] = fmt.Sprintf("(%s, %s)", args[1], args[2])
+		args[1] = fmt.Sprintf("(%s)(%s*1)", args[2], args[1])
 	} else if args[1] != "" {
 		args[1] = fmt.Sprintf("(%s)", args[1])
 	} else if args[2] != "" {
