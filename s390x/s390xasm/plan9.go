@@ -375,7 +375,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				op = "AND"
 			}
 		case OILF:
-			if int(inst.Args[1].(Imm)) < 0 {
+			if int(inst.Args[1].(Sign32)) < 0 {
 				op = "ORW"
 			}
 		}

@@ -4115,7 +4115,7 @@ var instFormats = [...]instFormat{
 	{OILL, 0xff0f000000000000, 0xa50b000000000000, 0x0, "RI-a", // OR IMMEDIATE (low low) (OILL R1,I2)
 		[8]*argField{ap_Reg_8_11, ap_ImmUnsigned_16_31}},
 	{OILF, 0xff0f000000000000, 0xc00d000000000000, 0x0, "RIL-a", // OR IMMEDIATE (low) (OILF R1,I2)
-		[8]*argField{ap_Reg_8_11, ap_ImmUnsigned_16_47}},
+		[8]*argField{ap_Reg_8_11, ap_ImmSigned32_16_47}},
 	{OCRK, 0xffff000000000000, 0xb975000000000000, 0xf0000000000, "RRF-a", // OR WITH COMPLEMENT (32) (OCRK R1,R2,R3)
 		[8]*argField{ap_Reg_24_27, ap_Reg_28_31, ap_Reg_16_19}},
 	{OCGRK, 0xffff000000000000, 0xb965000000000000, 0xf0000000000, "RRF-a", // OR WITH COMPLEMENT (64) (OCGRK R1,R2,R3)
