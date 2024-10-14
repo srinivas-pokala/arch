@@ -374,6 +374,10 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			if int(inst.Args[1].(Sign32)) < 0 {
 				op = "AND"
 			}
+		case OILF:
+			if int(inst.Args[1].(Sign32)) < 0 {
+				op = "ORW"
+			}
 		}
 
 	case NGRK, NRK, OGRK, ORK, XGRK, XRK: // opcode R1, R2, R3
@@ -1081,9 +1085,9 @@ func bitwise_op(op Op) string {
 		ret = "AND"
 	case NR, NRK, NILH, NILF:
 		ret = "ANDW"
-	case OGR, OGRK:
+	case OGR, OGRK, OILF:
 		ret = "OR"
-	case OR, ORK, OILH, OILF, OILL:
+	case OR, ORK, OILH, OILL:
 		ret = "ORW"
 	case XGR, XGRK, XILF:
 		ret = "XOR"
