@@ -15,7 +15,6 @@ type Inst struct {
 	Enc        uint64 // Raw encoding bits
 	Len        int    // Length of encoding in bytes.
 	Args       Args   // Instruction arguments, in s390x ISA manual order.
-	FormatType string // Instruction format type ex: RR,RRE,RXY etc
 }
 
 func (i Inst) String(pc uint64) string {
@@ -89,7 +88,6 @@ func (i Inst) String(pc uint64) string {
 				buf.WriteString(",")
 			}
 		}
-		//buf.WriteString(arg.String(pc))
 		buf.WriteString(str)
 		if rxb_check && i.Args[j+2] == nil {
 			break
