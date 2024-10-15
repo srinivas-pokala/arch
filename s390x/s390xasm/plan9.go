@@ -94,7 +94,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			if reverseOperandOrder(inst.Op) {
 				args[0], args[2] = args[2], args[0]
 			} else if reverseAllOperands(inst.Op) {
-				args[0], args[1], args[2] = args[2], args[0], args[1]
+				args[0], args[1], args[2] = args[1], args[2], args[0]
 			}
 		case 4:
 			if reverseOperandOrder(inst.Op) {
@@ -508,7 +508,7 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 			op = opStr
 		}
 		if op == "SYNC" || op == "NOPH" {
-			args = args[:0]
+			return op
 		}
 		if check {
 			args[0] = args[1]
@@ -655,6 +655,14 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 				if args[0] == args[2] {
 					args[0], args[1] = args[1], args[0]
 					args = args[:2]
+				} else if inst.Op == VS {
+					if args[0] == args[1] {
+						args[0] = args[2]
+						args = args[:2]
+					} else {
+						args[0], args[2] = args[2], args[0]
+						args = args[:3]
+					}
 				} else {
 					args[0], args[1], args[2] = args[1], args[2], args[0]
 					args = args[:3]
